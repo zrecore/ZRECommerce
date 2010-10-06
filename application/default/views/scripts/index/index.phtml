@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * Default home page view
+ *  
+ * @author A.Albino - copyright 2008 A.Albino
+ * @license GPL v3
+ * @version $Id$
+ */
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+
+if (isset($vars['content'])) echo $vars['content'];
+
+?>
+<?php
+
+	/**
+	 * Grab our article data. retrieve articles from the root category,
+	 * and only grab published articles. We dont care about the resource
+	 * type here.
+	 * 
+	 */
+	$articles = new Zre_Dataset_Article();
+	$articleData = $articles->listAll(null, array('order' => 'date_created DESC'), true);
+//	$readArticle = new Zre_Ui_Datagrid_Read(1, 'yes', 'home');
+//	
+//	$articleData = $readArticle->getData();
+	$totalArticles = count($articleData);
+	
+	foreach($articleData as $index => $article) {
+		
+		// ...Grab our article properties
+		$articleId 			= $article['article_id'];
+		$articleContainerId = $article['article_container_id'];
+		$articleResource 	= $article['resource'];
+		$articlePublished 	= $article['published'];
+		$articleTitle 		= $article['title'];
+		$articleDescription = $article['description'];
+		$articleDateCreated  = new Zend_Date( $article['date_created'] );
+		$articleDateModified = new Zend_Date( $article['date_modified'] );
+		$articleImage 		= $article['image'] == '' ? '/images/dummy.png' : $article['image'];
+		
+//		$articleDescription = html_entity_decode($articleDescription, ENT_QUOTES);
+
+		$articleDescription = str_replace(array('{', '}'), array('<', ' />'), $articleDescription);
+		
+		// ...And display however we want.
+?>
+		<div class="articleContainer">
+			<table cellspacing="0" cellpadding="0" border="0" class="articleContainerInner">
+				
+				<tr>
+					<td class="articleImageCell">
+						<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>" class="articleImageAnchor"><img src="<?php echo $articleImage; ?>" alt="<?php echo $articleTitle; ?>" class="articleImage" /></a>
+					</td>
+					
+					<td class="articleText">
+						<h2 class="articleTitle"><a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>">
+							<?php echo $articleTitle; ?>
+						</a></h2>
+						<div class="articleSubHeader"><?php echo $t->_('Summary'); ?></div>
+						<div class="articleDescription">
+						<?php echo Plugin::search_and_insert($articleDescription); ?>&nbsp;<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>"><?php echo $t->_('...more'); ?></a>
+						</div>
+						<div class="articleFooter"><?php echo $t->_('Written on ') . $articleDateCreated->getArpa(); ?></div>
+					</td>
+				</tr>
+			</table>
+		</div>
+<?php 
+	}
+?>

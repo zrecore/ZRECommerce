@@ -1,0 +1,164 @@
+#header-layout
+	{ height: 188px; 
+	  background-repeat: no-repeat; 
+	  background-image: url('/styles/redCarpet/components/header/header.png');
+	  background-position: 0px -16px;
+	  position: relative;
+	  margin: 0px; padding: 0px; margin-top: 24px;
+	  top: -12px; }
+#header-layout h1
+	{ display: none; position: absolute; }
+
+#main-menu-bar
+{
+	width: 100%;
+	display: relative;
+}
+.menu
+{ 	
+	position: relative; 
+	margin-top: 2%; }
+
+.menuItem
+{	padding-top: 10px;
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+	
+	width: 78px; 
+	height: 25px; }
+
+.menuItem:hover
+{ background-image: url('/styles/redCarpet/components/menu.selected.png'); }
+
+.menuItemSelected
+{	padding-top: 10px;
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+	background-image: url('/styles/redCarpet/components/menu.selected.png');
+	width: 78px; 
+	height: 25px; }
+
+#mnuAdmin, #mnuMainShop
+{
+	display: block;
+	margin: auto;
+	margin-right: 6%;
+	
+	width: 90%;
+	height: 20px;
+	text-align: right;
+
+	color: #000000;
+}
+
+#mnuAdmin a, #mnuMainShop a
+{
+	color: #852b24;
+	font-size: 1.2em;
+	text-decoration: none;
+}
+#mnuAdmin a:hover, #mnuMainShop a:hover
+{
+	color: #d81c1c;
+	text-decoration: none;
+}
+	
+#mnuHome:hover
+{ background-image: url('/styles/redCarpet/components/menu.selected.png'); }
+
+#viewCartButton
+{ 	padding-left: 24px;
+	background-image: url('/styles/redCarpet/components/tag.icon.png');
+	background-repeat: no-repeat;
+	background-position: 0px 3px;
+	position: relative;
+	width: 130px;
+	height: 20px;
+	float: right;
+	margin: auto;
+	margin-top: 80px;
+	margin-right: 64px;
+	text-align: left; }
+	
+	#viewCartButton a
+	{ color: #808080; font-weight: normal; font-size: 1.2em; text-decoration: none;}
+	#viewCartButton a .viewCartAmount 
+	{ color: #cc0000; font-weight: normal; font-size: 0.6em; text-decoration: none; }
+
+#menuBreadCrumb
+{ 	margin: auto;
+	left: 52px;
+	margin-top: 132px;
+	position: absolute;
+	float: left;
+	font-size: 1.4em;
+	font-weight: bold;
+	display: inline;
+	white-space: nowrap;
+}
+#menuBreadCrumb ul .first 
+{ 	background-image: url('/styles/redCarpet/components/pic.icon.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+	padding-left: 24px; }
+
+#menuBreadCrumb ul, #menuBreadCrumb ul li
+{ display: inline; position: relative; margin: 0px; padding: 0px; }
+
+#menuBreadCrumb ul li:after 
+{ content: " > "; font-weight: normal; color: #a0a0a0; }
+
+#menuBreadCrumb ul li a
+{ 	text-decoration: none;
+	text-transform: capitalize;
+	color: #404040; }
+	
+#menuBreadCrumb ul li a:hover
+{ 	color: #600000; }
+
+#main-menu-buttons
+{
+	margin: auto;
+	left: 5%;
+	top: 72px;
+	text-align: right;
+	position: absolute;
+}
+#main-menu-buttons a, #main-menu-buttons a img
+{
+	display: table-cell;
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+}
+
+#searchBarMain
+{ 	float: left;
+	margin: auto; 
+	position: relative;
+	margin-left: 48px;
+	top: -16px;
+	background-image: url('/styles/redCarpet/components/searchbar.background.png');
+	background-repeat: no-repeat;
+	background-position: 11px 0px;
+	width: 146px; }
+
+#searchBarMain #searchTextBox
+{ 	border: none;
+	margin: 0px;
+	margin-left: 12px;
+	margin-top: 3px;
+	padding: 0px; 
+	float: left; 
+	width: 90px; 
+	height: 18px;
+	background-image: url('/styles/redCarpet/components/searchbar.background.png');
+	background-repeat: no-repeat;
+	background-position: -4px -4px;
+}
+	
+#searchBarMain #searchButtonSubmit
+{ border: none; margin: 0; padding: 0; float: right; }

@@ -1,0 +1,199 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Layout
+ * @category Default
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+/**
+ * This script contains cache settings, ob_start() and ob_get_clean(), and an echo statement at the bottom.
+ * Assign 'disable_cache' a value of 1 to disable caching in any controller(s) you wish.
+ */
+$vars = $this->getVars();
+
+$save_output = null;
+/**
+ * Grab our template default settings
+ */
+$settings = Zre_Config::getSettingsCached();
+
+$isHttps = $_SERVER['SERVER_PORT'] == $settings->site->ssl_port ? true : false;
+
+if (empty($vars['template_name'])) $vars['template_name'] = $settings->site->template;
+
+/**
+ * Default Layout
+ * 
+ * Edit the content in the components sub-folder as you need.
+ * Use CSS to change backgrounds, colors, fonts, etc... 
+ * 
+ * CSS stylesheets can be found in /public/styles/[template_name]
+ * where [template_name] defaults to "default".
+ * 		 
+ * Notice how layout elements, such as div tags, are given
+ * id attributes. This is to allow you to manipulate fonts,
+ * colors, and placement using CSS. 
+ * 
+ * Please keep it that way. :)
+ *  
+ * @author 		A.Albino
+ * @version 	$id$
+ * @link 		http://www.alexventure.com
+ */
+	
+	// Import our style sheet.
+	
+	$template_name = (isset($vars['template_name']))?
+						$vars['template_name']:
+						'default';
+						
+	$jquery_ui_theme = $settings->site->jqueryui_theme;
+	
+	$style_sheet_content = '';
+	$style_sheets = array(
+		"styles/reset.css", 
+		"styles/$template_name/default.css",
+		"styles/$template_name/components/left-column/default.css",
+		"styles/$template_name/components/content/default.css",
+		"styles/$template_name/components/footer/default.css",
+		"styles/$template_name/components/header/default.css",
+		"styles/$template_name/components/right-column/default.css"
+	);
+	
+	$jqueryUiCss = ($isHttps ? 'https' : 'http') . "://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/$jquery_ui_theme/jquery-ui.css";
+	
+	if (isset($vars['extra_css'])) {
+		foreach($vars['extra_css'] as $css) {
+			$style_sheets[] = $css;
+		}
+	}
+	
+	foreach ($style_sheets as $css)
+	{
+		$real_path = realpath($css);
+		if ($real_path && file_exists( $real_path ))
+		{
+			$this->headLink()->appendStylesheet("/$css");
+		}
+	}
+	
+	$this->headLink()->appendStylesheet($jqueryUiCss);
+	$this->headStyle( $style_sheet_content, 'SET' );
+	$this->headScript()->prependFile( ($isHttps ? 'https' : 'http') . '://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js' );
+	$this->headScript()->prependFile( ($isHttps ? 'https' : 'http') . '://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' );
+	
+	echo '<?xml version="1.0" encoding="UTF-8" ?>' . "\n";
+	echo $this->doctype();
+	?>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+	    
+	    <link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
+	    <link rel="icon" type="image/png" href="/favicon.ico" />
+	    <link rel="icon" type="image/gif" href="/favicon.ico" />
+
+		<?php 
+		echo $this->headTitle() . "\n";
+	    echo $this->headLink() . "\n";
+		echo $this->headStyle() . "\n";
+	    echo $this->headScript() . "\n";
+		?>
+	</head>
+	
+	<body class="tundra">
+		<div id="body-content-span">
+		<div id="body-content-wrapper">
+			<div id="header-layout">
+				<?php
+					/**
+					 * Renders the header area. Edit components/header/default.phtml to configure
+					 * your header layout.
+					 */ 
+					echo $this->render('components/header/default.phtml'); 
+				?>
+			</div>
+			<div id="content-layout">
+				<?php 
+					/**
+					 * Renders the content area. Edit components/content/default.phtml to configure
+					 * your content layout.
+					 */
+					$left_column = $this->render('components/left-column/default.phtml');
+					$center_column = $this->render('components/content/default.phtml');
+					$right_column = $this->render('components/right-column/default.phtml');
+					
+					$layout_type = 'default';
+					/**
+					 * @todo Replace this if-statement with some kind of 
+					 * 		 session variable set by the current view.
+					 */
+					if ($left_column)
+					{
+						$layout_type = 'default-left-col';
+						if ($right_column)
+						{
+							$layout_type = 'default-left-right-col';
+						}
+					} else {
+						$layout_type = 'default';
+						if ($right_column)
+						{
+							$layout_type = 'default-right-col';
+						}
+					}
+					
+					switch($layout_type)
+					{
+						case 'default-left-col':
+							echo "
+							<div id=\"left-column\"  class=\"align-left\">$left_column</div>
+							<div id=\"center-column-right\" class=\"align-right\">$center_column</div>
+							";
+							break;
+						case 'default-right-col':
+							echo "
+							<div id=\"center-column-left\" class=\"align-left\">$center_column</div>
+							<div id=\"right-column\" class=\"align-right\">$right_column</div>
+							";
+							break;
+						case 'default-left-right-col':
+							echo "
+							<div id=\"left-column\" class=\"align-left\">$left_column</div>
+							<div id=\"center-column-center\">$center_column</div>
+							<div id=\"right-column\" class=\"align-right\">$right_column</div>
+							";
+							break;
+						case 'default':
+							echo "
+							<div id=\"center-column\">
+							$center_column
+							</div>
+							";
+						default:
+							break;
+					}
+				?>
+			</div>
+			<div id="footer-layout">
+				<?php 
+					/**
+					 * Renders the footer area. Edit components/footer/default.phtml to configure
+					 * your content layout.
+					 */
+					echo $this->render('components/footer/default.phtml');
+				?>
+			</div>
+		</div>
+		</div>
+	</body>
+
+</html>

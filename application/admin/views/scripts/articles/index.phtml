@@ -1,0 +1,235 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Articles
+ * @category Core
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title,Zend_View_Helper_Placeholder_Container_Abstract::SET );
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = isset($vars['params']) ? $vars['params'] : null;
+
+// See if we have any listing parameters.		
+$start_index = isset($params['start_index']) ? $params['start_index'] : 0;
+$max_per_page = isset($params['max_per_page']) ? $params['max_per_page'] : 10;
+
+// Grab our key/value POST vars, for use with our datagrid links.
+
+$url_params = '/start_index/'. $start_index . '/max_per_page/' . $max_per_page;
+
+// Content
+if (isset($vars['content'])) echo $vars['content'];
+
+// Listing
+$header_map = array(
+	'id' 			=> 'ID',
+	'container_id' 	=> 'Category',
+	'resource' 		=> 'Type',
+	'published' 	=> 'Published',
+	'title' 		=> 'Title',
+	'description' 	=> 'Desc.',
+	'date_created' 	=> 'Created',
+	'date_modified' => 'Modified'
+);
+
+$format_map = array(
+	'description' => ENT_QUOTES
+);
+
+$exclude_map = array(
+	'id',
+	'container_id',
+	'date_modified',
+	'image'
+);
+
+$strTitle = $t->_('Title: ');
+
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+
+		function rebindArticleForm() {
+			
+			$('#frmArticles .table-data .editor').each(function (i, obj) {
+				var content = $(obj).html();
+				$(obj).wymeditor({
+					html: content,
+					postInit: function(wym) {
+						
+						//construct the button's html
+						var html = "<li class='wym_tools_newbutton'>"
+							+ "<a name='SaveButton' href='#'"
+							+ " style='background-image:"
+							+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
+							+ "Save"
+							+ "</a></li>";
+					
+						//add the button to the tools box
+						jQuery(wym._box)
+							.find(wym._options.toolsSelector + wym._options.toolsListSelector)
+							.prepend(html);
+						
+							//handle click event
+							jQuery(wym._box)
+								.find('li.wym_tools_newbutton a').click(function() {
+									//do something
+									var htmlData = wym.html();
+									var article_id = jQuery(this).parent().parent().parent().parent().parent().parent().find('.editor').attr('id').replace('article_description_', '');
+									var article_title = jQuery('#article_title_' + article_id).val();
+
+									var subRow = $('#article_description_' + article_id).parent().parent();
+									var row = subRow.prev();
+
+									row.find('.article_title').html(article_title);
+									
+									jQuery.getJSON(
+										'/admin/articles/json-update',
+										{
+											article_id: article_id,
+											description: htmlData,
+											title: article_title
+										},
+										function (reply) {
+											var responseColor = '';
+											var subRow = $('#article_description_' + reply.article_id).parent().parent();
+											var row = subRow.prev();
+											
+											if (reply.result == 'ok') {
+												responseColor = '#0c0';
+												row.find('.article_date_created').html('<div>' + reply.date_created + '</div><div class="small-text">' + reply.date_modified + '</div>');
+											} else {
+												responseColor = '#c00';
+												$('#articles_msg_dialog').show().html('<div class="ui-state-error ui-corner-all">' + reply.data + '</div>').delay(5000).fadeOut();
+											}
+											var bgColor = subRow.css('background-color');
+											
+											subRow.css('background-color', responseColor);
+											subRow.animate({backgroundColor: bgColor}, 3000, function(){});
+										}
+									);
+									
+									return(false);
+								});
+					}
+				});
+			});
+		}
+		
+		$('#btnCreateArticle').click(function(ev){
+			// ...Create the article via getJSON()
+			
+		});
+		
+		$('#frmArticles').tableSort({
+			onJsonSuccess: function(response){
+				$('#frmArticles .table-data .table-body').remove();
+	
+				$.each(response.data, function(i, row){
+					
+					$('#frmArticles .table-data').append(
+						'<tbody class="table-body">' + 
+						'	<tr class="table-row">' + 
+						'		<td class="article_date_created"><div>' + row.date_created + '</div><div class="small-text">' + row.date_modified + '</div></td>' +
+						'		<td class="article_title">' + row.title + '</td>' +
+						'	</tr>' +
+						'	<tr class="table-sub-row">'  +
+						'		<td colspan="2">' +
+						'			<div class="form-list"><ul><li><label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
+						'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' + 
+						'		</td>' + 
+						'	</tr>' + 
+						'</tbody>'
+					);
+				});
+
+				rebindArticleForm();
+			}
+		});
+		
+		rebindArticleForm();
+	});
+</script>
+<div id="articles_msg_dialog"></div>
+<form id="frmArticles" action="/admin/articles/json.list">
+	<input type="hidden" class="table-sort-order" value="DESC" />
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th><a href="#date_created"><?php echo $t->_('Date Created'); ?></a></th>
+			<th><a href="#title"><?php echo $t->_('Article'); ?></a></th>
+		</tr>
+	<?php 
+	
+	/* @todo load dynamically via jQuery tableSort widget. //*/
+	$articles = new Zre_Dataset_Article();
+	
+	$data = $articles->listAll(null, array('order' => 'title DESC'));
+	
+	if (count($data) > 0) {
+		foreach($data as $row) {
+			$row = (object)$row;
+		?>
+		<tbody class="table-body">
+		<tr class="table-row">
+			<td class="article_date_created"><div><?php echo $row->date_created; ?></div><div class="small-text"><?php echo $row->date_modified;?></div></td>
+			<td class="article_title"><?php echo $row->title; ?></td>
+		</tr>
+		<tr class="table-sub-row">
+			<td colspan="2">
+				<div class="form-list">
+					<ul>
+						<li>
+							<label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_<?php echo $row->article_id; ?>" value="<?php echo $row->title;?>" />
+						</li>
+					</ul>
+				</div>
+				<div class="editor" id="article_description_<?php echo $row->article_id;?>"><?php echo $row->description; ?></div>
+			</td>
+		</tr>
+		</tbody>
+		<?php 
+		}
+	} else {
+		?>
+		<tbody class="table-body">
+		<tr class="table-row"><td colspan="2"><?php echo $t->_('No records found.');?></td></tr>
+		</tbody>
+		<?php 
+	}
+	//*/?>
+	</table>
+</form>
+<br />
+<br />
+<h3><?php echo $t->_('Create a new article'); ?></h3>
+<form id="frmCreateArticle" class="form-list">
+	<ul>
+		<li>
+			<label for="new_article_title"><?php echo $t->_('Title:'); ?></label>
+			<input type="text" id="new_article_title" value="" />
+		</li>
+		<li>
+			<label for="new_article_description"><?php echo $t->_('Desc:'); ?></label>
+			<input type="text" id="new_article_description" value="" />
+		</li>
+		<li>
+			<label for="new_article_image"><?php echo $t->_('Image:'); ?></label>
+			<input type="text" id="new_article_image" value="/images/dummy.png" />
+		</li>
+	</ul>
+	<input type="button" id="btnCreateArticle" value="<?php echo $t->_('New Article');?>" />
+</form>

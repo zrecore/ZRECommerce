@@ -1,0 +1,22 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Layout
+ * @category Default
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$vars = $this->getVars();
+if (isset($vars['right_column']) && is_array($vars['right_column']))
+{
+	foreach($vars['right_column'] as $item)
+	{
+		echo $item;
+	}
+}
+?>

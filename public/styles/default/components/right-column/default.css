@@ -1,0 +1,11 @@
+#right-column
+	{ width: 20%; right: 16px; margin: auto; top: 102px; }
+
+#right-column div
+	{ background-color: #f0f0f0; width: 100%; }
+#right-column div:hover
+	{ background-color: #dcdcdc; width: 100%; }
+#right-column div.selected
+	{ background-color: #dcdcdc; width: 100%; }
+#right-column div a
+	{ margin-left: 8px; color: #a0a0a0; font-weight: bold; text-decoration: none; }

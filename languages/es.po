@@ -1,0 +1,275 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: A.Albino <webmaster@alexventure.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Welcome, %s"
+msgstr "Bienvenido, %s"
+
+msgid "Guest"
+msgstr "Huésped"
+
+msgid "Login"
+msgstr "Ingresar"
+
+msgid "Logout"
+msgstr "Salir"
+
+msgid "Register"
+msgstr "Inscribir"
+
+msgid "User Profile"
+msgstr "Perfil de Usuario"
+
+msgid "About"
+msgstr "Información"
+
+msgid "Shop"
+msgstr "Comprar"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Help"
+msgstr "Ayuda"
+
+msgid "Home"
+msgstr "Índice"
+
+msgid "Support"
+msgstr "Apoyo"
+
+msgid "View Cart"
+msgstr "Ver Carro"
+
+msgid "Next"
+msgstr "Siguiente"
+
+msgid "Previous"
+msgstr "Previo"
+
+msgid "Up"
+msgstr "Arriba"
+
+msgid "Down"
+msgstr "Abajo"
+
+msgid "Left"
+msgstr "Izquierda"
+
+msgid "Right"
+msgstr "Derecha"
+
+msgid "Start"
+msgstr "Empezar"
+
+msgid "Reset"
+msgstr "Ajustar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Stop"
+msgstr "Alto"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Warning:"
+msgstr "Precaución:"
+
+msgid "Error:"
+msgstr "Error:"
+
+msgid "Alert:"
+msgstr "Alerta:"
+
+msgid "Ok:"
+msgstr "Ok:"
+
+msgid "Information:"
+msgstr "Informacion:"
+
+msgid "Cancelled:"
+msgstr "Cancelado:"
+
+msgid "Required"
+msgstr "Requerido"
+
+msgid "Optional"
+msgstr "Opcional"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Re-type Password"
+msgstr "Contraseña de nuevo"
+
+msgid "First Name"
+msgstr "Nombre"
+
+msgid "Last Name"
+msgstr "Apellido"
+
+msgid "E-Mail"
+msgstr "Correo electrónico"
+
+msgid "Age"
+msgstr "Edad"
+
+msgid "Date of Birth"
+msgstr "Fecha de nacimiento"
+
+msgid "Country"
+msgstr "País"
+
+msgid "State or Province"
+msgstr "Estado o Provincia"
+
+msgid "City"
+msgstr "Ciudad"
+
+msgid "Zip Code"
+msgstr "Código Postal"
+
+msgid "Primary Telephone"
+msgstr "Telefono primordial"
+
+msgid "Secondary Telephone"
+msgstr "Teléfono secundario"
+
+msgid "Value is empty, but a non-empty value is required"
+msgstr "Valor esta vacio, pero se requiere un valor"
+
+msgid "'%value%' is less than %min% characters long"
+msgstr "'%value%' es menos de %min% letras de largo"
+
+msgid "'%value%' is greater than %max% characters long"
+msgstr "'%value%' es mas de %max% letras de largo"
+
+msgid "'%value%' is not a valid email address in the basic format local-part@hostname"
+msgstr "'%value%' no es un correo electrónico en un formato basico como 'parte-local@dominio'"
+
+msgid "'%hostname%' is not a valid hostname for email address '%value%'"
+msgstr "'%hostname%' no es un nombre de alojamiento web valido para el correo electrónico '%value%'"
+
+msgid "'%hostname%' does not appear to have a valid MX record for the email address '%value%'"
+msgstr "Parece ser que '%hostname%' no tiene un record MX valido para el correo electrónico  '%value%'"
+
+msgid "'%localPart%' not matched against dot-atom format"
+msgstr "'%localPart%' no coincide contra el formato punto-átomo ('dot-atom')"
+
+msgid "'%localPart%' not matched against quoted-string format"
+msgstr "'%localPart%' no coincide contra formato de texto con comillas"
+
+msgid "'%localPart%' is not a valid local part for email address '%value%'"
+msgstr "'%localPart%' no es parte valida para el correo electrónico  '%value%'"
+
+msgid "'%value%' is not of the format YYYY-MM-DD"
+msgstr "'%value%' no esta en formato de YYYY-MM-DD"
+
+msgid "'%value%' does not appear to be a valid date"
+msgstr "'%value%' no parece ser una fecha valida"
+
+msgid "'%value%' does not fit given date format"
+msgstr "'%value%' no coincide con el formato de fecha dado"
+
+msgid "'%value%' does not match against pattern '%pattern%'"
+msgstr "'%value%' no coincide contra la pauta '%pattern%'"
+
+msgid "'%value%' contains non-digit characters"
+msgstr "'%value%' contiene carácteres no digitales"
+
+msgid "'%value%' has not only alphabetic characters"
+msgstr "'%value%' contiene carácteres no alphabeticos"
+
+msgid "Invalid phone number format. Try 7772228888 or 17772228888"
+msgstr "Numero de teléfono es de formato invalido. Intenta 7772228888 o 17772228888"
+
+msgid "Invalid zip code format, try 99999 or 99999-1234"
+msgstr "Código postal es en formato invalido, intenta 99999 ó 99999-1234"
+
+msgid "'%value%' is an empty string"
+msgstr "'%value%' es un texto vacio"
+
+msgid "Tokens do not match"
+msgstr "Fichas no coinciden"
+
+msgid "Passwords do not match"
+msgstr "Las contraseñas no coinciden"
+
+msgid "Empty captcha value"
+msgstr "Valor vacio dado para la imagen 'captcha'"
+
+msgid "Captcha value is wrong"
+msgstr "Valor dado para la imagen 'captcha' es incorrecto"
+
+msgid "Could not register new user. Please try again."
+msgstr "No se pudo registrar este usuario nuevo. Por favor, intente de nuevo."
+
+msgid "Invalid user name. Please try a different one."
+msgstr "Nombre de usuario invalido. Por favor use otro."
+
+msgid "Database query error."
+msgstr "Error de consulta a Base de Datos."
+
+msgid "Internal error."
+msgstr "Error interno."
+
+msgid "Please, log in to continue."
+msgstr "Por favor ingrese usando su nombre y contraseña para continuar."
+
+msgid "Redirecting, please wait."
+msgstr "Desviando, por favor espere."
+
+msgid "Fill out this form to register."
+msgstr "Llene este formulario para inscribirse."
+
+msgid "Updating, please wait."
+msgstr "Actualizando, por favor espere."
+
+msgid "Update complete."
+msgstr "Actualización completado."
+
+msgid "No update was performed."
+msgstr "No hubo actualización."
+
+msgid "Your order is being processed, please wait."
+msgstr "Su orden esta en procesamiento, por favor espere."
+
+msgid "(You have %value% attempts left.)"
+msgstr "(Tiene %value% intentos.)"
+
+msgid "You have installed zrecommerce. Please log in to your administraton panel, and create an index page."
+msgstr "Has installado zrecommerce. Por favor ingrese a el panal de administracion, y añada una pagina indice."
+
+msgid "Type the text you see below"
+msgstr "Escriba lo que ve en la imagen debajo."
+
+msgid " ...or click here to go now."
+msgstr " ...o haga clic aqui para seguir ya."
+
+msgid " ...or click here to continue."
+msgstr " ...o haga clic aqui para seguir ya."
+
+msgid "Your new settings have been saved."
+msgstr "Sus modificaciones de configuracion se han aguardado."
+
+msgid "User registration has been disabled on this site."
+msgstr "Inscripción de usuarios en este sitio ha sido desactivado."
+
+msgid "article_info_new"
+msgstr "Nuevo articulo - Llene este formulario para crear un nuevo articulo. Puede seleccionar una categoria para este articulo haciendo clic en una carpeta del navegador de articulos. Tambien puede puede especificar la carpeta pariente haciendo clic en un articulo."
+
+msgid "article_info_edit"
+msgstr "Editar articulo - Edite las propiedades de el articulo. Puede seleccionar una categoria para este articulo haciendo clic en una carpeta del navegador de articulos. Tambien puede puede especificar la carpeta pariente haciendo clic en un articulo."
+

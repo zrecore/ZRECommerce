@@ -1,0 +1,111 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Default
+ * @subpackage Default_Shop_Cart
+ * @category Views
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+$zendCurrency = new Zend_Currency( (string) $settings->site->currency );
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = $vars['params'];
+
+if (isset($vars['content'])) echo $vars['content'];
+
+// ...Display our cart
+
+Cart::loadSession();
+
+$cart = Cart::getCartContainer();
+$cartItems = $cart->getItems();
+
+$cartTotal = $zendCurrency->toCurrency( $cart->getTotal() );
+
+if ($cart->count() > 0) {
+	$output = '
+		<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+			<tr class="table-header">
+				<th>' . $t->_('Quantity') . '</th>
+				<th>' . $t->_('Title') . '</th>
+				<th>' . $t->_('Subtotal') . '</th>
+			</tr>
+	';
+	foreach ($cartItems as $cartItem) {
+		
+		if ( $cartItem instanceof Cart_Container_Item ) {
+			$cartItem = Cart_Container_Item::factory( $cartItem );
+			$cartItem->addValidator('CartQuantity', new Zre_Cart_Validate_CartQuantity());
+			$cost = $cartItem->getCostOptions()->calculate();
+			$itemPrice = $zendCurrency->toCurrency( $cost );
+			$cartSubtotal = $zendCurrency->toCurrency( $cartItem->getQuantity() * $cost );
+			
+			$cartDetails = $cartItem->getDetailOptions()->items();
+			
+			$output .= <<<EOD
+				<tr class="table-row">
+					<td>{$cartItem->getQuantity()} @ {$itemPrice}</td>
+					<td>
+						<h3>{$cartDetails['title']}</h3>
+						<p>{$cartDetails['desc']}</p>
+					</td>
+					<td>
+						<p>
+							{$cartSubtotal}
+						</p>
+					</td>
+				</tr>
+EOD;
+			
+		}
+	}
+	/**
+	 * @todo Insert additional checkout options below
+	 */
+	$output .= '
+			<tr class="table-header">
+				<th>&nbsp;</th>
+				<th style="text-align: right;">' . $t->_('Total:') . '</th>
+				<th>' . $cartTotal . '</th>
+			</tr>
+		</table>
+		<table cellspacing="0" cellpadding="0" border="0" style="width: 90%; margin: auto; margin-left: 5%;">
+			<tr>
+				<td style="text-align: right; padding-right: 12px;">
+					<a href="/shop/">' . $t->_('Continue Shopping') . '</a>
+				</td>
+				<td style="width: 1%;">
+					<form id="frmUpdate" action="/shop/update/" method="post">
+						<input type="button" value="' . $t->_('Update') . '" onclick="JavaScript: void();" />
+					</form>
+				</td>
+				<td style="width: 1%;">
+					<form id="frmFlush" action="/shop/flush/">
+						<input type="submit" value="' . $t->_('Empty') . '" onclick="JavaScript: void();" />
+					</form>
+				</td>
+				<td style="width: 1%;">
+					<form action="/shop/checkout" method="post">
+						<input type="submit" id="checkout" name="checkout" value="' . $t->_('Checkout') . '" />
+					</form>
+				</td>
+			</tr>
+		</table>
+	';
+} else {
+	$output = '<h3>' . $t->_('cart_message_empty') . '</h3><p><a href="/shop/">' . $t->_('Continue Shopping') . '</a></p>';
+}
+echo $output;
+?>

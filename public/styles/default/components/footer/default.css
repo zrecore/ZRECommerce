@@ -1,0 +1,11 @@
+#footer-bar
+	{ width: 100%; 
+	  bottom: -36px; 
+	  left: 0px; 
+	  margin: auto; 
+	  position: relative;
+	  height: 36px; 
+	  color: #ffffff;
+	  font-weight: bold;
+	  background-repeat: no-repeat;
+	  background-image: url('/styles/default/components/footer/footer.png'); }

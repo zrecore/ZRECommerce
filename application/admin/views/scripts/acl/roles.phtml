@@ -1,0 +1,249 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Acl
+ * @subpackage Acl
+ * @category Acl
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+
+
+$this->headTitle((string)$settings->site->title,Zend_View_Helper_Placeholder_Container_Abstract::SET );
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = isset($vars['params']) ? $vars['params'] : null;
+
+// Content
+if (isset($vars['content'])) echo $vars['content'];
+$aclRole = new Zre_Dataset_Acl_Role();
+$aclRoles = $aclRole->listAll(null, array('order' => 'acl_role_id ASC'));
+
+$roleJs = '';
+$roleParentsJs = '';
+$roleIdJs = '';
+
+foreach ($aclRoles as $role) {
+	$roles[$role['acl_role_id']] = $role['name'];
+	$roleJs .= "\tarrRoles['{$role['name']}'] = {$role['acl_role_id']};\n";
+	$roleIdJs .= "\tarrIdRoles[{$role['acl_role_id']}] = '{$role['name']}';\n";
+	if (isset($role['parents'])) {
+		
+		if (!empty($role['parents'])) {
+			$parentItems = unserialize($role['parents']);
+			if (is_string($parentItems)) $parentItems = array($parentItems);
+			
+			$roleParentsJs .= "\tarrRoleParents['{$role['name']}'] = new Array(";
+			$roleParentsJs .= "'" . implode("','", $parentItems) . "'";
+			$roleParentsJs .= ");\n";
+		} else {
+			$roleParentsJs .= "\tarrRoleParents['{$role['name']}'] = '';\n";
+		}
+		
+	}
+}
+
+$form = new Zend_Form();
+
+$role = new Zend_Form_Element_Select('available_roles');
+$role->setLabel('Roles');
+$role->setMultiOptions( $roles );
+$role->setAttribs(array(
+					'size' => 12 ));
+
+$roleId = new Zend_Form_Element_Hidden('current_role_id');
+$roleId->removeDecorator('DtDdWrapper')
+		->removeDecorator('Label');
+$roleName = new Zend_Form_Element_Text('roles_name');
+$roleName->setLabel('Role Name');
+
+$roleParents = new Zend_Form_Element_MultiCheckbox('roles_parents');
+$roleParents->setLabel('Role Parent(s)');
+$roleParents->addMultiOption('', '(none)');
+$roleParents->addMultiOptions( $roles );
+
+$createButton = new Zend_Form_Element_Button('btnRolesCreate');
+$createButton->setLabel('Create');
+$createButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+			
+$updateButton = new Zend_Form_Element_Button('btnRolesUpdate');
+$updateButton->setLabel('Update');
+$updateButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+			
+$deleteButton = new Zend_Form_Element_Button('btnRolesDelete');
+$deleteButton->setLabel('Delete');
+$deleteButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+
+$elements = array(
+	$role,
+	$roleId,
+	$roleName,
+	$roleParents,
+	$createButton,
+	$updateButton,
+	$deleteButton
+);
+
+$form->addElements( $elements );
+?>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+var arrRoles = new Array();
+<?php echo $roleJs; ?>
+	var arrIdRoles = new Array();
+	arrIdRoles[0] = '';
+<?php echo $roleIdJs; ?>
+	
+	var arrRoleParents = new Array();
+	arrRoleParents['(none)'] = '';
+<?php echo $roleParentsJs; ?>
+	
+	$("select#available_roles").change(function(){
+		var selectedValue = $("select#available_roles option:selected").attr("value");
+		var selectedText = $("select#available_roles option:selected").text();
+		var parentArr = arrRoleParents[selectedText];
+		updateParents(parentArr);
+		
+		$("#current_role_id").attr("value", selectedValue );
+		$("#roles_name").attr("value", selectedText );
+		
+	});
+
+	function updateParents(parentArr) {
+		var selectedText = $("select#available_roles option:selected").text();
+		if (parentArr) {
+			$("#roles_parents-").attr('checked', false);
+			for (var i in arrRoles) {
+				$("#roles_parents-" + arrRoles[i] ).attr('checked', false);
+			}
+			
+			for (var i in arrRoleParents[selectedText]) {
+				$("#roles_parents-" + arrRoles[ arrRoleParents[selectedText][i] ]).attr('checked', true);
+			}
+		} else {
+			$("#roles_parents-").attr('checked', true);
+			for (var i in arrRoles) {
+				$("#roles_parents-" + arrRoles[i] ).attr('checked', false);
+			}
+		}
+	}
+	
+	$("#btnRolesCreate").click(function(){
+		roleName = $("#roles_name").attr("value");
+		roleParents = getRoleParents(roleName);
+		$("select#available_roles").hide('fast');
+		$.getJSON("/admin/acl/ajax.role.create/name/" + roleName + roleParents, {}, function(j) {
+				refreshRoleList();
+		})
+	});
+	
+	$("#btnRolesUpdate").click(function(){
+		roleId = $("#current_role_id").attr("value");
+		roleName = $("#roles_name").attr("value");
+		
+		roleParents = getRoleParents(roleName);
+		
+		$("select#available_roles").hide('fast');
+		$.getJSON("/admin/acl/ajax.role.update/id/" + roleId + "/name/" + roleName + roleParents , {}, function(j) {
+			
+			if (j == 1) {
+				refreshRoleList();
+			} else {
+				alert("Error: Could not update. Result: " + j);
+			} 
+			
+		})
+	});
+	
+	function getRoleParents(roleName) {
+		var roleParentsDOM = $("input[name='roles_parents[]']");
+		var roleParents = '';
+		
+		roleParentsDOM.each(function() {
+			chkValue = $(this).val();
+			chkValue = chkValue ? chkValue : 0;
+			chkValue = parseInt(chkValue);
+			
+			chkChecked = $(this).attr('checked');
+			
+			if (chkChecked) {
+				roleParents += '/parents/' + arrIdRoles[ parseInt(chkValue) ];
+			}
+		});
+		
+		return roleParents;
+	}
+	
+	$("#btnRolesDelete").click(function(){
+		roleId = $("#current_role_id").attr("value");
+		
+		$("select#available_roles").hide('fast');
+		$.getJSON("/admin/acl/ajax.role.delete/id/" + roleId , {}, function(j) {
+				refreshRoleList();
+		})
+	});
+	
+	function refreshRoleList() {
+		$("select#available_roles").hide();
+		$('#roles_parents_element').hide();
+		
+		$.getJSON("/admin/acl/ajax.role.list/", {}, function(j) {
+			var options = '';
+			var newHtml = '<label for="roles_parents-"><input type="checkbox" name="roles_parents[]" id="roles_parents-" value="" />(none)</label><br />';
+			
+			arrRoles = new Array();
+			arrRoleParents = new Array();
+			arrIdRoles = new Array();
+			
+			arrIdRoles[0] = '';
+			arrRoleParents['(none)'] = '';
+			
+			for(var i = 0; i < j.length; i++) {
+				options += '<option value="' + j[i].acl_role_id + '">' + j[i].name + '</option>';
+				arrRoles[j[i].name] = j[i].acl_role_id;
+				arrRoleParents[j[i].name] = j[i].parents;
+				arrIdRoles[j[i].acl_role_id] = j[i].name;
+				
+				if (j[i].name) {
+					var roleId = j[i].acl_role_id;
+					var roleText = j[i].name;
+					
+					newHtml += '<label for="roles_parents-' + roleId + '"><input type="checkbox" name="roles_parents[]" id="roles_parents-' + roleId + '" value="' + roleId + '" />' + roleText + '</label><br />';
+				}
+			}
+			
+			$("select#available_roles").html(options);
+			$('#roles_parents_element').html(newHtml);
+
+			$("select#available_roles").show('slow');
+			$('#roles_parents_element').show('slow');
+		});
+	}
+
+});
+</script>
+<div style="width: 100%;">
+	<div style="
+		margin: auto; 
+		position: relative;
+		border: solid 1px #a0a0a0; 
+		width: 100%; 
+		min-height: 600px; 
+		vertical-align: top;">
+		
+		<?php echo $form; ?>
+	</div>
+	
+</div>

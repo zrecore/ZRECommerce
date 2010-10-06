@@ -1,0 +1,71 @@
+#center-column
+{	width: 90%;
+	margin: auto;
+	margin-top: 2%;
+	left: 5%;
+	text-align: left;
+	vertical-align: top; }
+
+#center-column-center
+{	width: 50%;
+	margin: auto; 
+	margin-top: 2%;
+	left:20%; 
+	
+	text-align: left;
+	vertical-align: top; }
+
+#center-column-left
+{	width: 71%;
+	margin: auto;
+	margin-top: 2%; 
+	left: -11%;
+	
+	text-align: left;
+	vertical-align: top;
+	position: relative; }
+
+#center-column-right
+{	width: 71%;
+	margin: auto; 
+	margin-top: 2%;
+	right: -9%; 
+
+	text-align: left;
+	vertical-align: top;
+	position: relative; }
+	
+.content_title
+{padding: 0px; margin: 0px;}
+
+.textAlignCenter
+{ text-align: center;}
+
+/* Data table css properties */
+.dataTable
+{margin-top: 1%; width: 100%;}
+
+.dataHeader
+{font-weight: bold; text-align: left; text-transform: uppercase;}
+.dataHeaderCell
+{background-color: #004466; color: #ffffff; text-align: center;}
+.dataHeaderCell:hover
+{background-color: #006688; color: #fcffff;}
+
+.dataRow
+{background-color: #f6f6f6; color: #404040;}
+.dataRow:hover
+{background-color: #f9f9f9; color: #000040;}
+
+.dataRowAlt
+{background-color: #f0f0f0; color: #404040;}
+.dataRowAlt:hover
+{background-color: #dddddd; color: #000040;}
+
+.dataCell, .dataCellAlt
+{margin: auto; padding: 4px;}
+.dataCellImage, .dataCellImageAlt
+{width: 150px; border: solid 1px #a0a0a0;}
+
+/* .dataCell, .dataCellAlt
+{margin: auto; padding: 4px; padding-top: 8px; padding-bottom: 8px;} */

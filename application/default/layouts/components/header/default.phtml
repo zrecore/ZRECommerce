@@ -1,0 +1,34 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Layout
+ * @category Default
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$vars = $this->getVars(); 
+$settings = Zre_Config::getSettingsCached();
+
+$t = Zend_Registry::get('Zend_Translate');
+
+?>
+<h1><?php echo $this->placeholder('title') ?></h1>
+
+<div id="main-menu-bar" class="align-left">
+	<?php
+	/**
+	 * Load header items.
+	 */
+	if ( Zre_Registry_Session::isRegistered('header_items') ) {
+		foreach ( Zre_Registry_Session::get('header_items') as $item) {
+			echo $item;
+		}
+	}
+	
+	?>
+</div>

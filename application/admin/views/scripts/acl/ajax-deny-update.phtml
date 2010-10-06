@@ -1,0 +1,22 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Admin_Acl
+ * @category Views
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$vars = $this->getVars();
+$params = $vars['params'];
+
+Data::serializeParam($params, 'resources');
+Data::serializeParam($params, 'privileges');
+$aclDeny = new Zre_Dataset_Acl_Deny();
+echo $aclDeny->update( $params, $params['id'] );
+?>

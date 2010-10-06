@@ -1,0 +1,275 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Acl
+ * @subpackage Acl
+ * @category Acl
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$vars = $this->getVars();
+$params = isset($vars['params']) ? $vars['params'] : null;
+
+$nameValue = null;
+if (isset($params['name'])) $nameValue = $params['name'];
+$aclDeny = new Zre_Dataset_Acl_Deny();
+$aclResource = new Zre_Dataset_Acl_Resource();
+
+$aclRules = $aclDeny->listAll(
+	isset($nameValue) ? array('name' => $nameValue) : null, 
+	array('order' => 'acl_deny_id ASC')
+);
+$aclResources = $aclResource->listAll(null, array('order' => 'acl_resource_id ASC'));
+$aclPrivileges = array('new', 'view', 'update', 'remove', 'publish', 'archive', 'ALL', 'NONE');
+$ruleJs = array();
+$ruleIdJs = array();
+$ruleResourcesJs = array();
+$rulePrivilegesJs = array();
+$allResourcesJs = array();
+$allPrivilegesJs = $aclPrivileges;
+
+?>
+<h1><?php echo $t->_('Deny ACL Rules')?></h1>
+<form id="frmDenyRules" method="post">
+<h3><?php echo $t->_('Role')?></h3>
+<?php
+$selectBoxRoles = '<select id="role" name="acl_deny_role">'; 
+$defaultResources = '';
+$defaultPrivileges = '';
+
+foreach($aclRules as $index => $rule) {
+	
+	$rule['resources'] = unserialize($rule['resources']);
+	$rule['privileges'] = unserialize($rule['privileges']);
+	
+	$selectBoxRoles .= '<option value="' . $rule['acl_deny_id'] . '">' . $rule['name'] . '</option>';
+	
+	if ($index == 0) {
+		$dontAddResources = array();
+		$i = 0;
+		if (!empty($rule['resources']) && count($rule['resources']) > 0) {
+			
+			foreach($rule['resources'] as $i => $resource) { 
+				$defaultResources .= '<input type="checkbox" checked="checked" id="acl_deny_resources_' . $i . '" name="acl_deny_resources[]" value="' . $resource . '" /><label for="acl_deny_resources_' . $i . '">' . $resource . '</label><br />';
+				$dontAddResources[] = $resource;
+			}
+			$i += 1;
+		}
+		
+		foreach($aclResources as $j => $otherResource) {
+			$resource = $otherResource['name'];
+			$allResourcesJs[] = $resource;
+			if ( !in_array($resource, $dontAddResources) ) {
+				$defaultResources .= '<input type="checkbox" id="acl_deny_resources_' . ($i + $j) . '" name="acl_deny_resources[]" value="' . $resource . '" /><label for="acl_deny_resources_' . ($i + $j) . '">' . $resource . '</label><br />';
+			}
+		}
+		$i = 0;
+		if (!empty($rule['privileges']) && count($rule['privileges']) > 0) {
+			foreach($rule['privileges'] as $i => $privilege) {
+				$defaultPrivileges .= '<input type="checkbox" checked="checked" id="acl_deny_privileges_' . $i . '" name="acl_deny_privileges[]" value="' . $privilege . '" /><label for="acl_deny_privileges_' . $i . '">' . $privilege . '</label><br />';
+			}
+			$i += 1;
+		}
+		$thePrivileges = !empty($rule['privileges']) ? $rule['privileges'] : array();
+		foreach($aclPrivileges as $j => $privilege) {
+			if (!in_array($privilege, $thePrivileges)) {
+				$defaultPrivileges .= '<input type="checkbox" id="acl_deny_privileges_' . ($i + $j) . '" name="acl_deny_privileges[]" value="' . $privilege . '" /><label for="acl_deny_privileges_' . ($i + $j) . '">' . $privilege . '</label><br />';
+			}
+		}
+	}
+	
+	$ruleJs[] = "\tarrRules['" . $rule['acl_deny_id'] . "'] = '" . $rule['name'] . "';";
+	$ruleIdJs[] = "\tarrRuleIds['" . $rule['name'] . "'] = '" . $rule['acl_deny_id'] . "';";
+	
+	$resources = ($rule['resources'] ? Zend_Json::encode($rule['resources']) : "null");
+	$privileges = ($rule['privileges'] ? Zend_Json::encode($rule['privileges']) : "null");
+	
+	$ruleResourcesJs[] = "\tarrRuleResources['" . $rule['name'] . "'] = " . $resources . ";";
+	$rulePrivilegesJs[] = "\tarrRulePrivileges['" . $rule['name'] . "'] = " . $privileges . ";";
+	
+}
+$selectBoxRoles .= '</select>';
+
+$ruleJs = implode("\n", $ruleJs);
+$ruleIdJs = implode("\n", $ruleIdJs);
+$ruleResourcesJs = implode("\n", $ruleResourcesJs);
+$rulePrivilegesJs = implode("\n", $rulePrivilegesJs);
+$allResourcesJs = Zend_Json::encode($allResourcesJs);
+$allResourcesJs = $allResourcesJs ? "$allResourcesJs;" : 'new Array();';
+$allPrivilegesJs = Zend_Json::encode($allPrivilegesJs);
+$allPrivilegesJs = $allPrivilegesJs ? "$allPrivilegesJs;" : 'new Array();';
+?>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	var arrRules = new Array();
+<?php echo $ruleJs; ?>
+
+	var arrRuleIds = new Array();
+<?php echo $ruleIdJs; ?>
+
+	var arrRuleResources = new Array();
+<?php echo $ruleResourcesJs; ?>
+
+	var arrRulePrivileges = new Array();
+<?php echo $rulePrivilegesJs; ?>
+	
+	var arrAllResources = <?php echo $allResourcesJs; ?>
+	
+	var arrAllPrivileges = <?php echo $allPrivilegesJs; ?>
+	
+	
+	$("#btnAclDenyUpdate").click(function(){
+	
+		roleId = $("#acl_deny_role").attr("value");
+		roleResources = new Array();
+		rolePrivileges = new Array();
+		
+		resources = $("input[name='acl_deny_resources[]']");
+		privileges = $("input[name='acl_deny_privileges[]']");
+		
+		var index = 0;
+		resources.each(function(i, obj) {
+			
+			if ( $(obj).attr('checked') == true) {
+				roleResources[index] = $(obj).val();
+				index++;
+			}
+		});
+		index = 0;
+		privileges.each(function(i, obj) {
+			if ( $(obj).attr('checked') == true ) {
+				rolePrivileges[index] = $(obj).val();
+				index++;
+			}
+		});
+		
+		$.getJSON("/admin/acl/ajax.deny.update/", 
+			{
+				id: roleId,
+				resources: roleResources,
+				privileges: rolePrivileges
+			}, 
+			function(j) {
+			
+			if (j == 1) {
+				refreshAclDenyRoleList();
+			} else {
+				alert("Error: Could not update. Result: " + j);
+			} 
+			
+		});
+	});
+	$('#acl_deny_role').change(
+		function () {
+			var selectedValue = $("select#acl_deny_role option:selected").attr("value");
+			var selectedText = $("select#acl_deny_role option:selected").text();
+			
+			var resources = arrRuleResources[selectedText];
+			var privileges = arrRulePrivileges[selectedText];
+			
+			var strResourcesOptions = '';
+			var strPrivilegesOptions = '';
+			
+			$('#acl_deny_resources_container').html('');
+			$('#acl_deny_privileges_container').html('');
+			
+			var lastResourceCount = 0;
+			var i = 0;
+			for (i in resources) {
+				strResourcesOptions += '<input id="acl_deny_resources_' + i + '" checked="checked" name="acl_deny_resources[]" type="checkbox" value="' + resources[i] + '"><label for="acl_deny_resources_' + i + '">' + resources[i] + '</label><br />';
+				
+			}
+			i += 1;
+			var isInArray = false;
+			var resourcesLen = arrAllResources.length;
+			
+			for (var j in arrAllResources) {
+				isInArray = false;
+				if (resources && resources.length > 0) {
+					for (var k in resources) {
+						
+						if (arrAllResources[j] == resources[k]) isInArray = true;
+					}
+				}
+				if (isInArray == false) {
+					strResourcesOptions += '<input id="acl_deny_resources_' + (i + j) + '" name="acl_deny_resources[]" type="checkbox" value="' + arrAllResources[j] + '"><label for="acl_deny_resources_' + (i + j) + '">' + arrAllResources[j] + '</label><br />';
+				}
+			}
+			
+			for (var i in privileges) {
+				strPrivilegesOptions += '<input id="acl_deny_privileges_' + i + '" checked="checked" name="acl_deny_privileges[]" type="checkbox" value="' + privileges[i] + '"><label for="acl_deny_privileges_' + i + '">' + privileges[i] + '</label><br />';
+			}
+			i += 1;
+			for (var j in arrAllPrivileges) {
+				isInArray = false;
+				if (privileges && privileges.length > 0) {
+					for (var k in privileges) {
+						
+						if (arrAllPrivileges[j] == privileges[k]) isInArray = true;
+					}
+				}
+				if (isInArray == false) {
+					strPrivilegesOptions += '<input id="acl_deny_privileges_' + (i + j) + '" name="acl_deny_privileges[]" type="checkbox" value="' + arrAllPrivileges[j] + '"><label for="acl_deny_privileges_' + (i + j) + '">' + arrAllPrivileges[j] + '</label><br />';
+				}
+			}
+			
+			$('#acl_deny_resources_container').html(strResourcesOptions);
+			$('#acl_deny_privileges_container').html(strPrivilegesOptions);
+		}
+	);
+	
+	function refreshAclDenyRoleList() {
+		$("#acl_deny_role").hide();
+		$("#acl_deny_role_properties").hide();
+		$.getJSON("/admin/acl/ajax.deny.list/", {}, function(j) {
+			
+			arrRules = new Array();
+			arrRuleIds = new Array();
+			arrRuleResources = new Array();
+			arrRulePrivileges = new Array();
+			
+			for(var i = 0; i < j.length; i++) {
+				arrRules[j[i].acl_deny_id] = j[i].name;
+				arrRuleIds[j[i].name] = j[i].acl_deny_id;
+				arrRuleResources[j[i].name] = j[i].resources;
+				arrRulePrivileges[j[i].name] = j[i].privileges;
+			}
+			
+			$('#acl_deny_role').change();
+
+			$("#acl_deny_role").show();
+			$("#acl_deny_role_properties").show();
+		});
+	}
+});
+</script>
+<?php echo $selectBoxRoles; ?>
+<br />
+<table cellspacing="0px" cellpadding="0px" border="0px" id="acl_deny_role_properties">
+	<tr>
+		<td style="vertical-align: top; padding-left: 12px;">
+			<h3><?php echo $t->_('Resources');?></h3>
+			<div id="acl_deny_resources_container">
+			<?php echo $defaultResources;?>
+			</div>
+		</td>
+		<td style="vertical-align: top; padding-left: 16px;">
+			<h3><?php echo $t->_('Privileges');?></h3>
+			<div id="acl_deny_privileges_container">
+			<?php echo $defaultPrivileges;?>
+			</div>
+		</td>
+	</tr>
+</table>
+<br />
+	<input type="button" id="btnAclDenyUpdate" value="<?php echo $t->_('Update')?>" />
+</form>

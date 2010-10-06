@@ -1,0 +1,97 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Default
+ * @subpackage Default_Shop_Index
+ * @category Default
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = $vars['params'];
+
+if (isset($vars['content'])) echo $vars['content'];
+
+echo $this->form;
+?>
+<?php
+
+	/**
+	 * Grab our article data. retrieve articles from the root category,
+	 * and only grab published articles. We dont care about the resource
+	 * type here.
+	 * 
+	 */
+	$categoryParentId = isset($params['c']) ? $params['c'] : null;
+	if (!is_numeric($categoryParentId)) $categoryParentId = 1;
+	
+	$articleContainer = new Zre_Dataset_Article_Container();
+	
+	$mainCategory = $articleContainer->read( $categoryParentId );
+	
+	
+	$categories = $articleContainer->listAll( array('parent_id' => $categoryParentId) );
+?>
+<h1 class="productCategoryTitle"><?php echo $t->_('Category:'); ?> <?php echo $mainCategory->current()->title;?></h1>
+<?php
+$product = new Zre_Dataset_Product();
+$productData = $product->listAll(
+	array('published' => 'yes'), 
+	array('order' => 'date_created DESC')
+);
+
+	foreach($productData as $index => $product) {
+		
+		// ...Grab our article properties
+		$productId 			= $product['product_id'];
+		$productContainerId = $product['container_id'];
+		$productResource 	= $product['resource'];
+		$productPublished 	= $product['published'];
+		$productTitle 		= $product['title'];
+		$productDescription = $product['description'];
+		$productDateCreated  = new Zend_Date( $product['date_created'] );
+		$productDateModified = new Zend_Date( $product['date_modified'] );
+		$productImage 		= $product['image'];
+		
+		$productDescription = html_entity_decode($productDescription, ENT_QUOTES);
+		$productDescription = str_replace(array('{', '}', '\"'), array('<', ' />', '"'), $productDescription);
+		
+		if (empty($productImage)) $productImage = '/images/dummy.png';
+		// ...And display however we want.
+?>
+		<div class="productContainer">
+			<table cellspacing="0" cellpadding="0" border="0" class="productContainerInner">
+				
+				<tr>
+					<td class="productImageContainer">
+						<a href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>" class="productImageAnchor"><img src="<?php echo $productImage; ?>" alt="<?php echo $productTitle; ?>" class="productImage" /></a>
+					</td>
+					
+					<td class="productText">
+						<a name="product-<?php echo $productId; ?>" href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>">
+							<h2 class="productTitle"><?php echo $productTitle; ?></h2>
+						</a>
+						<div class="productSubHeader"><?php echo $t->_('Summary'); ?></div>
+						<div class="productDescription">
+						<?php echo Plugin::search_and_insert($productDescription); ?>&nbsp;<a href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>"><?php echo $t->_('...more'); ?></a>
+						</div>
+						<div class="productFooter"><?php echo $t->_('Written on ') . $productDateCreated->getArpa(); ?></div>
+					</td>
+				</tr>
+			</table>
+		</div>
+<?php 
+	}
+?>

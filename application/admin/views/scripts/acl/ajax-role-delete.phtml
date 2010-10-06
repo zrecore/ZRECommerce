@@ -1,0 +1,21 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Admin_Acl
+ * @category Views
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$vars = $this->getVars();
+$params = $vars['params'];
+$aclRole = new Zre_Dataset_Acl_Role();
+if (isset($params['id'])) {
+	echo (int)$aclRole->delete('acl_role_id = ?', $params['id'] );
+}
+?>

@@ -1,0 +1,67 @@
+<?php
+$t = Zend_Registry::get('Zend_Translate');
+$backupArchives = $this->backupArchives;
+
+$counter = 0;
+?>
+<h3><?php echo $t->_('Backup Manager');?></h3>
+<a href="/admin/backup/backup"><?php echo $t->_('Create Backup');?></a>
+<a href="/admin/backup/import"><?php echo $t->_('Import');?></a>
+<a href="/admin/backup/export"><?php echo $t->_('Export');?></a>
+<br /><br />
+<h3><?php echo $t->_('Existing Archives');?></h3>
+<ul id="archives">
+	<?php foreach($backupArchives as $archive):
+			if ($archive[0] != '.') {
+				$backupId = substr($archive, 0, -7);
+	?>
+		<li>
+			<input type="checkbox" name="archive[]" class="archiveDownloadCheckbox" value="<?php echo $backupId;?>" />
+			<label for="archive_<?php echo $counter?>"><?php echo $archive;?></label>
+			<a href="/admin/backup/download/id/<?php echo $backupId?>">Download</a>
+			<br />
+		</li>
+	<?php
+		  } 
+	endforeach;?>
+</ul>
+<br />
+<input type="button" id="Delete" value="<?php echo $t->_('Delete')?>" />
+<?php 
+$js = <<<EOD
+	var arrArchives = new Array();
+	
+	$('#Delete').click(function() {
+		var strAjaxRequest = "";
+		$('.archiveDownloadCheckbox').each(function() {
+			if ($(this).attr('checked') == true) {
+				strAjaxRequest += "/id/" + $(this).val();
+			}
+		});
+		
+		if (strAjaxRequest != "") {
+			$('#archives').slideUp();
+			$.getJSON("/admin/backup/ajax.delete" + strAjaxRequest, function(data) {
+				$('#archives').html()
+				$.each(data, function(i, id) {
+					var htmlText = new String();
+					var archive = new String(id);
+					var idKey = archive.substr(0, archive.length - 8);
+					
+					htmlText += '<li>';
+					htmlText += '	<input type="checkbox" name="archive[]" class="archiveDownloadCheckbox" value="' + idKey + '" />';
+					htmlText += '	<label for="archive_' + i + '">' + id + '</label>';
+					htmlText += '	<a href="/admin/backup/download/id/' + idKey + '">Download</a>';
+					htmlText += '	<br />';
+					htmlText += '</li>';
+					$('#archives').html(htmlText);
+				});
+				$('#archives').slideDown();
+			});
+			
+		}
+	});
+EOD;
+
+$this->headScript()->appendScript($js);
+?>

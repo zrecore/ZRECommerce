@@ -1,0 +1,26 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Layout
+ * @category Default
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+ $t = Zend_Registry::get('Zend_Translate');
+?>
+<div id="footer-bar">
+<?php 
+	if (Zre_Registry_Session::isRegistered('footer_items')) {
+		$items = Zre_Registry_Session::get('footer_items');
+		
+		foreach ( $items as $item) {
+			echo $item;
+		}
+	}
+?>
+</div>

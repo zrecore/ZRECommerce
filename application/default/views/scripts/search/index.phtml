@@ -1,0 +1,85 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Search
+ * @subpackage Search_Index
+ * @category Controllers
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = $vars['params'];
+
+if (isset($vars['enable_dojo']) && $vars['enable_dojo'])
+{
+	$this->dojo()->enable()
+		->setDjConfigOption('parseOnLoad', true);
+}
+if (isset($vars['content'])) echo $vars['content'];
+
+$searchKeyword = $params['searchTextBox'];
+if (!isset($searchKeyword)) $searchKeyword = 'Article';
+
+//Zre_Search::index();
+
+$searchResults = Zre_Search::search( $searchKeyword );
+
+$searchIndex = Zre_Search::getSearchObject()->getIndexObject();
+$searchCount = count($searchResults);
+
+if ($searchCount > 0) {
+	$counter = 0;
+	$output = '
+		<h1>' . $t->_('Results for "') . $searchKeyword . '" (' . $searchCount . '):</h1>
+		<ol>
+	';
+	
+	$query = Zre_Search::getSearchObject()->getKeywordObject();
+	
+	foreach ($searchResults as $result) {
+		
+		$itemTitle = $query->highlightMatches($result->title);
+		$itemType = $result->item_type;
+		$itemDescription = '';
+		$itemLink = '';
+		
+		switch($itemType) {
+			case 'article':
+				$item = Zre_Dataset_Article::read( (int)$result->getDocument()->id );
+				$itemDescription = $query->highlightMatches($item['description']);
+				$itemTitle = '<a href="/read/article/id/' . (int)$result->getDocument()->id . '">' . $itemTitle . '</a>';
+				break;
+			case 'product':
+				$item = Zre_Dataset_Product::read( (int)$result->getDocument()->id );
+				$itemDescription = $query->highlightMatches($item['description']);
+				$itemTitle = '<a href="/shop/product/id/' . (int)$result->getDocument()->id . '">' . $itemTitle . '</a>';
+				break;
+		}
+
+		$output .= "
+			<li><h2>$itemTitle</h2><div>$itemDescription</div></li>
+		";
+		
+		$counter++;
+	}
+	
+	$output .= '
+	</ol>';
+	
+	echo $output;
+} else {
+	echo $t->_('No results found for "' . $searchKeyword . '".');
+}
+?>

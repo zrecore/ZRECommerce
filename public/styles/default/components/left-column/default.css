@@ -1,0 +1,11 @@
+#left-column
+	{ width: 20%; left: 17px; }
+	
+#left-column div
+	{ background-color: #f0f0f0; width: 100%; text-align: left; }
+#left-column div:hover
+	{ background-color: #dcdcdc; width: 100%; }
+#left-column div.selected
+	{ background-color: #dcdcdc; width: 100%; }
+#left-column div a
+	{ margin-left: 8px; color: #a0a0a0; font-weight: bold; text-decoration: none; }

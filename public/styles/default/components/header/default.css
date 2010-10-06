@@ -1,0 +1,36 @@
+#header-layout
+	{ height: 100px; 
+	  background-repeat: no-repeat; 
+	  background-image: url('/styles/default/components/header/header.png'); }
+#header-layout h1
+	{ color: #ffffff; font-size: 3em; margin: auto; position: absolute; top: 24px; left: 5%; padding: 0px;}
+
+#main-menu-bar
+{
+	width: 100%;
+	display: relative;
+}
+#mnuAdmin, #mnuMainShop
+{
+	display: block;
+	margin: auto;
+	margin-left: 5%;
+	margin-top: 80px;
+	width: 90%;
+	height: 20px;
+	text-align: left;
+
+	color: #ffffff;
+	font-weight: bold;
+}
+
+#mnuAdmin a, #mnuMainShop a
+{
+	color: #ffffff;
+	text-decoration: none;
+}
+#mnuAdmin a:hover, #mnuMainShop a:hover
+{
+	color: #0066ff;
+	text-decoration: none;
+}

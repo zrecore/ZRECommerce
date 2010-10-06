@@ -1,0 +1,189 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Acl
+ * @subpackage Acl
+ * @category Acl
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+
+$vars = $this->getVars();
+$params = isset($vars['params']) ? $vars['params'] : null;
+
+// Content
+if (isset($vars['content'])) echo $vars['content'];
+
+$aclResource = new Zre_Dataset_Acl_Resource();
+$aclResources = $aclResource->listAll(null, array('order' => 'acl_resource_id ASC'));
+
+$resources = array();
+$resourceParents = array();
+$idResourceMap = array();
+$resourceParentOptions = array();
+
+foreach ($aclResources as $resource) {
+	$resources[$resource['acl_resource_id']] = $resource['name'];
+	$resourceParentOptions[$resource['name']] = $resource['name'];
+	$resourceParents[] = 'resourceParents["' . $resource['acl_resource_id'] . '"] = "' . $resource['parent'] . '"';
+}
+$id_resource_map = array_flip($resources);
+
+foreach ($id_resource_map as $name => $id) {
+	$idResourceMap[] = 'idResourceMap["' . $name . '"] = "' . $id . '"';
+}
+
+$resourceParentsString = implode(";\n", $resourceParents);
+$idResourceMapString = implode(";\n", $idResourceMap);
+
+$form = new Zend_Form();
+
+$resource = new Zend_Form_Element_Select('available_resources');
+$resource->setLabel('Resources');
+$resource->setMultiOptions($resources);
+$resource->setAttribs(array(
+						'size' => 12 ));
+
+$resourceId = new Zend_Form_Element_Hidden('current_resource_id');
+$resourceId->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+$resourceName = new Zend_Form_Element_Text('name');
+$resourceName->setLabel('Resource Name');
+
+$resourceParent = new Zend_Form_Element_Select('parent');
+$resourceParent->setLabel('Resource Parent');
+$resourceParent->addMultiOption('', '-');
+$resourceParent->addMultiOptions( $resources );
+//$resourceParent->setAttribs(array(
+//							'size' => 12));
+
+$createButton = new Zend_Form_Element_Button('Create');
+$createButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+			
+$updateButton = new Zend_Form_Element_Button('Update');
+$updateButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+			
+$deleteButton = new Zend_Form_Element_Button('Delete');
+$deleteButton->removeDecorator('DtDdWrapper')
+			->removeDecorator('Label');
+
+$elements = array(
+	$resource,
+	$resourceId,
+	$resourceName,
+	$resourceParent,
+	$createButton,
+	$updateButton,
+	$deleteButton
+);
+
+$form->addElements( $elements );
+?>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+var resourceParents = new Array();
+<?php echo $resourceParentsString; ?>
+
+var idResourceMap = new Array();
+<?php echo $idResourceMapString; ?>
+
+$("select#available_resources").change(function(){
+	var selectedValue = $("select#available_resources option:selected").attr("value");
+	var selectedText = $("select#available_resources option:selected").text();
+	var selectedParent = resourceParents[selectedValue];
+	var selectedParentId = idResourceMap[selectedParent];
+	
+	if (!selectedParentId) selectedParentId = '';
+	
+	$("#current_resource_id").attr("value", selectedValue );
+	$("#name").attr("value", selectedText );
+	
+	$("#parent option[value=" + selectedParentId  + "]").attr("selected", true);
+});
+
+
+$("#Create").click(function(){
+	resourceName = $("#name").attr("value");
+	resourceParent = $("#parent option:selected").text();
+	if (resourceParent == '-') resourceParent = '';
+	
+	$("select#available_resources").hide('fast');
+	$.getJSON("/admin/acl/ajax.resource.create/name/" + resourceName + "/parent/" + resourceParent , {}, function(j) {
+			refreshResourceList();
+	})
+	//$("select#available_resources").show('slow');
+});
+
+
+$("#Update").click(function(){
+	resourceId = $("#current_resource_id").attr("value");
+	resourceName = $("#name").attr("value");
+	resourceParent = $("#parent option:selected").text();
+	if (resourceParent == '-') resourceParent = '';
+	
+	$("select#available_resources").hide('fast');
+	
+	$.getJSON(
+		"/admin/acl/ajax.resource.update/", 
+		{
+			id: resourceId,
+			name: resourceName,
+			parent: resourceParent
+		}, 
+		function(j) {
+			refreshResourceList();
+	})
+	//$("select#available_resources").show('slow');
+});
+
+
+$("#Delete").click(function(){
+	resourceId = $("#current_resource_id").attr("value");
+	$("select#available_resources").hide('fast');
+	$.getJSON("/admin/acl/ajax.resource.delete/id/" + resourceId , {}, function(j) {
+			refreshResourceList();
+	})
+	//$("select#available_resources").show('slow');
+});
+
+function refreshResourceList() {
+	$("select#available_resources").hide('fast');
+	$.getJSON("/admin/acl/ajax.resource.list/", {}, function(j) {
+		var options = '';
+		resourceParents = new Array();
+		for(var i = 0; i < j.length; i++) {
+			options += '<option value="' + j[i].acl_resource_id + '">' + j[i].name + '</option>';
+			resourceParents[j[i].acl_resource_id] = j[i].parent;
+		}
+		$("select#available_resources").html(options);
+	})
+	$("select#available_resources").show('slow');
+}
+});
+</script>
+<div style="width: 100%;">
+	<div style="
+		margin: auto; 
+		position: relative;
+		border: solid 1px #a0a0a0; 
+		width: 100%; 
+		min-height: 600px; 
+		vertical-align: top;">
+		
+		<?php echo $form; ?>
+	</div>
+	
+</div>
+<?php
+
+$this->headScript()->appendScript($script);  
+?>

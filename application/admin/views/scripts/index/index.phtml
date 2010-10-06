@@ -1,0 +1,132 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Index
+ * @category Core
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = Zre_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+
+if (isset($vars['content'])) echo $vars['content'];
+
+$logout_minutes = ((int)$settings->site->session_timeout) / 60;
+
+$template_name = (string)$settings->site->template;
+
+$searchIndexLinkText = $t->_('Search settings');
+$aclIndexLinkText = $t->_('Acl settings');
+$pluginIndexLinkText = $t->_('Plugin manager');
+	
+//$output = <<<EOD
+//<h3 class="content_title">{$t->_('Home')}</h3>
+//<p>
+//	Please click an option to administer that part of this site.
+//</p>
+//<div>
+//	<a href="/admin/index/settings">
+//		<img src="/styles/$template_name/components/content/administration/settings.png" alt="[System Settings]" />
+//	</a>
+//	<a href="/admin/users">
+//		<img src="/styles/$template_name/components/content/administration/users.png" alt="[Users]" />
+//	</a>
+//	<a href="/admin/articles">
+//		<img src="/styles/$template_name/components/content/administration/articles.png" alt="[Articles]" />
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/backup/">
+//		<img src="/styles/$template_name/components/content/administration/backup.png" alt="[Backup]" />
+//	</a>
+//	<a href="/admin/orders">
+//		<img src="/styles/$template_name/components/content/administration/orders.png" alt="[Orders]" />
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/index/updates">
+//		<img src="/styles/$template_name/components/content/administration/updates.png" alt="[Updates]" />
+//	</a>
+//	<a href="/admin/products">
+//		<img src="/styles/$template_name/components/content/administration/products.png" alt="[Products]" />
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/logs">
+//		<img src="/styles/$template_name/components/content/administration/errors.png" alt="[Errors]" />
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/search/">
+//		$searchIndexLinkText
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/acl/">
+//		$aclIndexLinkText
+//	</a>
+//</div>
+//<div>
+//	<a href="/admin/plugins/">
+//		$pluginIndexLinkText
+//	</a>
+//</div>
+//
+//<p>
+//	<b><i>Note: You will automatically be logged out after {$logout_minutes} minutes of inactivity.</i></b>
+//</p>
+//EOD;
+?>
+<style type="text/css">
+	
+/* Vertical Tabs
+----------------------------------*/
+.ui-tabs-vertical { width: 55em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+
+</style>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		$('#adminTabs').tabs();
+//		$('#adminTabs').tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
+//		$("#adminTabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
+	});
+</script>
+
+<h3 class="content_title"><?php echo $t->_('Home');?></h3>
+<div id="adminTabs">
+	<ul>
+		<li><a href="/admin/settings"><span>System</span></a></li>
+		<li><a href="/admin/acl"><span>ACL</span></a></li>
+		<li><a href="/admin/users"><span>Users</span></a></li>
+		<li><a href="/admin/articles"><span>Content</span></a></li>
+		<li><a href="/admin/orders"><span>Orders</span></a></li>
+		<li><a href="/admin/products"><span>Listings</span></a></li>
+		
+	</ul>
+</div>
+<?php 
+// Check for plugins
+//echo Plugin::search_and_insert($output);
+//
+//echo $output;
+
+echo $this->form;
+?>

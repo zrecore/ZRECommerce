@@ -1,0 +1,33 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Admin_Acl
+ * @category Views
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$vars = $this->getVars();
+$params = $vars['params'];
+
+$id = $params['id'];
+$aclAllow = new Zre_Dataset_Acl_Allow();
+$rows = $aclAllow->read( $id );
+
+foreach($rows as $index => $value) {
+	if (isset($value['resources'])) {
+		$rows[$index]['resources'] = unserialize($value['resources']);
+	}
+	
+	if (isset($value['privileges'])) {
+		$rows[$index]['privileges'] = unserialize($value['privileges']);
+	}
+}
+
+echo Zend_Json::encode( $rows );
+?>

@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Default error view
+ *  
+ * @author
+ * @version
+ */
+
+$this->headTitle('Error Page', Zend_View_Helper_Placeholder_Container_Abstract::SET);
+$this->placeholder('title')->set($this->title);
+?>
+
+<?php if ($this->message): ?>
+	<p>The following error occurred:</p>
+	<?php echo $this->message ?>
+<?php endif; ?>

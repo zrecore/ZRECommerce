@@ -1,0 +1,52 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Acl
+ * @subpackage Acl
+ * @category Acl
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$vars = $this->getVars();
+$params = isset($vars['params']) ? $vars['params'] : null;
+
+// Content
+if (isset($vars['content'])) echo $vars['content'];
+?>
+<style type="text/css">
+	
+/* Vertical Tabs
+----------------------------------*/
+.ui-tabs-vertical { width: 55em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+
+</style>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+//		$('#aclTabs').tabs();
+		$('#aclTabs').tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
+		$("#aclTabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
+	});
+</script>
+<h1><?php echo $t->_('Select a task');?></h1>
+<div id="aclTabs">
+<ul>
+	<li><a href="/admin/acl/resources/"><span><?php echo $t->_('Edit Resources');?></span></a></li>
+	<li><a href="/admin/acl/roles/"><span><?php echo $t->_('Edit Roles');?></span></a></li>
+	<li><a href="/admin/acl/allow/"><span><?php echo $t->_('Edit Allow Rules');?></span></a></li>
+	<li><a href="/admin/acl/deny/"><span><?php echo $t->_('Edit Deny Rules');?></span></a></li>
+</ul>
+</div>

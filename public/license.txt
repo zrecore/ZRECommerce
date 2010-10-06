@@ -1,0 +1,31 @@
+License 
+	- Creative Commons: Attribution - Share Alike 3.0 United States
+
+Copyrights 2008 ZRECommerce - All rights reserved.
+
+See http://creativecommons.org/licenses/by-sa/3.0/us/ for more details
+
+You are free:
+
+    * to Share — to copy, distribute and transmit the work
+    * to Remix — to adapt the work
+
+Under the following conditions:
+
+    * Attribution — You must attribute the work in the manner specified by the 
+      author or licensor (but not in any way that suggests that they endorse 
+      you or your use of the work).
+
+      Attribute this work:
+      Information
+      What does "Attribute this work" mean?
+      The page you came from contained embedded licensing metadata, including 
+      how the creator wishes to be attributed for re-use. You can use the HTML 
+      here to cite the work. Doing so will also include metadata on your page 
+      so that others can find the original work as well.
+      
+    * Share Alike — If you alter, transform, or build upon this work, you may 
+      distribute the resulting work only under the same, similar or a compatible 
+      license.
+      
+See http://creativecommons.org/licenses/by-sa/3.0/us/ for more details

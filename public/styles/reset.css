@@ -1,0 +1,18 @@
+@CHARSET "UTF-8";
+
+html, body, address, blockquote, div, dl, form, h1, h2, h3, h4, h5, h6, ol, p, pre, table, ul,
+dd, dt, li, tbody, td, tfoot, th, thead, tr, button, del, ins, map, object,
+a, abbr, acronym, b, bdo, big, br, cite, code, dfn, em, i, img, kbd, q, samp, small, span,
+strong, sub, sup, tt, var, legend, fieldset {
+margin: 0;
+padding: 0;
+}
+img, fieldset {
+border: 0;
+}
+
+body, select, input, textarea {
+font: 100%/1.2 sans-serif, "lucida sans", verdana, arial, helvetica;
+}
+
+.ui-tabs {font-size: 0.95em !important}

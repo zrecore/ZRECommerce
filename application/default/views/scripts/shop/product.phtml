@@ -1,0 +1,200 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Default
+ * @subpackage Default_Shop_Product
+ * @category Views
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$vars = $this->getVars();
+$params = $vars['params'];
+$baseCssUrl = Zre_Template::baseCssTemplateUrl();
+
+$productId = isset($params['id']) ? $params['id'] : 1;
+$productTitleText = '';
+$product = new Zre_Dataset_Product();
+$productData = $product->read( $productId )->current();
+
+$productTitleText = $productData->title . ' - ';
+
+$productId = 		$productData->product_id;
+$productTitle = 	$productData->title;
+$productDescription = $productData->description;
+$productImage = 	($productData->image != '' ? $productData->image : '/images/dummy.png');
+
+$zendCurrency = 	new Zend_Currency((string)$settings->site->currency);
+$productPrice = 	$zendCurrency->toCurrency( $productData->price );
+$productWeight = 	$productData->weight;
+$productSize = 		$productData->size;
+
+$productStockLeft = $productData->allotment - ( $productData->pending + $productData->sold );
+
+
+$this->headTitle($productTitleText . (string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+if (isset($vars['content'])) echo $vars['content'];
+
+// ...Display product info
+
+?>
+<div class="productArea">
+	<div class="productAreaHeader">
+		<div class="productImageContainer">
+			<img class="productImage" src="<?php echo $productImage;?>" alt="[<?php echo $t->_('Image: ') .  $productTitle; ?>]" />
+		</div>
+		<div class="productDataContainer">
+			<h2 class="productTitle"><?php echo $productTitle; ?></h2>
+			<p class="productAmountLeftLabel"><?php echo $t->_('Amount Left'); ?> - <span class="productAmountLeftValue"><?php echo $productStockLeft . ' ' . $t->_('Units'); ?></span></p>
+			<p class="productPriceLabel"><?php echo $t->_('Price'); ?> - <span class="productPriceValue"><?php echo $productPrice; ?></span></p>
+			<p class="productWeightLabel"><?php echo $t->_('Weight'); ?> - <span class="productWeightValue"><?php echo $productWeight; ?></span></p>
+			<p class="productSizeLabel"><?php echo $t->_('Size'); ?> - <span class="productSizeValue"><?php echo $productSize; ?></span></p>
+			<div class="productShippingContainer">
+				<div class="productShippingTitle">
+					<?php echo $t->_('Shipping'); ?>
+				</div>
+				<div class="productShipingValuesListingContainer">
+					<ul class="productShipingValuesListing">
+						<?php 
+							/**
+							 * @todo List product shipping options here.
+							 */
+						?>
+					</ul>
+				</div>
+				<div class="productThumbnailContainer">
+					<?php 
+						/**
+						 * @todo List product thumbnail gallery widget here.
+						 */
+					?>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<div class="productAreaBody">
+		<div class="productAreaReview">
+			
+				<div class="productReviewRatingBackground">
+					<?php 
+					/**
+					 * display 5 star rating, out of total amount of reviews.
+					 */
+							
+					$productRating = 75; //percent out of 100
+					$productTotalReviews = 765;
+					?>
+					<div class="productReviewRatingForeground" style="width: <?php echo $productRating?>%"></div>
+				</div>
+				<span><?php echo $productRating?>% (<?php echo $productTotalReviews . ' ' . $t->_('Reviews');?>)</span>
+			
+		</div>
+		<div class="productReviewDescription">
+			<h3 class="productReviewTitle"><?php echo $t->_('Latest User Reviews'); ?></h3>
+			<div class="productReviewText">
+				<?php 
+					/**
+					 * Display excerpts from latest reviews.
+					 */
+					echo str_repeat('foobarbaz this is a test. ', 20);
+				?>
+			</div>
+		</div>
+	</div>
+	<div class="productAreaFooter">
+		<div class="productDescription">
+			<h3 class="productDescriptionTitle">
+				<?php echo $t->_('Product Description'); ?>
+			</h3>
+			<div class="productDescriptionText">
+				<?php echo $productDescription; ?>
+			</div>
+		</div>
+		<div class="productAddToCartArea">
+			<div class="boxSmallTop"></div>
+			<div class="boxSmallCenter">
+			<?php 
+				
+				$form = new Zend_Form();
+				$form->setAction( $this->url(array('controller' => 'shop', 'action' => 'add')) );
+				$form->setMethod(Zend_Form::METHOD_POST);
+				
+				$id = new Zend_Form_Element_Hidden('id');
+				$id->setValue( $productId );
+				$id->removeDecorator('DtDdWrapper');
+				
+				/**
+				 * @todo Add anti crsf unique key field
+				 */
+				
+				$quantity = new Zend_Form_Element_Text('quantity');
+				$quantity->setValidators(array( new Zend_Validate_GreaterThan(0)));
+				$quantity->setLabel('Quantity:');
+				$quantity->setValue(1);
+				
+				/**
+				 * @todo Implement dynamic product attributes here
+				 * 		 They need to be hidden input fields, that are updated
+				 * 		 by changing items under the "product options" section.
+				 */
+				
+				$buttonAdd = new Zend_Form_Element_Image('Add');
+				$buttonAdd->setAttribs(array(
+												'class' => 'productButtonAddToCart',
+												'src' => $baseCssUrl . '/components/product.button.red.png' ));
+				
+				$buttonAdd->removeDecorator('DtDdWrapper');
+				
+				$form->addElements(array(	$quantity,
+											$buttonAdd, 
+											$id ));
+				
+				echo $form;
+			?>
+			</div>
+			<div class="boxSmallBottom"></div>
+		</div>
+		
+		<div class="productOptionsArea">
+			<div class="boxLargeTop"></div>
+			<div class="boxLargeCenter">
+				<h3 class="productOptionsTitle"><?php echo $t->_('Product Options'); ?></h3>
+				<ul class="productOptionsList">
+					<?php 
+						/**
+						 * @todo List product options here. changing properties
+						 * 		 here should update the hidden fields in the
+						 * 		 "Add" form.
+						 */
+					?>
+					<li>Size: <select>
+						<optgroup label="Red">
+							<option>small</option>
+							<option>medium</option>
+							<option>large</option>
+						</optgroup>
+						<optgroup label="Green">
+							<option>small</option>
+							<option>medium</option>
+						</optgroup>
+						<optgroup label="Blue">
+							<option>large</option>
+						</optgroup>
+					</select></li>
+				</ul>
+			</div>
+			<div class="boxLargeBottom"></div>
+		</div>
+	</div>
+</div>

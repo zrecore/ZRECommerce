@@ -1,0 +1,94 @@
+/*  
+	Import the default dojo.css script (It does a lot of the reset
+	work for us)
+	
+*/
+
+
+body
+{
+	margin: 0px; 
+	padding: 0px; 
+	background-image: url('/styles/redCarpet/components/background.png');
+	font-size: 0.8em;
+}
+
+#body-content-span
+				{ width: 100%; text-align: center; 
+				  background-repeat: repeat-x;
+				  background-image: url('/styles/redCarpet/components/header/header.repeat.png');
+				  background-position: top center; padding-top: 24px; }
+#body-content-wrapper 
+				{ width: 891px; 
+				  position: relative; 
+				  color: #000000; 
+				  background-image: url('/styles/redCarpet/components/body.png'); 
+				  height: 101%; 
+				  margin: auto;}
+
+#body-content-wrapper input, 
+#body-content-wrapper select, 
+#body-content-wrapper button, 
+#body-content-wrapper textarea,
+#body-content-wrapper fieldset
+				{ color: #000000; }
+				
+#body-content-wrapper .RichTextEditable
+				{ background-color: #ffffff; }
+				  
+.align-left 	{ position: absolute; left: 0px; }
+.align-right 	{ position: absolute; right: 0px; }
+
+.no-fluf 		{ margin: 0px; padding: 0px;  }
+.fluf-left
+				{ margin-left: 8px;}
+
+.float-box-left	{ margin: auto; float: left;  }
+.float-box-right{ margin: auto; float: right; }
+
+.text-left {text-align: left;}
+.text-right {text-align: right;}
+.no-bullets {list-style: none;}
+.small-text {font-size: smaller;}
+.h1 {font-size: 2.2em !important; font-weight: bold;}
+.h2 {font-size: 2.0em !important; font-weight: bold;}
+.h3 {font-size: 1.8em !important; font-weight: bold;}
+.h4 {font-size: 1.6em !important; font-weight: bold;}
+.h5 {font-size: 1.4em !important; font-weight: bold;}
+.h6 {font-size: 1.2em !important; font-weight: bold;}
+
+.tool-bar
+				{ background-color: #f0f0ff; margin-top: 4px; }
+
+.errors
+	{ color: #990000; font-size: 0.8em; }
+.ok
+	{ color: #009900; font-size: 1.0em; font-weight: bold;}
+.required
+	{ color: #555; }
+.not_required
+	{ color: #00b4ff; }
+
+.zend_form_dojo dt, .zend_form_dojo dd
+	{ margin: auto; margin-top: 4px; margin-bottom: 4px; padding: 0px; }
+.zend_form_dojo dt label 
+	{ color: #00b4ff; font-weight: bold; }
+.zend_form_dojo dt label.required
+	{ color: #007eb3; font-weight: bold; }
+.zend_form_dojo dd .description
+	{ color: #c0c0c0; font-weight: bold; font-size: 0.8em; margin: auto; margin-top: 3px; margin-bottom: 0px; padding: 0px; }
+	
+.zend_form_dojo div fieldset label 
+	{ color: #a0a0a0; font-weight: bold; }
+.zend_form_dojo div fieldset label.required
+	{ color: #808080; font-weight: bold; }
+.zend_form_dojo div fieldset .description
+	{ color: #a0a0a0; font-weight: bold; font-size: 0.8em; margin: auto; margin-top: 3px; margin-bottom: 0px; padding: 0px; }
+	
+.zend_form_dojo dd
+	{
+		margin-bottom: 18px;
+	}
+	
+input
+{ color: #000000; }

@@ -1,0 +1,14 @@
+<?php
+	$version = '1.1.1';
+?>
+<h3>Updates</h3>
+<div>
+	Your installation is at version <?php echo $version;?>
+	<?php
+		$isLatestVersion = true;
+
+		if (!$isLatestVersion) {
+	?> Please update to the lasest version. <a href="/admin/settings/update?start=1">Update Now.</a><?php 
+		}
+	?>
+</div>

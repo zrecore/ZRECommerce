@@ -1,0 +1,64 @@
+/*  
+	Import the default dojo.css script (It does a lot of the reset
+	work for us)
+	
+*/
+
+
+body
+	{margin: 0px; padding: 0px; background-image: url('/styles/default/components/background.png');}
+
+#body-content-span
+				{ width: 100%; text-align: center; 
+				  background-repeat: repeat-x; 
+				  background-image: url('/styles/default/components/background-repeat.png'); }
+#body-content-wrapper 
+				{ width: 833px; 
+				  position: relative; 
+				  background-image: url('/styles/default/components/body-repeat.png'); 
+				  height: 101%; 
+				  margin: auto;}
+.align-left 	{ position: absolute; left: 0px; }
+.align-right 	{ position: absolute; right: 0px; }
+
+.no-fluf 		{ margin: 0px; padding: 0px;  }
+.fluf-left
+				{ margin-left: 8px;}
+
+.float-box-left	{ margin: auto; float: left;  }
+.float-box-right{ margin: auto; float: right; }
+
+.tool-bar
+				{ background-color: #f0f0ff; margin-top: 4px; }
+
+.errors
+	{ color: #990000; font-size: 0.8em; }
+.ok
+	{ color: #009900; font-size: 1.0em; font-weight: bold;}
+.required
+	{ color: #007eb3; }
+.not_required
+	{ color: #00b4ff; }
+
+.zend_form_dojo dt, .zend_form_dojo dd
+	{ margin: auto; margin-top: 4px; margin-bottom: 4px; padding: 0px; }
+.zend_form_dojo dt label 
+	{ color: #00b4ff; font-weight: bold; }
+.zend_form_dojo dt label.required
+	{ color: #007eb3; font-weight: bold; }
+.zend_form_dojo dd .description
+	{ color: #c0c0c0; font-weight: bold; font-size: 0.8em; margin: auto; margin-top: 3px; margin-bottom: 0px; padding: 0px; }
+	
+.zend_form_dojo div fieldset label 
+	{ color: #a0a0a0; font-weight: bold; }
+.zend_form_dojo div fieldset label.required
+	{ color: #808080; font-weight: bold; }
+.zend_form_dojo div fieldset .description
+	{ color: #a0a0a0; font-weight: bold; font-size: 0.8em; margin: auto; margin-top: 3px; margin-bottom: 0px; padding: 0px; }
+	
+.zend_form_dojo dd
+	{
+		margin-bottom: 18px;
+	}
+img 
+	{max-width: 98%}

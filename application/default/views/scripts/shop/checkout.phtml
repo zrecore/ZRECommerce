@@ -1,0 +1,28 @@
+<?php
+if (isset($this->content)) {
+	?><div id="message" class="errors"><?php echo $this->content;?></div><?php 
+}
+$d = array();
+if (isset($this->data)) $d = $this->data;
+?>
+<form action="/shop/checkout" method="post">
+	<h3>Bill To:</h3>
+	<ul class="form-list">
+		<li><label>First Name:</label><input type="text" name="firstName" value="<?php echo isset($d->firstName) ? $d->firstName : '';?>" /></li>
+		<li><label>Last Name:</label><input type="text" name="lastName" value="<?php echo isset($d->lastName) ? $d->lastName : '';?>" /></li>
+		<li><label>Address (line 1):</label><input type="text" name="street1" value="<?php echo isset($d->street1) ? $d->street1 : '';?>" /></li>
+		<li><label>Address (line 2):</label><input type="text" value="<?php echo isset($d->street2) ? $d->street2 : '';?>" /></li>
+		<li><label>City:</label><input type="text" name="city" value="<?php echo isset($d->city) ? $d->city : '';?>" /></li>
+		<li><label>State:</label><select name="state"><option value="CA"<?php echo isset($d->state) && $d->state == 'CA' ? ' selected="selected"' : '' ?>>California</option></select></li>
+		<li><label>Zip:</label><input type="text" name="postalCode" value="<?php echo isset($d->postalCode) ? $d->postalCode : '';?>" /></li>
+		<li><label>Country:</label><select name="country"><option value="US"<?php echo isset($d->country) && $d->country == 'US' ? ' selected="selected"' : '' ?>>United States of America</option></select></li>
+		<li><label>E-Mail:</label><input type="text" name="email"  value="<?php echo isset($d->email) ? $d->email : '';?>" /></li>
+	</ul>
+	<h3>Credit Card:</h3>
+	<ul class="form-list">
+		<li><label>Account Number:</label><input type="text" name="accountNumber" /></li>
+		<li><label>Expiration Month (MM):</label><input type="text" name="expirationMonth" /></li>
+		<li><label>Expiration Year (YYYY):</label><input type="text" name="expirationYear" /></li>
+	</ul>
+	<input type="submit" name="billingSubmitted" value="Pay Now" />
+</form>

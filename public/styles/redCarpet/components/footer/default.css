@@ -1,0 +1,11 @@
+#footer-bar
+	{ width: 100%; 
+	  bottom: -83px; 
+	  left: 0px; 
+	  margin: auto; 
+	  position: relative;
+	  height: 83px; 
+	  color: #ffffff;
+	  font-weight: bold;
+	  background-repeat: no-repeat;
+	  background-image: url('/styles/redCarpet/components/footer/footer.png'); }

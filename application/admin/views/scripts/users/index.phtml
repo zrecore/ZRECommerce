@@ -1,0 +1,130 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Users
+ * @category Core
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+
+if (isset($vars['content'])) echo $vars['content'];
+
+/**
+ * @todo implement pagination jquery plugin.
+ */
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		$('#btnCreateUser').click(function(ev){
+			// ...Create the article via getJSON()
+		});
+
+		$('#frmUsers').tableSort({
+			onTableRowClick: function(ev){
+				alert($(this).html());
+			},
+			onJsonSuccess: function(response){
+				$('#frmUsers .table-data .table-row').remove();
+
+				$.each(response.data, function(i, row){
+					
+					$('#frmUsers .table-data').append(
+						'<tr class="table-row">' + 
+						'	<td>' + row.user_id + '</td>' +
+						'	<td>' + row.name + '</td>' +
+						'	<td>' + row.email + '</td>' +
+						'	<td>' + row.role + '</td>' +
+						'	<td>' + row.city + '</td>' +
+						'	<td>' + row.state_province + '</td>' +
+						'	<td>' + row.zipcode + '</td>' +
+						'	<td>' + row.country + '</td>' + 
+						'</tr>'
+					);
+				});
+			}
+		});
+	});
+</script>
+<form id="frmUsers" action="/admin/users/json.list">
+	<input type="hidden" class="table-sort-order" value="DESC" />
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th><a href="#user_id">ID</a></th>
+			<th><a href="#name">User</a></th>
+			<th><a href="#email">E-Mail</a></th>
+			<th><a href="#role">Role</a></th>
+			<th><a href="#city">City</a></th>
+			<th><a href="#state_province">State</a></th>
+			<th><a href="#zipcode">Zip</a></th>
+			<th><a href="#country">Country</a></th>
+		</tr>
+	<?php 
+	if (count($this->records) > 0):
+		foreach($this->records as $i => $r):
+			$r = (object)$r;
+	?>
+		<tr class="table-row">
+			<td><?php echo $r->user_id?></td>
+			<td><?php echo $r->name?></td>
+			<td><?php echo $r->email?></td>
+			<td><?php echo $r->role?></td>
+			<td><?php echo $r->city?></td>
+			<td><?php echo $r->state_province?></td>
+			<td><?php echo $r->zipcode?></td>
+			<td><?php echo $r->country?></td>
+		</tr>
+	<?php
+		endforeach;
+	else:
+	?>
+	
+	
+	<?php  
+	endif;
+	?>
+	</table>
+</form>
+<br />
+<br />
+<h3><?php echo $t->_('Create a new user'); ?></h3>
+<form id="frmCreateUser" class="form-list">
+	<ul>
+		<li>
+			<label for="new_user_name"><?php echo $t->_('User Name:'); ?></label>
+			<input type="text" id="new_user_name" value="" />
+		</li>
+		<li>
+			<label for="new_user_email"><?php echo $t->_('E-Mail:'); ?></label>
+			<input type="text" id="new_user_email" value="" />
+		</li>
+		<li>
+			<label for="new_user_role"><?php echo $t->_('Role:'); ?></label>
+			<select id="new_user_role">
+				<?php 
+				$roles = new Zre_Dataset_Acl_Role();
+				$data = $roles->listAll(null, array('order' => 'name ASC'));
+				foreach ($data as $row) {
+					$row = (object) $row;
+					?><option value="<?php echo $row->acl_row_id; ?>"><?php echo $row->name; ?></option><?php 
+				}
+				?>
+			</select>
+		</li>
+	</ul>
+	<input type="button" id="btnCreateUser" value="<?php echo 'New User'; ?>" />
+</form>

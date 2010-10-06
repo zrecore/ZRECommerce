@@ -1,0 +1,152 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Plugin_Index
+ * @category Controllers
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = Zre_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+$params = $vars['params'];
+
+if (isset($vars['content'])) echo $vars['content'];
+
+$plugins = Plugin_Dataset_Plugins::listAll();
+
+$isSubmitted = isset($params['is_submitted']); 
+$probe = Plugin::probe();
+
+ksort($probe, SORT_ASC);
+
+if ($isSubmitted == 1) {
+	
+	$listInstalledPlugins = array();
+	//... Form submitted. Validate and process.
+	foreach ($plugins as $index => $plugin) {
+		$id = $plugin['id'];
+		$name = $plugin['name'];
+		
+		$enabled = (isset($params["plugin-$id-enabled"]) ? 1 : 0);
+		$position = $params["plugin-$id-position"];
+		
+		$listInstalledPlugins[] = $name;
+
+		$newData = array(	'id' => $id, 
+							'enabled' => $enabled,
+							'position' => $position );
+		
+		Plugin_Dataset_Plugins::update( $newData );
+				
+		
+	}
+	
+	foreach ($probe as $key => $value) {
+		$isInstalled = (int) in_array($key, $listInstalledPlugins);
+		$installed = (isset($params["probe-$key-installed"]) ? 1 : 0);
+		
+		if ($isInstalled) {
+			if (!$installed) {
+				$className = 'Plugin_' . $key;
+				$plugin = new $className();
+				$plugin->uninstall();
+				
+				$pluginData = Plugin_Dataset_Plugins::listAll('name = ?', $name);
+				$id = $pluginData[0]['id'];
+				
+				Plugin_Dataset_Plugins::delete(array('id' => $id));
+			}
+		} else {
+			if ($installed) {
+				// ...Install it.
+				$className = 'Plugin_' . $key;
+				$plugin = new $className();
+				$plugin->install();
+				
+				Plugin_Dataset_Plugins::create(array('name' => $key));
+			}
+		}
+	}
+	
+	$plugins = Plugin_Dataset_Plugins::listAll();
+}
+
+?>
+<form method="post" id="frmPlugins">
+<input type="hidden" name="is_submitted" value="1" />
+<h3><?php echo $t->_('Installed');?></h3>
+<table cellspacing="8" cellpadding="0" border="0" style="border: solid 1px #a0a0a0;">
+	<tr>
+		<td><?php echo $t->_('Id'); ?></td>
+		<td><?php echo $t->_('Name'); ?></td>
+		<td><?php echo $t->_('Enabled'); ?></td>
+		<td><?php echo $t->_('Position'); ?></td>
+	</tr>
+<?php 
+$listInstalledPlugins = array();
+
+foreach ($plugins as $plugin) {
+	$id = $plugin['id'];
+	$name = $plugin['name'];
+	$enabled = $plugin['enabled'];
+	$position = $plugin['position'];
+	
+	$listInstalledPlugins[] = $name;
+	
+	?>
+	<tr class="">
+		<td class=""><?php echo $id; ?></td>
+		<td class=""><?php echo $name; ?></td>
+		<td class=""><input name="plugin-<?php echo $id; ?>-enabled"
+				   id="plugin-<?php echo $id; ?>-enabled"
+				   type="checkbox" <?php echo ($enabled ? 'checked="checked" ' : ''); ?>/></td>
+		<td class=""><input 
+				   name="plugin-<?php echo $id; ?>-position"
+				   id="plugin-<?php echo $id; ?>-position"
+				   type="text"
+				   value="<?php echo $position; ?>" /></td>
+	</tr>
+	<?php 
+}
+?>
+</table>
+<h3><?php echo $t->_('Found');?></h3>
+<table cellspacing="8" cellpadding="0" border="0" style="border: solid 1px #a0a0a0;">
+	<tr>
+		<td><?php echo $t->_('Name'); ?></td>
+		<td><?php echo $t->_('Installed'); ?></td>
+	</tr>
+<?php 
+foreach ($probe as $key => $value) {
+	
+	$isInstalled = in_array( $key, $listInstalledPlugins );
+	
+	?>
+	<tr class="">
+		<td class=""><a href="JavaScript: 
+			void(document.getElementById('probe-<?php echo $key; ?>-installed').checked = (
+			document.getElementById('probe-<?php echo $key; ?>-installed').checked ? '' : 'checked'));" title="<?php echo $value['path']; ?>"><?php echo $key; ?></a></td>
+		<td class=""><input 
+						type="checkbox" 
+						name="probe-<?php echo $key; ?>-installed" 
+						id="probe-<?php echo $key; ?>-installed" <?php echo ($isInstalled ? 'checked="checked" ' : ''); ?>/></td>
+	</tr>
+	<?php 
+}
+?>
+</table>
+<input type="submit" value="<?php echo $t->_('Ok'); ?>" /><input type="reset" value="<?php echo $t->_('Reset'); ?>" />
+</form>

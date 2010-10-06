@@ -1,0 +1,55 @@
+<?php
+/**
+ * ZRECommerce e-commerce web application.
+ * 
+ * @author ZRECommerce
+ * 
+ * @package Admin
+ * @subpackage Products
+ * @category Core
+ * 
+ * @version $Id$
+ * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
+ * @license Creative Commons license - See public/license.txt
+ */
+
+$settings = ZRE_Config::getSettingsCached();
+$t = Zend_Registry::get('Zend_Translate');
+
+$this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+if (empty($this->title)) $this->title = (string)$settings->site->title;
+$this->placeholder('title')->set($this->title);
+
+$vars = $this->getVars();
+
+if (isset($vars['enable_dojo']) && $vars['enable_dojo'])
+{
+	$this->dojo()->enable()
+		->setDjConfigOption('parseOnLoad', true);
+}
+if (isset($vars['content'])) echo $vars['content'];
+
+// Menu
+$config = array(
+	'All' => 		array('id'=>'mnuAdminProductsAll', 'class'=>'menuItem', 'url'=>'/admin/products/'),
+	'New' => 		array('id'=>'mnuAdminProductsNew', 'class'=>'menuItem', 'url'=>'/admin/products/new/'),
+	'Categories' => array('id'=>'mnuAdminProductsCategories', 'class'=>'menuItem', 'url'=>'/admin/products/categories/')
+);
+echo new Zre_Ui_Menu('mnuOptions', $config);
+
+$articlesCategoryTree = new Zre_Ui_Jquery_Tree('articleCategoryTree', '/admin/products/ajaxcategories/');
+			
+$this->headScript()->appendFile( '/scripts/jquery/jqueryFileTree/jqueryFileTree.js' );
+$this->headScript()->appendScript( $articlesCategoryTree->getScript() );
+?>
+<p>
+<?php echo $t->_('article_info_new'); ?>
+</p>
+<div style="width: 100%; position: relative; display: block; margin: auto;">
+	<div style="float: left; width: 25%; height: 440px; overflow: scroll;">
+		<?php echo $articlesCategoryTree->getHtml();?>
+	</div>
+	<div style="width: 95%;">
+		<?php echo $this->form; ?>
+	</div>
+</div>

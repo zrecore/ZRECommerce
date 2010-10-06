@@ -1,0 +1,34 @@
+<?php
+
+$cart = $this->cart_container;
+$order_id = $this->order_id;
+$product = new Zre_Dataset_Product();
+?>
+<h1>Checkout Complete</h1>
+
+Thank you for your order. You may <a href="JavaScript:window.print();">print</a> this page for your records.<br /><br />
+
+<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+	<tr class="table-header">
+		<th colspan="2">Order #<?php echo $order_id?></th>
+	</tr>
+	<tr class="table-header">
+		<th>Quantity</th>
+		<th>Item</th>
+	</tr>
+	<?php foreach($cart->getItems() as $cartItem): 
+			$item = Cart_Container_Item::factory($cartItem); ?>
+	<tr class="table-row">
+		<td><?php echo $item->getQuantity(); ?>@<?php echo $item->getCostOptions()->calculate(); ?></td>
+		<td>
+		<?php $p = $product->read($item->getSku())->current();?>
+		<p><?php echo $p->title; ?></p>
+		<small><?php echo $p->description;?></small>
+		</td>
+	</tr>
+	<?php endforeach;?>
+	<tr class="table-header">
+		<th>Total:</th>
+		<th><?php echo $cart->getTotal(); ?></th>
+	</tr>
+</table>

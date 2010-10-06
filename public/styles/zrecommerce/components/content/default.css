@@ -1,0 +1,113 @@
+#center-column
+{	width: 90%;
+	margin: auto;
+	margin-top: 2%;
+	left: 5%;
+	text-align: left;
+	vertical-align: top; }
+
+#center-column-center
+{	width: 50%;
+	margin: auto; 
+	margin-top: 2%;
+	left:20%; 
+	
+	text-align: left;
+	vertical-align: top; }
+
+#center-column-left
+{	width: 71%;
+	margin: auto;
+	margin-top: 2%; 
+	left: -11%;
+	
+	text-align: left;
+	vertical-align: top;
+	position: relative; }
+
+#center-column-right
+{	width: 71%;
+	margin: auto; 
+	margin-top: 2%;
+	right: -9%; 
+
+	text-align: left;
+	vertical-align: top;
+	position: relative; }
+	
+.content_title
+{padding: 0px; margin: 0px;}
+
+.textAlignCenter
+{ text-align: center;}
+
+/* Data table css properties */
+.dataTable
+{margin-top: 1%; width: 100%;}
+
+.dataHeader
+{font-weight: bold; text-align: left; text-transform: uppercase;}
+.dataHeaderCell
+{background-color: #004466; color: #ffffff; text-align: center;}
+.dataHeaderCell:hover
+{background-color: #006688; color: #fcffff;}
+
+.dataRow
+{background-color: #f6f6f6; color: #404040;}
+.dataRow:hover
+{background-color: #f9f9f9; color: #000040;}
+
+.dataRowAlt
+{background-color: #f0f0f0; color: #404040;}
+.dataRowAlt:hover
+{background-color: #dddddd; color: #000040;}
+
+.dataCell, .dataCellAlt
+{margin: auto; padding: 4px;}
+.dataCellImage, .dataCellImageAlt
+{width: 150px; border: solid 1px #a0a0a0;}
+
+/* .dataCell, .dataCellAlt
+{margin: auto; padding: 4px; padding-top: 8px; padding-bottom: 8px;} */
+
+.articleContainer
+{ margin: 1em; border: solid 1px #a0a0a0; background-color: #202020; width: 95%; display: block; }
+
+.articleTitle
+{ margin-bottom: 0.8em; margin-left: 2%; }
+
+.articleTitleCell
+{ margin: 8px; }
+
+.articleImageCell
+{ vertical-align: top; }
+
+.articleImageAnchor
+{ text-decoration: none; }
+
+.articleImage
+{ border: none; margin: 1em; margin-top: 0px; }
+
+.articleDescription
+{ margin: 1em; padding-right: 1em; vertical-align: top; }
+
+.articleDescription a
+{ color: #ff8800; }
+
+.articleDescription a:hover
+{ color: #ffaa00; }
+
+.articleContent
+{ margin-left: 2%; margin-right: 2%; }
+
+legend
+{ color: #FFFFFF; font-weight: bold; margin-left: -5px; }
+
+a.lightLink { color: #666}
+
+.optional
+{ color: #00B4FF; }
+
+fieldset
+{ padding-left: 20px; margin-bottom: 8px; }
+  
