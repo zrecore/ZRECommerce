@@ -9,8 +9,8 @@
  * @category Search
  * 
  * @version $Id$
- * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
- * @license Creative Commons license - See public/license.txt
+ * @copyright Copyrights 2008 ZRECommerce. See README file.
+ * @license GPL v3 or higher. See README file.
  */
 /**
  * Zre_Search_Adapter_Interface - All search adapters must implement this 

@@ -10,7 +10,7 @@
  * 
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce All rights reserved.
- * @license Creative Commons license - See public/license.txt
+ * @license GPL v3 or higher. See README file.
  */
 
 /**

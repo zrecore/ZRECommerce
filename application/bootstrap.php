@@ -10,8 +10,8 @@
  * @category Boot
  * 
  * @version $Id$
- * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
- * @license Creative Commons license - See public/license.txt
+ * @copyright Copyrights 2008 ZRECommerce. See README file.
+ * @license GPL v3 or higher. See README file.
  */
 /**
  * Bootstrap - Zend_Appication_Bootstrap_Bootstrap class. Internal methods are

@@ -8,8 +8,8 @@
  * @category Cart
  * 
  * @version $Id$
- * @copyright Copyrights 2008 ZRECommerce. All rights reserved.
- * @license Creative Commons license - See public/license.txt
+ * @copyright Copyrights 2008 ZRECommerce. See README file.
+ * @license GPL v3 or higher. See README file.
  */
 /**
  * Cart_Container_Item_Options_Cost - This class represents a collection of
