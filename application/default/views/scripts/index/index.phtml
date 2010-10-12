@@ -60,11 +60,11 @@ if (isset($vars['content'])) echo $vars['content'];
 				
 				<tr>
 					<td class="articleImageCell">
-						<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug)); ?>" class="articleImageAnchor"><img src="<?php echo $articleImage; ?>" alt="<?php echo $articleTitle; ?>" class="articleImage" /></a>
+						<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>" class="articleImageAnchor"><img src="<?php echo $articleImage; ?>" alt="<?php echo $articleTitle; ?>" class="articleImage" /></a>
 					</td>
 					
 					<td class="articleText">
-						<h2 class="articleTitle"><a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexArticleRead'); ?>">
+						<h2 class="articleTitle"><a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>">
 							<?php echo $articleTitle; ?>
 						</a></h2>
 						<div class="articleSubHeader"><?php echo $t->_('Summary'); ?></div>
@@ -78,7 +78,7 @@ if (isset($vars['content'])) echo $vars['content'];
 									'id' 			=> $articleId, 
 									'title' 		=> $titleSlug
 								), 
-								'indexArticleRead'
+								'indexReadArticle'
 							);
 						?>"><?php echo $t->_('...more'); ?></a>
 						</div>

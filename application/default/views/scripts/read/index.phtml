@@ -74,6 +74,8 @@ echo $this->form;
 		$articleDescription = html_entity_decode($articleDescription, ENT_QUOTES);
 		$articleDescription = str_replace(array('{', '}', '\"'), array('<', ' />', '"'), $articleDescription);
 		
+		$titleSlug = Zre_Template::createSlug($articleTitle);
+		
 		if (empty($articleImage)) $articleImage = '/images/dummy.png';
 		// ...And display however we want.
 ?>
@@ -82,7 +84,7 @@ echo $this->form;
 				
 				<tr>
 					<td class="articleImageCell">
-						<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>" class="articleImageAnchor"><img src="<?php echo $articleImage; ?>" alt="<?php echo $articleTitle; ?>" class="articleImage" /></a>
+						<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>" class="articleImageAnchor"><img src="<?php echo $articleImage; ?>" alt="<?php echo $articleTitle; ?>" class="articleImage" /></a>
 					</td>
 					
 					<td class="articleText">
@@ -93,7 +95,7 @@ echo $this->form;
 						</h2>
 						<div class="articleSubHeader"><?php echo $t->_('Summary'); ?></div>
 						<div class="articleDescription">
-						<?php echo Plugin::search_and_insert($articleDescription); ?>&nbsp;<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>"><?php echo $t->_('...more'); ?></a>
+						<?php echo Plugin::search_and_insert($articleDescription); ?>&nbsp;<a href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>"><?php echo $t->_('...more'); ?></a>
 						</div>
 						<div class="articleFooter"><?php echo $t->_('Written on ') . $articleDateCreated->getArpa(); ?></div>
 					</td>

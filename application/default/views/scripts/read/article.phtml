@@ -70,6 +70,7 @@ if ($articleData->count() > 0) {
 	
 	$articleContent = '';
 }
+$titleSlug = Zre_Template::createSlug($articleTitle);
 ?>
 <div class="articleContainer">
 	<table cellspacing="0" cellpadding="0" border="0" class="articleContainerInner">
@@ -81,7 +82,7 @@ if ($articleData->count() > 0) {
 			
 			<td class="articleText">
 				<h2 class="articleTitle">
-					<a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId)); ?>">
+					<a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>">
 						<?php echo $articleTitle; ?>
 					</a>
 				</h2>

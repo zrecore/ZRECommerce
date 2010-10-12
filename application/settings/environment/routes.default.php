@@ -5,6 +5,7 @@
 $front = Zend_Controller_Front::getInstance();
 $router = $front->getRouter();
 
+// ...'Read' controller routes
 $route = new Zend_Controller_Router_Route(
 	'a/:id/:title',
 	array(
@@ -13,4 +14,14 @@ $route = new Zend_Controller_Router_Route(
 		'module' => 'default'
 	)
 );
-$router->addRoute('indexArticleRead', $route);
+$router->addRoute('indexReadArticle', $route);
+//
+//$route = new Zend_Controller_Router_Route(
+//	'a/:id/:title',
+//	array(
+//		'controller' => 'read',
+//		'action' => 'article',
+//		'module' => 'default'
+//	)
+//);
+//$router->addRoute('indexArticleRead', $route);
