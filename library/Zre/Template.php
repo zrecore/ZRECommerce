@@ -167,5 +167,15 @@ class Zre_Template {
 	public static function listProducts( $baseContainerId = 0 ) {
 		return Zre_Dataset_Product::readContainerProducts( $baseContainerId );
 	}
+	
+	public static function createSlug($text, $sep='-') {
+		$text = str_ireplace("\n", " ", $text);
+		$text = trim($text);
+		
+		$text = trim(preg_replace('/[^a-zA-Z0-9]/i', ' ', $text));
+		$text = preg_replace('/[^a-zA-Z0-9_]+/i',$sep, $text);
+		
+		return $text;
+	}
 }
 ?>
