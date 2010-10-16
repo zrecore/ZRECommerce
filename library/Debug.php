@@ -73,8 +73,9 @@ class Debug {
 	 * Send the specified content to the current administrative e-mail
 	 * @param $content
 	 */
-	public static function mail($content) {
+	public static function mail($content, $to = null) {
+		if (!isset($to)) $to = $_SERVER["SERVER_ADMIN"];
 		
-		return mail($_SERVER["SERVER_ADMIN"], 'Debug message', $content, "From: zrecommerce@localhost\n");
+		return mail($to, 'Debug message', $content, "From: zrecommerce@localhost\n");
 	}
 }

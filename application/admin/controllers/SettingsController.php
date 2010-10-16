@@ -82,8 +82,6 @@ class Admin_SettingsController extends Zend_Controller_Action
 			unset($formValues['action']);
 			unset($formValues['controller']);
 			unset($formValues['module']);
-					
-			$params = $this->getRequest()->getParams();
 			
 			$config = new Zend_Config($formValues, true);
 			$config->setExtend('dev', 'production');
@@ -107,6 +105,49 @@ class Admin_SettingsController extends Zend_Controller_Action
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
 		
+	}
+	
+	public function configAjaxAction() 
+	{
+		$request = $this->getRequest();
+		$reply = null;
+		
+		$settingsPath = realpath('../application/settings/environment') . DIRECTORY_SEPARATOR . 'settings.xml';
+		$object = simplexml_load_file($settingsPath);
+		
+		$formValues = $request->getParams();
+		$formSettingsClass = new Zre_Ui_Form_Settings($object, true);
+		$form = $formSettingsClass->getFormObject();
+		
+		unset($formValues['Submit']);
+		unset($formValues['is_submitted']);
+		unset($formValues['action']);
+		unset($formValues['controller']);
+		unset($formValues['module']);
+		
+//		if($form->isValid($formValues)) {
+					
+			$config = new Zend_Config($formValues, true);
+			$config->setExtend('dev', 'production');
+					
+			Zre_Config::saveSettings($config, $settingsPath);
+			Zre_Config::flush();
+			Zre_Config::loadSettings($settingsPath, false);
+			$reply = array(
+				'result' => 'ok',
+				'desc' => 'Settings saved.'
+			);
+//		} else {
+//			//Do nothing right now
+//			
+//			$reply = array(
+//				'result' => 'error',
+//				'desc' => 'Invalid parameters. ',
+//				'debug' => print_r($formValues, true)
+//			);
+//	    }
+//	    
+	    $this->_helper->json($reply, true);
 	}
 	
 	public function importAction()

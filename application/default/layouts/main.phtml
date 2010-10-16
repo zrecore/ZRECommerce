@@ -86,7 +86,7 @@ if (empty($vars['template_name'])) $vars['template_name'] = $settings->site->tem
 	
 	$this->headLink()->appendStylesheet($jqueryUiCss);
 	$this->headStyle( $style_sheet_content, 'SET' );
-	$this->headScript()->prependFile( ($isHttps ? 'https' : 'http') . '://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js' );
+	$this->headScript()->prependFile( ($isHttps ? 'https' : 'http') . '://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js' );
 	$this->headScript()->prependFile( ($isHttps ? 'https' : 'http') . '://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' );
 	
 	echo '<?xml version="1.0" encoding="UTF-8" ?>' . "\n";
@@ -109,7 +109,7 @@ if (empty($vars['template_name'])) $vars['template_name'] = $settings->site->tem
 		?>
 	</head>
 	
-	<body class="tundra">
+	<body>
 		<div id="body-content-span">
 		<div id="body-content-wrapper">
 			<div id="header-layout">

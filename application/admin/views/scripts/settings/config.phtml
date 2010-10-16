@@ -22,6 +22,45 @@ $this->placeholder('title')->set($this->title);
 
 $vars = $this->getVars();
 
+?>
+<script type="text/javascript">
+<!--
+jQuery(document).ready(function($){
+	
+	$('#frmSettings').submit(function(ev){
+		ev.preventDefault();
+		
+		var formValues = $(this).find('input[type=text]');
+		var url = '/admin/settings/config-ajax';
+
+		/**
+		 * @todo Convert formValues into proper array.
+		 */
+//		jQuery.each(formValues, function(i, obj){
+//			alert(i + ', ' + $(obj).attr('id'));
+//		});
+		jQuery.post(
+			url, 
+			formValues, 
+			function(reply) {
+				
+				$('#msg').html(reply.desc)
+						 .show()
+						 .delay(3000)
+						 .slideUp();
+				
+			}, 
+			'json'
+		);
+	});
+});
+//-->
+</script>
+<?php 
+
 if (isset($vars['content'])) echo $vars['content'];
 
 echo $this->form;
+?>
+<div id="msg" class="ui-corner-all ui-state-highlight" style="margin-top: 20px; padding: 1em .7em; display: none">
+</div>

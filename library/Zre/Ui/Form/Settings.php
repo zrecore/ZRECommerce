@@ -67,7 +67,8 @@ class Zre_Ui_Form_Settings
         	$is_submitted = new Zend_Form_Element_Hidden('is_submitted');
         	$is_submitted->setValue(1);
         	
-	        $this->form->setAction('/admin/index/settings/')
+	        $this->form->setAction('/admin/settings/config/')
+	        		   ->setAttrib('id', 'frmSettings')
 	        		   ->addElement( $is_submitted )
 	                   ->setMethod( Zend_Form::METHOD_POST );
 	                   
