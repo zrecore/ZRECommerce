@@ -15,9 +15,10 @@
 	background-position: bottom left;
 	background-repeat: repeat-x; padding-bottom: 16px;
 	margin: 0px;
-	margin-bottom: 16px;
+	margin-bottom: 24px;
 	padding-left: 24px;
 	padding-top: 12px;
+	padding-bottom: 32px;
 	position: relative; }
 
 .articleText
@@ -48,10 +49,10 @@
 { border: none; width: 107px; height: 107px; padding-left: 4px; padding-top: 4px; }
 
 .articleSubHeader
-{ font-size: 0.9; color: #a0a0a0; margin: auto; }
+{ font-size: 0.9em; color: #a0a0a0; margin: auto; }
 
 .articleDescription
-{ margin: auto; font-size: 1.0em; color: #202020; line-height: 1.6em; }
+{ margin: auto; font-size: 1.2em; color: #202020; line-height: 1.6em; }
 
 .articleDescription a
 { color: #aa0000; text-decoration: underline; }
@@ -63,7 +64,7 @@
 { margin-left: 2%; margin-right: 2%; }
 
 .articleFooter
-{ font-size: 0.9em; color: #404040; margin: auto; position: absolute; bottom: 6px; }
+{ font-size: 0.9em; color: #404040; margin: auto; position: absolute; bottom: 8px; }
 
 .articleReadContainer
 { position: relative; margin: auto; width: 100%; min-height: 140px; }

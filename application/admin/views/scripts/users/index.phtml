@@ -23,6 +23,7 @@ $this->placeholder('title')->set($this->title);
 $vars = $this->getVars();
 
 if (isset($vars['content'])) echo $vars['content'];
+$strPassword = $t->_('Password');
 
 /**
  * @todo implement pagination jquery plugin.
@@ -35,15 +36,13 @@ if (isset($vars['content'])) echo $vars['content'];
 		});
 
 		$('#frmUsers').tableSort({
-			onTableRowClick: function(ev){
-				alert($(this).html());
-			},
 			onJsonSuccess: function(response){
-				$('#frmUsers .table-data .table-row').remove();
+				$('#frmUsers .table-data .table-body').remove();
 
 				$.each(response.data, function(i, row){
 					
 					$('#frmUsers .table-data').append(
+						'<tbody class="table-body">' + 
 						'<tr class="table-row">' + 
 						'	<td>' + row.user_id + '</td>' +
 						'	<td>' + row.name + '</td>' +
@@ -53,7 +52,11 @@ if (isset($vars['content'])) echo $vars['content'];
 						'	<td>' + row.state_province + '</td>' +
 						'	<td>' + row.zipcode + '</td>' +
 						'	<td>' + row.country + '</td>' + 
-						'</tr>'
+						'</tr>' + 
+						'<tr class="table-sub-row">' +
+						'	<td colspan="8"><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></td>' + 
+						'</tr>' +  
+						'</table>'
 					);
 				});
 			}
@@ -78,6 +81,7 @@ if (isset($vars['content'])) echo $vars['content'];
 		foreach($this->records as $i => $r):
 			$r = (object)$r;
 	?>
+		<tbody class="table-body">
 		<tr class="table-row">
 			<td><?php echo $r->user_id?></td>
 			<td><?php echo $r->name?></td>
@@ -88,6 +92,12 @@ if (isset($vars['content'])) echo $vars['content'];
 			<td><?php echo $r->zipcode?></td>
 			<td><?php echo $r->country?></td>
 		</tr>
+		<tr class="table-sub-row">
+			<td colspan="8">
+				<label><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></label>
+			</td>
+		</tr>
+		</tbody>
 	<?php
 		endforeach;
 	else:
