@@ -477,7 +477,10 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			);
 			
 			$records = $dataset->listAll(null, $options);
-			
+			foreach($records as $i => $r) {
+				$records[$i]['title'] = stripslashes($records[$i]['title']);
+				$records[$i]['description'] = stripslashes($records[$i]['description']);
+			}
 			$data = array(
 				'result' => 'ok',
 				'data' => $records

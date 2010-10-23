@@ -175,5 +175,9 @@ class Admin_SettingsController extends Zend_Controller_Action
 	public function updatesAction() {
 		
 	}
+	
+	public function phpEnvironmentAction() {
+		
+	}
 
 }

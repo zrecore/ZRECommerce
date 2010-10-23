@@ -149,8 +149,8 @@ $strTitle = $t->_('Title: ');
 						'	</tr>' +
 						'	<tr class="table-sub-row">'  +
 						'		<td colspan="2">' +
-						'			<div class="form-list"><ul><li><label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
-						'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' + 
+						'			<div class="form-list"><ul><li><label><?php echo stripslashes($strTitle); ?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
+						'			<div class="editor" id="article_description_' + row.article_id + '">' + stripslashes(row.description) + '</div>' + 
 						'		</td>' + 
 						'	</tr>' + 
 						'</tbody>'
@@ -193,11 +193,11 @@ $strTitle = $t->_('Title: ');
 				<div class="form-list">
 					<ul>
 						<li>
-							<label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_<?php echo $row->article_id; ?>" value="<?php echo $row->title;?>" />
+							<label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_<?php echo $row->article_id; ?>" value="<?php echo stripslashes($row->title);?>" />
 						</li>
 					</ul>
 				</div>
-				<div class="editor" id="article_description_<?php echo $row->article_id;?>"><?php echo $row->description; ?></div>
+				<div class="editor" id="article_description_<?php echo $row->article_id;?>"><?php echo stripslashes($row->description); ?></div>
 			</td>
 		</tr>
 		</tbody>

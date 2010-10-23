@@ -47,8 +47,8 @@ if ($articleData->count() > 0) {
 	$articleContainerId = $articleData['article_container_id'];
 	$articleResource 	= $articleData['resource'];
 	$articlePublished 	= $articleData['published'];
-	$articleTitle 		= $articleData['title'];
-	$articleDescription = $articleData['description'];
+	$articleTitle 		= stripslashes($articleData['title']);
+	$articleDescription = stripslashes($articleData['description']);
 	$articleDateCreated  = new Zend_Date( $articleData['date_created'] );
 	$articleDateModified = new Zend_Date( $articleData['date_modified'] );
 	$articleImage 		= $articleData['image'];

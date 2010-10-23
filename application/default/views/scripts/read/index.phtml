@@ -65,13 +65,12 @@ echo $this->form;
 		$articleContainerId = $a->container_id;
 		$articleResource 	= $a->resource;
 		$articlePublished 	= $a->published;
-		$articleTitle 		= $a->title;
-		$articleDescription = $a->description;
+		$articleTitle 		= stripslashes($a->title);
+		$articleDescription = stripslashes($a->description);
 		$articleDateCreated  = new Zend_Date( $a->date_created );
 		$articleDateModified = new Zend_Date( $a->date_modified );
 		$articleImage 		= $a->image;
 		
-		$articleDescription = html_entity_decode($articleDescription, ENT_QUOTES);
 		$articleDescription = str_replace(array('{', '}', '\"'), array('<', ' />', '"'), $articleDescription);
 		
 		$titleSlug = Zre_Template::createSlug($articleTitle);
