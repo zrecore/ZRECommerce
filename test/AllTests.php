@@ -6,9 +6,9 @@
  * @version 
  */
 require_once 'PHPUnit/Framework/TestSuite.php';
-require_once '../application/Initializer.php';
+//require_once 'application/Initializer.php';
 
-require_once 'test/application/default/controllers/IndexControllerTest.php';
+require_once 'application/default/controllers/IndexControllerTest.php';
 
 /**
  * AllTests class - aggregates all tests of this project

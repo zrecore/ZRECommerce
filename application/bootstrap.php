@@ -124,4 +124,3 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		if (file_exists($routerConfig)) require_once $routerConfig;
 	}
 }
-?>

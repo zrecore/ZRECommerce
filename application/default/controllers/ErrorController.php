@@ -43,6 +43,18 @@ class ErrorController extends Zend_Controller_Action
                 break;
         }
         
+        
+        $error_output = '
+        The following was logged:
+        Env:
+        ' . APPLICATION_ENV . '
+        Exception:
+        ' . (string) $errors->exception . '
+        
+        Session:
+        ' . print_r($_SESSION, true) . '
+        ';
+        Debug::log($error_output);
         $this->view->message = "<a href=\"/\">Back to home.</a><br /><br />\n<div style=\"background-color: #ffffff; color: #000000;\">". str_replace("\n", "\n<br />",$errors->exception) . "</div>\n<br /><br /><a href=\"/\">Back to home.</a>";
         
         Zre_Registry_Session::set('selectedMenuItem', '');

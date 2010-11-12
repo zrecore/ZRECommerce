@@ -24,7 +24,7 @@ $save_output = null;
  */
 $settings = Zre_Config::getSettingsCached();
 
-$isHttps = $_SERVER['SERVER_PORT'] == $settings->site->ssl_port ? true : false;
+$isHttps = isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == $settings->site->ssl_port ? true : false;
 
 if (empty($vars['template_name'])) $vars['template_name'] = $settings->site->template;
 
