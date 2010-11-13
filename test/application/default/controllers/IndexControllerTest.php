@@ -8,7 +8,7 @@
 // Zend_Application
 require_once 'Zend/Application.php';
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
-require_once 'application/Initializer.php';
+//require_once 'application/Initializer.php';
 
 /**
  * IndexController Test Case
