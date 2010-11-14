@@ -120,7 +120,7 @@ class Zre_Template {
 		
 		$sslPort = (int) $settings->site->ssl_port;
 		
-		return (bool)($_SERVER['SERVER_PORT'] == $sslPort);
+		return (bool)(isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == $sslPort);
 	}
 	/**
 	 * Returns a list of article category IDs (1-level deep)

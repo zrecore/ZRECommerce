@@ -22,7 +22,7 @@ $articleTitleText = '';
 $article = new Zre_Dataset_Article();
 
 if (is_numeric($params['id'])) {
-	$data = $article->read( $params['id'] )->toArray();
+	$data = $article->read( $params['id'] )->current()->toArray();
 	$articleTitleText = $data['title'] . ' - ';
 }
 
@@ -55,8 +55,8 @@ if ($articleData->count() > 0) {
 	
 	if (!$articleImage) $articleImage = '/images/dummy.png';
 	
-	$articleData['content'] = str_replace(array('{', '}'), array('<', ' />'), $articleData['content']);
-	$articleContent = ( $articleData['use_zre_plugins'] == 'yes' ? Plugin::search_and_insert( $articleData['content'] ) : $articleData['content'] );
+//	$articleData['content'] = str_replace(array('{', '}'), array('<', ' />'), $articleData['content']);
+//	$articleContent = ( $articleData['use_zre_plugins'] == 'yes' ? Plugin::search_and_insert( $articleData['content'] ) : $articleData['content'] );
 } else {
 	$articleId 			= 1;
 	$articleContainerId = 1;
@@ -86,7 +86,6 @@ $titleSlug = Zre_Template::createSlug($articleTitle);
 						<?php echo $articleTitle; ?>
 					</a>
 				</h2>
-				<div class="articleSubHeader"><?php echo $t->_('Summary'); ?></div>
 				<div class="articleDescription">
 				<?php echo Plugin::search_and_insert($articleDescription); ?>
 				</div>
@@ -94,11 +93,6 @@ $titleSlug = Zre_Template::createSlug($articleTitle);
 			</td>
 		</tr>
 	</table>
-</div>
-<div class="articleReadContainer">
-	<div class="articleReadContainerContent">
-		<?php echo $articleContent; ?>
-	</div>
 </div>
 
 <a 	class="lightLink" 
