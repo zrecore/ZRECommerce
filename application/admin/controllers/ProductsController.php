@@ -303,160 +303,160 @@ class Admin_ProductsController extends Zend_Controller_Action
 		
 	}
 	
-	public function ajaxcategoriesAction()
-	{
-		$this->view->assign('disable_cache', 1);
-		$this->_helper->layout->disableLayout();
-		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
-		
-		$rootContainerId = $this->getRequest()->getParam('dir');
-		$useDefault = false;
-		
-		if (!isset($rootContainerId) || $rootContainerId == '/') {
-			$useDefault = true;
-			$rootContainerId = '/0/';
-		}
-		$dirIds = explode('/', $rootContainerId);
-		$rootContainerId = (int) $dirIds[1];
-		
-		$rootContainerData = Zre_Dataset_Product::readContainer($rootContainerId);
-		
-		if ($useDefault == true) {
-			$output = '
-				<ul class="jqueryFileTree" style="display: none;">
-					<li class="directory collapsed">
-					<a href="#" rel="" onclick="
-						document.getElementById(\'container_id\').value=\'' . (int)$rootContainerData['id'] . '\';
-					">' . $rootContainerData['title'] . '</a>
-					</li>
-				</ul>
-			';
-		
-		} else {
-			$output .= '
-				<ul class="jqueryFileTree" style="display: none;">
-			';
-			
-			$directories = Zre_Dataset_Product::readContainerChildren( array('parent_id' => $rootContainerId) );
-			
-			foreach($directories as $directory) {
-				
-				if ($directory['id'] != $rootContainerId) {
-					$output .= '
-					<li class="directory collapsed">
-						<a href="#" rel="/' . (int)$directory['id'] . '/" onclick="
-							document.getElementById(\'container_id\').value=\'' . (int)$directory['id'] . '\';
-						">' . $directory['title'] . '</a>
-					';
-					
-					$listings = Zre_Dataset_Product::readContainerProducts( $directory['id'] );
-					foreach ($listings as $listing) {
-						if ($listing['category_id'] == $directory['id']) {
-							$output .= '
-							<li class="file ext_html">
-								<a href="#" rel="/' . (int)$directory['id'] . '/' . $listing['description'] . ']' . '" onclick="
-									document.getElementById(\'container_id\').value=\'' . $directory['id'] . '\';
-								">' . $listing['title'] . '</a>
-							</li>
-							';
-						}
-					}
-					
-					$output .= '
-					</li>
-					';
-				}
-			}
-			
-			$output .= '
-				</li>
-			</ul>';
-		}
-		
-		echo $output;
-
-	}
-	
-	public function ajaxCategoryEditAction()
-	{
-		$this->view->assign('disable_cache', 1);
-		$this->_helper->layout->disableLayout();
-		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
-		
-		$rootContainerId = $this->getRequest()->getParam('dir');
-		$useDefault = false;
-		
-		if (!isset($rootContainerId) || $rootContainerId == '/') {
-			$useDefault = true;
-			$rootContainerId = '/0/';
-		}
-		$dirIds = explode('/', $rootContainerId);
-		$rootContainerId = (int) $dirIds[1];
-		
-		$rootContainerData = Zre_Dataset_Product::readContainer($rootContainerId);
-		
-		if ($useDefault == true) {
-			$output = '
-				<ul class="jqueryFileTree" style="display: none;">
-					<li class="directory collapsed">
-					<a href="#" rel="" onclick="
-						document.getElementById(\'id\').value=\'' . (int)$rootContainerData['id'] . '\';
-						document.getElementById(\'title\').value=\'' . $rootContainerData['title'] . '\';
-						document.getElementById(\'description\').value=\'' . $rootContainerData['description'] . '\';
-						document.getElementById(\'parent_id\').value=\'' . $rootContainerData['parent_id'] . '\';
-					">' . $rootContainerData['title'] . '</a>
-					</li>
-				</ul>
-			';
-		
-		} else {
-			$output .= '
-				<ul class="jqueryFileTree" style="display: none;">
-			';
-			
-			$directories = Zre_Dataset_Product::readContainerChildren( array('parent_id' => $rootContainerId) );
-			
-			foreach($directories as $directory) {
-				
-				if ($directory['id'] != $rootContainerId) {
-					$output .= '
-					<li class="directory collapsed">
-						<a href="#" rel="/' . (int)$directory['id'] . '/" onclick="
-							document.getElementById(\'id\').value=\'' . (int)$directory['id'] . '\';
-							document.getElementById(\'title\').value=\'' . $directory['title'] . '\';
-							document.getElementById(\'description\').value=\'' . $directory['description'] . '\';
-							document.getElementById(\'parent_id\').value=\'' . $directory['parent_id'] . '\';
-						">' . $directory['title'] . '</a>
-					';
-					
-					$listings = Zre_Dataset_Product::readContainerProducts( $directory['id'] );
-					
-					foreach ($listings as $listing) {
-						if ($listing['category_id'] == $directory['id']) {
-							$output .= '
-							<li class="file ext_html">
-								<a href="#" rel="/' . (int)$directory['id'] . '/' . $listing['description'] . ']' . '" onclick="
-									document.getElementById(\'parent_id\').value=\'' . $directory['id'] . '\';
-									document.getElementById(\'title\').value=\'' . $directory['title'] . '\';
-									document.getElementById(\'description\').value=\'' . $directory['description'] . '\';
-									document.getElementById(\'parent_id\').value=\'' . $directory['parent_id'] . '\';
-								">' . $listing['title'] . '</a>
-							</li>
-							';
-						}
-					}
-					
-					$output .= '
-					</li>
-					';
-				}
-			}
-			
-			$output .= '
-				</li>
-			</ul>';
-		}
-		echo $output;
-
-	}
+//	public function ajaxcategoriesAction()
+//	{
+//		$this->view->assign('disable_cache', 1);
+//		$this->_helper->layout->disableLayout();
+//		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
+//		
+//		$rootContainerId = $this->getRequest()->getParam('dir');
+//		$useDefault = false;
+//		
+//		if (!isset($rootContainerId) || $rootContainerId == '/') {
+//			$useDefault = true;
+//			$rootContainerId = '/0/';
+//		}
+//		$dirIds = explode('/', $rootContainerId);
+//		$rootContainerId = (int) $dirIds[1];
+//		
+//		$rootContainerData = Zre_Dataset_Product::readContainer($rootContainerId);
+//		
+//		if ($useDefault == true) {
+//			$output = '
+//				<ul class="jqueryFileTree" style="display: none;">
+//					<li class="directory collapsed">
+//					<a href="#" rel="" onclick="
+//						document.getElementById(\'container_id\').value=\'' . (int)$rootContainerData['id'] . '\';
+//					">' . $rootContainerData['title'] . '</a>
+//					</li>
+//				</ul>
+//			';
+//		
+//		} else {
+//			$output .= '
+//				<ul class="jqueryFileTree" style="display: none;">
+//			';
+//			
+//			$directories = Zre_Dataset_Product::readContainerChildren( array('parent_id' => $rootContainerId) );
+//			
+//			foreach($directories as $directory) {
+//				
+//				if ($directory['id'] != $rootContainerId) {
+//					$output .= '
+//					<li class="directory collapsed">
+//						<a href="#" rel="/' . (int)$directory['id'] . '/" onclick="
+//							document.getElementById(\'container_id\').value=\'' . (int)$directory['id'] . '\';
+//						">' . $directory['title'] . '</a>
+//					';
+//					
+//					$listings = Zre_Dataset_Product::readContainerProducts( $directory['id'] );
+//					foreach ($listings as $listing) {
+//						if ($listing['category_id'] == $directory['id']) {
+//							$output .= '
+//							<li class="file ext_html">
+//								<a href="#" rel="/' . (int)$directory['id'] . '/' . $listing['description'] . ']' . '" onclick="
+//									document.getElementById(\'container_id\').value=\'' . $directory['id'] . '\';
+//								">' . $listing['title'] . '</a>
+//							</li>
+//							';
+//						}
+//					}
+//					
+//					$output .= '
+//					</li>
+//					';
+//				}
+//			}
+//			
+//			$output .= '
+//				</li>
+//			</ul>';
+//		}
+//		
+//		echo $output;
+//
+//	}
+//	
+//	public function ajaxCategoryEditAction()
+//	{
+//		$this->view->assign('disable_cache', 1);
+//		$this->_helper->layout->disableLayout();
+//		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
+//		
+//		$rootContainerId = $this->getRequest()->getParam('dir');
+//		$useDefault = false;
+//		
+//		if (!isset($rootContainerId) || $rootContainerId == '/') {
+//			$useDefault = true;
+//			$rootContainerId = '/0/';
+//		}
+//		$dirIds = explode('/', $rootContainerId);
+//		$rootContainerId = (int) $dirIds[1];
+//		
+//		$rootContainerData = Zre_Dataset_Product::readContainer($rootContainerId);
+//		
+//		if ($useDefault == true) {
+//			$output = '
+//				<ul class="jqueryFileTree" style="display: none;">
+//					<li class="directory collapsed">
+//					<a href="#" rel="" onclick="
+//						document.getElementById(\'id\').value=\'' . (int)$rootContainerData['id'] . '\';
+//						document.getElementById(\'title\').value=\'' . $rootContainerData['title'] . '\';
+//						document.getElementById(\'description\').value=\'' . $rootContainerData['description'] . '\';
+//						document.getElementById(\'parent_id\').value=\'' . $rootContainerData['parent_id'] . '\';
+//					">' . $rootContainerData['title'] . '</a>
+//					</li>
+//				</ul>
+//			';
+//		
+//		} else {
+//			$output .= '
+//				<ul class="jqueryFileTree" style="display: none;">
+//			';
+//			
+//			$directories = Zre_Dataset_Product::readContainerChildren( array('parent_id' => $rootContainerId) );
+//			
+//			foreach($directories as $directory) {
+//				
+//				if ($directory['id'] != $rootContainerId) {
+//					$output .= '
+//					<li class="directory collapsed">
+//						<a href="#" rel="/' . (int)$directory['id'] . '/" onclick="
+//							document.getElementById(\'id\').value=\'' . (int)$directory['id'] . '\';
+//							document.getElementById(\'title\').value=\'' . $directory['title'] . '\';
+//							document.getElementById(\'description\').value=\'' . $directory['description'] . '\';
+//							document.getElementById(\'parent_id\').value=\'' . $directory['parent_id'] . '\';
+//						">' . $directory['title'] . '</a>
+//					';
+//					
+//					$listings = Zre_Dataset_Product::readContainerProducts( $directory['id'] );
+//					
+//					foreach ($listings as $listing) {
+//						if ($listing['category_id'] == $directory['id']) {
+//							$output .= '
+//							<li class="file ext_html">
+//								<a href="#" rel="/' . (int)$directory['id'] . '/' . $listing['description'] . ']' . '" onclick="
+//									document.getElementById(\'parent_id\').value=\'' . $directory['id'] . '\';
+//									document.getElementById(\'title\').value=\'' . $directory['title'] . '\';
+//									document.getElementById(\'description\').value=\'' . $directory['description'] . '\';
+//									document.getElementById(\'parent_id\').value=\'' . $directory['parent_id'] . '\';
+//								">' . $listing['title'] . '</a>
+//							</li>
+//							';
+//						}
+//					}
+//					
+//					$output .= '
+//					</li>
+//					';
+//				}
+//			}
+//			
+//			$output .= '
+//				</li>
+//			</ul>';
+//		}
+//		echo $output;
+//
+//	}
 }

@@ -36,12 +36,11 @@ if (isset($vars['content'])) echo $vars['content'];
 
 // Listing
 $header_map = array(
-	'id' 			=> 'ID',
-	'container_id' 	=> 'Category',
+	'article_id' 			=> 'ID',
+	'article_container_id' 	=> 'Category',
 	'resource' 		=> 'Type',
 	'published' 	=> 'Published',
 	'title' 		=> 'Title',
-	'description' 	=> 'Desc.',
 	'date_created' 	=> 'Created',
 	'date_modified' => 'Modified'
 );
@@ -51,8 +50,8 @@ $format_map = array(
 );
 
 $exclude_map = array(
-	'id',
-	'container_id',
+	'article_id',
+	'article_container_id',
 	'date_modified',
 	'image'
 );

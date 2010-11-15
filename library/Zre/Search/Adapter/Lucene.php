@@ -163,8 +163,8 @@ class Zre_Search_Adapter_Lucene implements Zre_Search_Adapter_Interface {
 		$containerItems = Zre_Dataset_Article::readContainerArticles( $containerId );
 
 		foreach ($containerChildren as $child) {
-			if ( $child['id'] != $containerId ) {
-				$indexObject = $this->_getArticleCategories( $child['id'], $indexObject );
+			if ( $child['article_id'] != $containerId ) {
+				$indexObject = $this->_getArticleCategories( $child['article_id'], $indexObject );
 			}
 		}
 
@@ -179,22 +179,22 @@ class Zre_Search_Adapter_Lucene implements Zre_Search_Adapter_Interface {
 //		$indexObject->addDocument( $docContainerInfo );
 		
 		foreach( $containerItems as $item ) {
-			$docContainerItems[$item['id']] = new Zend_Search_Lucene_Document();
+			$docContainerItems[$item['article_id']] = new Zend_Search_Lucene_Document();
 			
-			$itemData = Zre_Dataset_Article::read( $item['id'] );
+			$itemData = Zre_Dataset_Article::read( $item['article_id'] );
 			
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('id', $itemData['id']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('container_id', $itemData['container_id']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('resource', $itemData['resource']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('published', $itemData['published']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('item_type', 'article') );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::keyword('title', $itemData['title']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unStored('description', $itemData['description']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_created', $itemData['date_created']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_modified', $itemData['date_modified']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('article_id', $itemData['article_id']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('article_container_id', $itemData['container_id']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('resource', $itemData['resource']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('published', $itemData['published']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('item_type', 'article') );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unStored('title', $itemData['title']) );
+//			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unStored('description', $itemData['description']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_created', $itemData['date_created']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_modified', $itemData['date_modified']) );
+			$docContainerItems[$item['article_id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
 			
-			$indexObject->addDocument( $docContainerItems[$item['id']] );
+			$indexObject->addDocument( $docContainerItems[$item['article_id']] );
 			
 		}
 
@@ -230,23 +230,23 @@ class Zre_Search_Adapter_Lucene implements Zre_Search_Adapter_Interface {
 //		$indexObject->addDocument( $docContainerInfo );
 //		
 		foreach( $containerItems as $item ) {
-			$docContainerItems[$item['id']] = new Zend_Search_Lucene_Document();
+			$docContainerItems[$item['product_id']] = new Zend_Search_Lucene_Document();
 			
-			$itemData = Zre_Dataset_Product::read( $item['id'] );
+			$itemData = Zre_Dataset_Product::read( $item['product_id'] );
 			
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('id', $itemData['id']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('container_id', $itemData['container_id']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('published', $itemData['published']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('item_type', 'product') );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::keyword('title', $itemData['title']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unStored('description', $itemData['description']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_created', $itemData['date_created']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_modified', $itemData['date_modified']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('price', $itemData['price']) );
-			$docContainerItems[$item['id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('product_id', $itemData['product_id']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('article_id', $itemData['article_id']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('published', $itemData['published']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('item_type', 'product') );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::keyword('title', $itemData['title']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unStored('description', $itemData['description']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_created', $itemData['date_created']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('date_modified', $itemData['date_modified']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('price', $itemData['price']) );
+			$docContainerItems[$item['product_id']]->addField( Zend_Search_Lucene_Field::unIndexed('image', $itemData['image']) );
 			
-			$indexObject->addDocument( $docContainerItems[$item['id']] );
+			$indexObject->addDocument( $docContainerItems[$item['product_id']] );
 			
 		}
 		

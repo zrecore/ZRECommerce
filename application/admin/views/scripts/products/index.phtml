@@ -27,8 +27,8 @@ if (isset($vars['content'])) echo $vars['content'];
 
 // Listing
 $header_map = array(
-	'id' 			=> 'ID',
-	'container_id' 	=> 'Parent',
+	'product_id'	=> 'ID',
+	'article_id' 	=> 'Article',
 	'title' 		=> 'Title',
 	'description' 	=> 'Description',
 	'price' 		=> 'Price',
@@ -39,8 +39,8 @@ $header_map = array(
 );
 
 $exclude_map = array(
-	'id',
-	'container_id',
+	'product_id',
+	'article_id',
 	'date_created',
 	'date_modified',
 );
