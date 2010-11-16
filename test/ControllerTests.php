@@ -1,28 +1,28 @@
 <?php
 /**
- * AllTests - A Test Suite for your Application 
+ * ControllerTests - A Test Suite for controllers.
  * 
  * @author aalbino
  */
-require_once 'PHPUnit/Framework/TestSuite.php';
-require_once 'ControllerTests.php';
-//require_once 'application/Initializer.php';
-
 require_once 'application/default/controllers/IndexControllerTest.php';
 require_once 'application/default/controllers/OrdersControllerTest.php';
 
 /**
- * AllTests class - aggregates all tests of this project
+ * ControllerTests class - aggregates all controller tests of this project
  */
-class AllTests extends PHPUnit_Framework_TestSuite {
+class ControllerTests extends PHPUnit_Framework_TestSuite {
 	
+	protected function setUp() {
+			
+	}
 	/**
 	 * Constructs the test suite handler.
 	 */
 	public function __construct() {
-		$this->setName ( 'AllTests' );
+		$this->setName ( 'ControllerTests' );
 		
-		$this->addTestSuite ( 'ControllerTests' );
+		$this->addTestSuite ( 'IndexControllerTest' );
+		$this->addTestSuite ( 'OrdersControllerTest' );
 	
 	}
 	

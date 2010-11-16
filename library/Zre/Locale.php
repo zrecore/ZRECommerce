@@ -55,7 +55,7 @@ class Zre_Locale
 					$translate->setCache($cache);
 					$locale->setCache($cache);
 					
-					$namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE, true);
+					$namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE);
 					$namespace->locale = $locale;
 					$namespace->translate = $translate;
 					$namespace->last_locale_string = $locale;

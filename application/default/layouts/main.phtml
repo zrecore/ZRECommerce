@@ -17,6 +17,7 @@
  * Assign 'disable_cache' a value of 1 to disable caching in any controller(s) you wish.
  */
 $vars = $this->getVars();
+if (!isset($vars)) $vars = array();
 
 $save_output = null;
 /**
@@ -26,7 +27,7 @@ $settings = Zre_Config::getSettingsCached();
 
 $isHttps = isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == $settings->site->ssl_port ? true : false;
 
-if (empty($vars['template_name'])) $vars['template_name'] = $settings->site->template;
+if (!isset($vars['template_name']) || empty($vars['template_name'])) $vars['template_name'] = $settings->site->template;
 
 /**
  * Default Layout

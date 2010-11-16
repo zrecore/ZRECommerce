@@ -46,11 +46,16 @@ class ErrorController extends Zend_Controller_Action
 		        'Env:
 		        	' . APPLICATION_ENV . '
 		        Exception:
-		        	' . (string) $errors->exception . '
+		        	' . (string) $errors->exception;
+
+                if (isset($_SESSION)) {
+		        $error_output .= '
 		        
 		        Session:
 		        
-		        ' . print_r($_SESSION, true) . '
+		        ' . print_r($_SESSION, true);
+                }
+		        $error_output .= '
 		        
 		        Request:
 		        

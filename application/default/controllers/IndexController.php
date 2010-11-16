@@ -41,24 +41,11 @@ class IndexController extends Zend_Controller_Action
 		$output = $content->__toString();
 
         $this->view->assign('content', $output);
-        $this->view->assign('enable_jquery', 1);
-        $this->view->assign('extra_jquery_js', array(
-        										'/scripts/jquery/jquery.easing.js' ));
         $cssBase = substr( Zre_Template::baseCssTemplateUrl(), 1 );
 		
 		$this->view->assign('extra_css', array( $cssBase . '/components/content/article.css' ));
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Home');
 		Zre_Registry_Session::save();
-    }
-	/**
-	 * Test page action.
-	 *
-	 */
-    public function testAction()
-    {
-    	$this->view->assign('disable_cache', 1);
-    	$this->view->assign('params', $this->getRequest()->getParams());
-    	
     }
 }

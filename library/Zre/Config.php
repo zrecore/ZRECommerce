@@ -157,7 +157,7 @@
 						
 						$system_config = self::parseSettings($system_config, $system_config->runmode);
 						
-						$config_namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE, true);
+						$config_namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE);
 						$config_namespace->config = serialize($system_config);
 						$config_namespace->config_last_filetime = filectime( $file );
 						$config_namespace->config_filepath = $file;
@@ -183,7 +183,7 @@
 						$config_namespace->config_filepath = $file;
 						
 					} else {
-						$config_namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE, true);
+						$config_namespace = new Zend_Session_Namespace(self::DEFAULT_NAMESPACE);
 						$config_namespace->config = serialize($system_config);
 						$config_namespace->config_last_filetime = filectime( $file );
 						$config_namespace->config_filepath = $file;

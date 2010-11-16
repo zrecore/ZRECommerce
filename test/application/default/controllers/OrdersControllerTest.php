@@ -1,20 +1,9 @@
-<?
-/**
- * IndexControllerTest - Test the default index controller
- * 
- * @author
- * @version 
- */
-// Zend_Application
+<?php
 require_once 'Zend/Application.php';
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
 
-//require_once 'application/Initializer.php';
-
-/**
- * IndexController Test Case
- */
-class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
+class OrdersControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
+{
 
 	/**
 	 * Prepares the environment before running a test.
@@ -50,7 +39,7 @@ class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
 		
 		parent::setUp ();
 	}
-
+	
 	/**
 	 * Prepares the environment before running a test.
 	 */
@@ -63,26 +52,22 @@ class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
+		// TODO Auto-generated FooControllerTest::tearDown()
 		Zend_Session::destroy();
 		parent::tearDown ();
 	}
 	
-	/**
-	 * Constructs the test case.
-	 */
-	public function __construct() {
-		// TODO Auto-generated constructor
-	}
-	
-	/**
-	 * Tests FooController->barAction()
-	 */
 	public function testIndexAction() {
 		// TODO Auto-generated FooControllerTest->testBarAction()
-		$this->dispatch ( '/index/index' );
-		$this->assertController ( 'index' );
-//		$this->assertAction ( 'index' );
+		$this->dispatch ( '/orders/index' );
+		$this->assertController ( 'orders' );
 		Zend_Session::destroy();
 	}
+	
+	public function testProcessAction() {
+		$this->dispatch( '/orders/process' );
+		$this->assertController( 'orders' );
+		Zend_Session::destroy();
+	}
+	
 }
-?>
