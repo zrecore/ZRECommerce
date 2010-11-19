@@ -102,7 +102,6 @@ class Admin_LoginController extends Zend_Controller_Action {
 				if ($is_valid == true)
 				{
 					$form->resetLoginAttemptCount();
-					$form = null;
 //					Zend_Session::rememberUntil( (int)$settings->site->session_timeout );
 					
 					$userAuth = (array) $auth_adapter->getResultRowObject(null, array('password'));
@@ -122,6 +121,7 @@ class Admin_LoginController extends Zend_Controller_Action {
 			}
 			
 		}
+		
 		$login_count = $form->getLoginAttemptCount();
 		if ($login_count > 0 && $login_count < $form->max_login_attempts )
 		{

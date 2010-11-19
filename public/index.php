@@ -13,25 +13,9 @@
  * @license GPL v3 or higher. See README file.
  */
 
-define('BASE_PATH', realpath(dirname(__FILE__) . '/../'));
-define('APPLICATION_PATH', BASE_PATH . '/application');
+require_once realpath(dirname(__FILE__) . '/../application/bootstrap.php');
 
-// Include path
-set_include_path(
-    BASE_PATH . '/library'
-    . PATH_SEPARATOR . get_include_path()
-);
-
-// Define application environment
-define('APPLICATION_ENV', 'development');
-defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV',
-              (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-                                         : 'production'));
-
-// Zend_Application
-require_once 'Zend/Application.php';
-
+Bootstrap::setupPaths();
 $application = new Zend_Application(
     APPLICATION_ENV,
     APPLICATION_PATH . '/configs/application.ini'

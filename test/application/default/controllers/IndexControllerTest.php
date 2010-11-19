@@ -5,42 +5,21 @@
  * @author
  * @version 
  */
-// Zend_Application
-require_once 'Zend/Application.php';
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
-
-//require_once 'application/Initializer.php';
+require_once realpath(dirname(__FILE__) . '/../../../../application/bootstrap.php');
 
 /**
  * IndexController Test Case
  */
-class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
+class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase 
+{
 
 	/**
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
-		 // Assign and instantiate in one step:
-        
-        if (!defined('BASE_PATH')) define('BASE_PATH', realpath(dirname(__FILE__) . '/../../../../'));
-		if (!defined('APPLICATION_PATH'))  define('APPLICATION_PATH', BASE_PATH . '/application');
 		
-		// Include path
-		set_include_path(
-		    BASE_PATH . '/library'
-		    . PATH_SEPARATOR . get_include_path()
-		);
-		
-		// Define application environment
-		if (!defined('APPLICATION_ENV')) define('APPLICATION_ENV', 'test');
-		defined('APPLICATION_ENV')
-		    || define('APPLICATION_ENV',
-		              (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-		                                         : 'production'));
-		
-		// Zend_Application
-		require_once 'Zend/Application.php';
-		
+		Bootstrap::setupPaths();
 		$application = new Zend_Application(
 		    APPLICATION_ENV,
 		    APPLICATION_PATH . '/configs/application.ini'
@@ -67,12 +46,6 @@ class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
 		parent::tearDown ();
 	}
 	
-	/**
-	 * Constructs the test case.
-	 */
-	public function __construct() {
-		// TODO Auto-generated constructor
-	}
 	
 	/**
 	 * Tests FooController->barAction()
@@ -81,7 +54,7 @@ class IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase {
 		// TODO Auto-generated FooControllerTest->testBarAction()
 		$this->dispatch ( '/index/index' );
 		$this->assertController ( 'index' );
-//		$this->assertAction ( 'index' );
+		$this->assertAction ( 'index' );
 		Zend_Session::destroy();
 	}
 }

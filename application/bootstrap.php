@@ -18,11 +18,34 @@
  * called in the order they are written within this class.
  *
  */
+require_once 'Zend/Application/Bootstrap/ResourceBootstrapper.php';
+require_once 'Zend/Application/Bootstrap/Bootstrapper.php';
+require_once 'Zend/Application/Bootstrap/BootstrapAbstract.php';
+require_once 'Zend/Application/Bootstrap/Bootstrap.php';
+
+// Zend_Application
+require_once 'Zend/Application.php';
+
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
 	
-	protected function _initApplication() {
-    	
+	static function setupPaths() {
+    	if (!defined('BASE_PATH')) define('BASE_PATH', realpath(dirname(__FILE__) . '/../'));
+		if (!defined('APPLICATION_PATH'))  define('APPLICATION_PATH', BASE_PATH . '/application');
+		
+		// Include path
+		set_include_path(
+		    BASE_PATH . '/library'
+		    . PATH_SEPARATOR . get_include_path()
+		);
+		
+		// Define application environment
+		if (!defined('APPLICATION_ENV')) define('APPLICATION_ENV', 'test');
+		defined('APPLICATION_ENV')
+		    || define('APPLICATION_ENV',
+		              (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
+		                                         : 'production'));
+		
     }
     
 	public function _initAutoLoader() {
@@ -59,7 +82,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		$settings = Zre_Config::getSettingsCached();
 		
 		if (!$settings) {
-			$settings_path = realpath('../application/settings/environment/') . DIRECTORY_SEPARATOR . 'settings.xml';
+			$settings_path = APPLICATION_PATH . '/settings/environment/settings.xml';
 			$settings = Zre_Config::loadSettings($settings_path, true);
 //			$settings = ($settings->runmode->use == 'production')?$settings->production:$settings->dev;
 		}

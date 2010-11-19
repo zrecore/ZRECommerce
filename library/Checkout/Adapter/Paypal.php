@@ -1,9 +1,22 @@
 <?php
-class Checkout_Adapter_Paypal {
-	public function getClient() {
-		$options = array('wsdl' => 'https://www.sandbox.paypal.com/wsdl/PayPalSvc.wsdl');
-		$client = new Zend_Soap_Client(null, $options);
+class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
+	/**
+	 * Calculate the gross total of all items
+	 * @param Cart_Container The cart to calculate.
+	 * @return float The total.
+	 */
+	public function calculate(Cart_Container $cartContainer)
+	{
 		
-		return $client;
+	}
+	/**
+	 * Charge the total using the specified payment method.
+	 * @param float $total
+	 * @param Checkout_Payment_Interface $payment
+	 * @return unknown_type
+	 */
+	public function pay(float $total, Checkout_Payment_Interface $payment)
+	{
+		
 	}
 }

@@ -26,7 +26,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		$settings = Zre_Config::getSettingsCached();
 		
 		if (!Zre_Template::isHttps() && $settings->site->enable_ssl == 'yes') {
-			$this->_redirect('https://' . $settings->site->url . '/admin/', array('exit' => true));
+			$this->_redirect('https://' . $settings->site->url . '/admin/');
 		}
 		
 		// All pages here require a valid login. Kick out if invalid.
@@ -35,7 +35,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		{
 //			Zend_Session::rememberUntil( (int)$settings->site->session_timeout );
 		} else {
-			$this->_redirect('/admin/login', array('exit'=> true));
+			$this->_redirect('/admin/login');
 		}
 		
 //		$this->view->assign('enable_admin_menu', 1);

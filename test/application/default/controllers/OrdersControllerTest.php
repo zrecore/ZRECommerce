@@ -1,7 +1,16 @@
 <?php
-require_once 'Zend/Application.php';
+/**
+ * IndexControllerTest - Test the default index controller
+ * 
+ * @author
+ * @version 
+ */
 require_once 'Zend/Test/PHPUnit/ControllerTestCase.php';
+require_once realpath(dirname(__FILE__) . '/../../../../application/bootstrap.php');
 
+/**
+ * IndexController Test Case
+ */
 class OrdersControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
 {
 
@@ -9,26 +18,8 @@ class OrdersControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
-		 // Assign and instantiate in one step:
-        
-        if (!defined('BASE_PATH')) define('BASE_PATH', realpath(dirname(__FILE__) . '/../../../../'));
-		if (!defined('APPLICATION_PATH'))  define('APPLICATION_PATH', BASE_PATH . '/application');
 		
-		// Include path
-		set_include_path(
-		    BASE_PATH . '/library'
-		    . PATH_SEPARATOR . get_include_path()
-		);
-		
-		// Define application environment
-		if (!defined('APPLICATION_ENV')) define('APPLICATION_ENV', 'test');
-		defined('APPLICATION_ENV')
-		    || define('APPLICATION_ENV',
-		              (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-		                                         : 'production'));
-		
-		// Zend_Application
-		require_once 'Zend/Application.php';
+		Bootstrap::setupPaths();
 		
 		$application = new Zend_Application(
 		    APPLICATION_ENV,
@@ -65,6 +56,7 @@ class OrdersControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
 	}
 	
 	public function testProcessAction() {
+		$this->markTestIncomplete('Need to finish setting up /orders/process unit test.');
 		$this->dispatch( '/orders/process' );
 		$this->assertController( 'orders' );
 		Zend_Session::destroy();
