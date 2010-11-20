@@ -13,36 +13,17 @@
  * @license GPL v3 or higher. See README file.
  */
 $settings = ZRE_Config::getSettingsCached();
-$t = Zend_Registry::get('Zend_Translate');
 
-$vars = $this->getVars();
-$params 	= $vars['params'];
+$articleData = $this->data;
 
-$articleTitleText = '';
-$article = new Zre_Dataset_Article();
-
-if (is_numeric($params['id'])) {
-	$data = $article->read( $params['id'] )->current()->toArray();
-	$articleTitleText = $data['title'] . ' - ';
-}
+$articleTitleText = $articleData['title'];
 
 $this->headTitle($articleTitleText . (string)$settings->site->title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
 if (empty($this->title)) $this->title = (string)$settings->site->title;
 $this->placeholder('title')->set($this->title);
 
-if (isset($vars['content'])) echo $vars['content'];
+if (isset($this->content)) echo $this->content;
 
-
-$node_id 	= isset($params['id']) ? $params['id'] : 1;
-
-//$articleDatagrid = new Zre_Ui_Datagrid_Read_Article($node_id);
-//
-//$articleData = $articleDatagrid->getData();
-//
-$articleData = $article->read( $node_id );
-
-if ($articleData->count() > 0) {
-	$articleData = $articleData->current()->toArray();
 	$articleId 			= $articleData['article_id'];
 	$articleContainerId = $articleData['article_container_id'];
 	$articleResource 	= $articleData['resource'];
@@ -55,22 +36,7 @@ if ($articleData->count() > 0) {
 	
 	if (!$articleImage) $articleImage = '/images/dummy.png';
 	
-//	$articleData['content'] = str_replace(array('{', '}'), array('<', ' />'), $articleData['content']);
-//	$articleContent = ( $articleData['use_zre_plugins'] == 'yes' ? Plugin::search_and_insert( $articleData['content'] ) : $articleData['content'] );
-} else {
-	$articleId 			= 1;
-	$articleContainerId = 1;
-	$articleResource 	= '';
-	$articlePublished 	= '';
-	$articleTitle 		= $t->_('Page Not Found');
-	$articleDescription = $t->_('The requested article was not found.');
-	$articleDateCreated  = new Zend_Date();
-	$articleDateModified = new Zend_Date();
-	$articleImage 		= '/images/dummy.png';
-	
-	$articleContent = '';
-}
-$titleSlug = Zre_Template::createSlug($articleTitle);
+	$titleSlug = Zre_Template::createSlug($articleTitle);
 ?>
 <div class="articleContainer">
 	<table cellspacing="0" cellpadding="0" border="0" class="articleContainerInner">
@@ -81,15 +47,13 @@ $titleSlug = Zre_Template::createSlug($articleTitle);
 			</td>
 			
 			<td class="articleText">
-				<h2 class="articleTitle">
-					<a name="article-<?php echo $articleId; ?>" href="<?php echo $this->url(array('controller'=>'read', 'action'=>'article', 'id'=>$articleId, 'title' => $titleSlug), 'indexReadArticle'); ?>">
-						<?php echo $articleTitle; ?>
-					</a>
-				</h2>
+				<h1 class="articleTitle">
+					<?php echo $articleTitle; ?>
+				</h1>
 				<div class="articleDescription">
 				<?php echo Plugin::search_and_insert($articleDescription); ?>
 				</div>
-				<div class="articleFooter"><?php echo $t->_('Last edited ') . $articleDateCreated->getArpa(); ?></div>
+				<div class="articleFooter"><?php echo $this->translate('Last edited ') . $articleDateCreated->getArpa(); ?></div>
 			</td>
 		</tr>
 	</table>
@@ -97,5 +61,5 @@ $titleSlug = Zre_Template::createSlug($articleTitle);
 
 <a 	class="lightLink" 
 	href="<?php echo $this->url(array('controller' => 'read', 'action' => 'index')); ?>">
-	<?php echo $t->_('Browse Articles'); ?>
+	<?php echo $this->translate('Browse Articles'); ?>
 </a>

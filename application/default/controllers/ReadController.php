@@ -60,11 +60,28 @@ class ReadController extends Zend_Controller_Action {
 		$this->view->assign('extra_css', array( $cssBase . '/components/content/article.css' ));
 		
 		// Read an article
-		$node_id = $this->getRequest()->getParam('id');
+		$article = new Zre_Dataset_Article();
+		$id = $this->getRequest()->getParam('id');
         
         // ...If no node_id was specified, re-route back to index action.
-		if (!isset($node_id))
+		if (!isset($id))
 		{
+			$this->_redirect('/read/');
+		}
+		// ...Is this a valid ID?
+		if (is_numeric($id) && is_int($id)) {
+			$records = $article->read( $id );
+			
+			// ...Is this a valid record?
+			if ($records->count() > 0) {
+				$data = $records->current()->toArray();
+				$this->view->data = $data;
+			} else {
+				// ...No, redirect.
+				$this->_redirect('/read/');
+			}
+		} else {
+			// ...No, redirect.
 			$this->_redirect('/read/');
 		}
 		
