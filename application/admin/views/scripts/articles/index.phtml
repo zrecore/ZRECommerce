@@ -186,6 +186,7 @@ $strInternalError = $this->translate('Internal error.');
 							jQuery.getJSON(
 								'/admin/articles/json-create',
 								{
+									article_container_id: 1,
 									description: htmlData,
 									title: article_title,
 									image: article_image
