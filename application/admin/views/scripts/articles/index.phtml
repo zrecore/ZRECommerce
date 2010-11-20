@@ -57,11 +57,36 @@ $exclude_map = array(
 );
 
 $strTitle = $t->_('Title: ');
+$strInternalError = $this->translate('Internal error.');
 
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
+		function renderTable(response)
+		{
+			$('#frmArticles .table-data .table-body').remove();
 
+			$.each(response.data, function(i, row){
+				
+				$('#frmArticles .table-data').append(
+					'<tbody class="table-body">' + 
+					'	<tr class="table-row">' + 
+					'		<td class="article_date_created"><div>' + row.date_created + '</div><div class="small-text">Modified: ' + row.date_modified + '</div></td>' +
+					'		<td class="article_title">' + row.title + '</td>' +
+					'	</tr>' +
+					'	<tr class="table-sub-row">'  +
+					'		<td colspan="2">' +
+					'			<div class="form-list"><ul><li><label>' + row.title + '</label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
+					'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' + 
+					'		</td>' + 
+					'	</tr>' + 
+					'</tbody>'
+				);
+			});
+
+			rebindArticleForm();
+		}
+		
 		function rebindArticleForm() {
 			
 			$('#frmArticles .table-data .editor').each(function (i, obj) {
@@ -129,34 +154,66 @@ $strTitle = $t->_('Title: ');
 			});
 		}
 		
-		$('#btnCreateArticle').click(function(ev){
-			// ...Create the article via getJSON()
-			
-		});
-		
 		$('#frmArticles').tableSort({
-			onJsonSuccess: function(response){
-				$('#frmArticles .table-data .table-body').remove();
-	
-				$.each(response.data, function(i, row){
-					
-					$('#frmArticles .table-data').append(
-						'<tbody class="table-body">' + 
-						'	<tr class="table-row">' + 
-						'		<td class="article_date_created"><div>' + row.date_created + '</div><div class="small-text">' + row.date_modified + '</div></td>' +
-						'		<td class="article_title">' + row.title + '</td>' +
-						'	</tr>' +
-						'	<tr class="table-sub-row">'  +
-						'		<td colspan="2">' +
-						'			<div class="form-list"><ul><li><label><?php echo stripslashes($strTitle); ?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
-						'			<div class="editor" id="article_description_' + row.article_id + '">' + stripslashes(row.description) + '</div>' + 
-						'		</td>' + 
-						'	</tr>' + 
-						'</tbody>'
-					);
-				});
+			onJsonSuccess: renderTable
+		});
 
-				rebindArticleForm();
+		$('#new_article_description').wymeditor({
+			postInit: function(wym) {
+				
+				//construct the button's html
+				var html = "<li class='wym_tools_newbutton'>"
+					+ "<a name='SaveButton' href='#'"
+					+ " style='background-image:"
+					+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
+					+ "Save"
+					+ "</a></li>";
+			
+				//add the button to the tools box
+				jQuery(wym._box)
+					.find(wym._options.toolsSelector + wym._options.toolsListSelector)
+					.prepend(html);
+				
+					//handle click event
+					jQuery(wym._box)
+						.find('li.wym_tools_newbutton a').click(function() {
+							//do something
+							var htmlData = wym.html();
+							
+							var article_title = jQuery('#new_article_title').val();
+							var article_image = jQuery('#new_article_image').val();
+							
+							jQuery.getJSON(
+								'/admin/articles/json-create',
+								{
+									description: htmlData,
+									title: article_title,
+									image: article_image
+								},
+								function (reply) {
+									if (reply > 0) {
+										jQuery.getJSON(
+											'/admin/articles/json-list',
+											{
+												sort: 'date_created',
+												order: 'DESC'
+											},
+											function(response) {
+												renderTable(response);
+
+												jQuery('#new_article_title').val('');
+												jQuery('#new_article_image').val('');
+												wym.html('');
+											}
+										);
+									} else {
+										alert('<?php echo $strInternalError; ?>');
+									}
+								}
+							);
+							
+							return(false);
+						});
 			}
 		});
 		
@@ -165,7 +222,7 @@ $strTitle = $t->_('Title: ');
 </script>
 <div id="articles_msg_dialog"></div>
 <form id="frmArticles" action="/admin/articles/json.list">
-	<input type="hidden" class="table-sort-order" value="DESC" />
+	<input type="hidden" class="table-sort-order" value="ASC" />
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
 			<th><a href="#date_created"><?php echo $t->_('Date Created'); ?></a></th>
@@ -173,7 +230,7 @@ $strTitle = $t->_('Title: ');
 		</tr>
 	<?php 
 	
-	/* @todo load dynamically via jQuery tableSort widget. //*/
+	/* @todo load dynamically via jQuery tableSort widget. */
 	$articles = new Zre_Dataset_Article();
 	
 	$data = $articles->listAll(null, array('order' => 'title DESC'));
@@ -184,7 +241,7 @@ $strTitle = $t->_('Title: ');
 		?>
 		<tbody class="table-body">
 		<tr class="table-row">
-			<td class="article_date_created"><div><?php echo $row->date_created; ?></div><div class="small-text"><?php echo $row->date_modified;?></div></td>
+			<td class="article_date_created"><div><?php echo $row->date_created; ?></div><div class="small-text">Modified: <?php echo $row->date_modified;?></div></td>
 			<td class="article_title"><?php echo $row->title; ?></td>
 		</tr>
 		<tr class="table-sub-row">
@@ -205,30 +262,26 @@ $strTitle = $t->_('Title: ');
 	} else {
 		?>
 		<tbody class="table-body">
-		<tr class="table-row"><td colspan="2"><?php echo $t->_('No records found.');?></td></tr>
+			<tr class="table-row"><td colspan="2"><?php echo $t->_('No records found.');?></td></tr>
 		</tbody>
 		<?php 
 	}
-	//*/?>
+	?>
 	</table>
 </form>
 <br />
 <br />
 <h3><?php echo $t->_('Create a new article'); ?></h3>
-<form id="frmCreateArticle" class="form-list">
-	<ul>
+<div>
+	<ul class="form-list">
 		<li>
 			<label for="new_article_title"><?php echo $t->_('Title:'); ?></label>
 			<input type="text" id="new_article_title" value="" />
-		</li>
-		<li>
-			<label for="new_article_description"><?php echo $t->_('Desc:'); ?></label>
-			<input type="text" id="new_article_description" value="" />
 		</li>
 		<li>
 			<label for="new_article_image"><?php echo $t->_('Image:'); ?></label>
 			<input type="text" id="new_article_image" value="/images/dummy.png" />
 		</li>
 	</ul>
-	<input type="button" id="btnCreateArticle" value="<?php echo $t->_('New Article');?>" />
-</form>
+	<div id="new_article_description"></div>
+</div>

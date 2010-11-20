@@ -501,10 +501,16 @@ class Admin_ArticlesController extends Zend_Controller_Action
 		$data = null;
 		
 		try {
+			
 			$dataset = new Zre_Dataset_Article();
-			$data = $dataset->create($request->getParams());
+			$record = $request->getParams();
+			
+			$record['date_created'] = new Zend_Db_Expr('NOW()');
+			$record['date_modified'] = new Zend_Db_Expr('NOW()');
+			$data = $dataset->create($record);
 		} catch (Exception $e) {
 			Debug::log((string)$e);
+			$data = 0;
 		}
 		
 		$this->_helper->json($data);

@@ -66,11 +66,11 @@ abstract class Data_Set_Abstract {
 	 * @param array $data Column-value pairs
 	 * @return mixed The primary key of the row inserted.
 	 */
-	public function create(array $data) {
+	public function create($data) {
 		try {
 			$model = $this->getModel();
 			$data = Data::filterColumns($data, $model);
-			
+			Debug::log(print_r($data, true));
 			return $model->insert($data);
 		} catch (Exception $e) {
 			Debug::logException($e);
