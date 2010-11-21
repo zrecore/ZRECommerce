@@ -25,7 +25,6 @@ class Plugin_Dataset_Model_Plugins extends Zend_Db_Table_Abstract {
 	
 	public function __construct($config = array())
 	{
-		//$this->setDefaultAdapter( new Zre_Db_Adapter_Sqlite( $this->_name . '.sq3' ) );
 		$settings = Zre_Config::getSettingsCached();
 		$this->_name = $settings->db->table_name_prepend . $this->_name;
 		$this->setDefaultAdapter( new Zre_Db_Adapter_Mysql() );

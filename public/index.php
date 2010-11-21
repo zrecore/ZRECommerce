@@ -18,7 +18,7 @@ require_once realpath(dirname(__FILE__) . '/../application/bootstrap.php');
 Bootstrap::setupPaths();
 $application = new Zend_Application(
     APPLICATION_ENV,
-    APPLICATION_PATH . '/configs/application.ini'
+    APPLICATION_PATH . '/settings/application.ini'
 );
 
 $application->bootstrap();

@@ -22,7 +22,7 @@ class Admin_IndexControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
         Bootstrap::setupPaths();
 		$application = new Zend_Application(
 		    APPLICATION_ENV,
-		    APPLICATION_PATH . '/configs/application.ini'
+		    APPLICATION_PATH . '/settings/application.ini'
 		);
 		
 		$this->bootstrap = $application;

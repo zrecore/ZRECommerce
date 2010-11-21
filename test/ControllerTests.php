@@ -16,7 +16,7 @@ require_once 'application/admin/controllers/LoginControllerTest.php';
 require_once 'application/admin/controllers/LogsControllerTest.php';
 require_once 'application/admin/controllers/OrdersControllerTest.php';
 require_once 'application/admin/controllers/PluginsControllerTest.php';
-require_once 'application/admin/controllers/ProductsControllerTest.php';
+// @todo require the Products controller.
 require_once 'application/admin/controllers/SearchControllerTest.php';
 require_once 'application/admin/controllers/SettingsControllerTest.php';
 require_once 'application/admin/controllers/UsersControllerTest.php';
