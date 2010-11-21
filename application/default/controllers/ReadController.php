@@ -69,7 +69,8 @@ class ReadController extends Zend_Controller_Action {
 			$this->_redirect('/read/');
 		}
 		// ...Is this a valid ID?
-		if (is_numeric($id) && is_int($id)) {
+		
+		if (is_numeric($id)) {
 			$records = $article->read( $id );
 			
 			// ...Is this a valid record?
