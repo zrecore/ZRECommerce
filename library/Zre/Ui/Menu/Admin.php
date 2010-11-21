@@ -25,16 +25,8 @@ class Zre_Ui_Menu_Admin extends Zre_Ui_Menu_Abstract
 		if (!isset($config)) 
 		{
 			$config = array(
-				'Admin' => 		array('id'=>'mnuAdminIndex', 'class'=>'menuItem', 'url'=>'/admin/'),
-				'Settings' => 	array('id'=>'mnuAdminIndexSettings', 'class'=>'menuItem', 'url'=>'/admin/index/settings/'),
-				'Backup' => 	array('id'=>'mnuAdminIndexBackup', 'class'=>'menuItem', 'url'=>'/admin/backup/'),
-				'Updates' =>	array('id'=>'mnuAdminIndexUpdates', 'class'=>'menuItem', 'url'=>'/admin/index/updates/'),
-				'Errors' =>		array('id'=>'mnuAdminIndexLogs', 'class'=>'menuItem', 'url'=>'/admin/logs/'),
-				'Users' =>		array('id'=>'mnuAdminUsers', 'class'=>'menuItem', 'url'=>'/admin/users/'),
-				'Orders' =>		array('id'=>'mnuAdminOrders', 'class'=>'menuItem', 'url'=>'/admin/orders/'),
-				'Products' =>	array('id'=>'mnuAdminProducts', 'class'=>'menuItem', 'url'=>'/admin/products/'),
-				'Articles' =>	array('id'=>'mnuAdminArticles', 'class'=>'menuItem', 'url'=>'/admin/articles/'),
-				'Sign Out' =>	array('id'=>'mnuSignOut', 'class'=>'menuItem', 'url'=>'/admin/login/logout/')
+				'View Site' => array('id'=>'mnuViewSite', 'class'=>'menuItem', 'url'=>'/'),
+				'Sign Out'  =>	array('id'=>'mnuSignOut', 'class'=>'menuItem', 'url'=>'/admin/login/logout/')
 			);
 			
 			$configKeys = array_keys($config);
