@@ -232,7 +232,7 @@ class ShopController extends Zend_Controller_Action {
 						);
 						
 						$order_id = $ordersDataset->create($order);
-						
+						Debug::print_r($result);
 						$ordersCybersource = array(
 							'order_id' => $order_id,
 							'decision' => $result->decision,

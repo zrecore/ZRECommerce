@@ -36,35 +36,41 @@ $strPassword = $t->_('Password');
 		});
 
 		$('#frmUsers').tableSort({
+			pageIndex: 1,
+			rowCount: 5,
 			onJsonSuccess: function(response){
-				$('#frmUsers .table-data .table-body').remove();
+				if (response.result == 'ok') {
 
-				$.each(response.data, function(i, row){
-					
-					$('#frmUsers .table-data').append(
-						'<tbody class="table-body">' + 
-						'<tr class="table-row">' + 
-						'	<td>' + row.user_id + '</td>' +
-						'	<td>' + row.name + '</td>' +
-						'	<td>' + row.email + '</td>' +
-						'	<td>' + row.role + '</td>' +
-						'	<td>' + row.city + '</td>' +
-						'	<td>' + row.state_province + '</td>' +
-						'	<td>' + row.zipcode + '</td>' +
-						'	<td>' + row.country + '</td>' + 
-						'</tr>' + 
-						'<tr class="table-sub-row">' +
-						'	<td colspan="8"><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></td>' + 
-						'</tr>' +  
-						'</table>'
-					);
-				});
+				    $('#frmUsers .table-data .table-body').remove();
+
+				    $.each(response.data, function(i, row){
+
+					    $('#frmUsers .table-data').append(
+						    '<tbody class="table-body">' +
+						    '<tr class="table-row">' +
+						    '	<td>' + row.user_id + '</td>' +
+						    '	<td>' + row.name + '</td>' +
+						    '	<td>' + row.email + '</td>' +
+						    '	<td>' + row.role + '</td>' +
+						    '	<td>' + row.city + '</td>' +
+						    '	<td>' + row.state_province + '</td>' +
+						    '	<td>' + row.zipcode + '</td>' +
+						    '	<td>' + row.country + '</td>' +
+						    '</tr>' +
+						    '<tr class="table-sub-row">' +
+						    '	<td colspan="8"><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></td>' +
+						    '</tr>' +
+						    '</tbody>'
+					    );
+				    });
+				} else {
+				    alert('Error: ' + response.data);
+				}
 			}
 		});
 	});
 </script>
 <form id="frmUsers" action="/admin/users/json.list">
-	<input type="hidden" class="table-sort-order" value="DESC" />
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
 			<th><a href="#user_id">ID</a></th>
@@ -76,43 +82,12 @@ $strPassword = $t->_('Password');
 			<th><a href="#zipcode">Zip</a></th>
 			<th><a href="#country">Country</a></th>
 		</tr>
-	<?php 
-	if (count($this->records) > 0):
-		foreach($this->records as $i => $r):
-			$r = (object)$r;
-	?>
-		<tbody class="table-body">
-		<tr class="table-row">
-			<td><?php echo $r->user_id?></td>
-			<td><?php echo $r->name?></td>
-			<td><?php echo $r->email?></td>
-			<td><?php echo $r->role?></td>
-			<td><?php echo $r->city?></td>
-			<td><?php echo $r->state_province?></td>
-			<td><?php echo $r->zipcode?></td>
-			<td><?php echo $r->country?></td>
-		</tr>
-		<tr class="table-sub-row">
-			<td colspan="8">
-				<label><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></label>
-			</td>
-		</tr>
-		</tbody>
-	<?php
-		endforeach;
-	else:
-	?>
-	
-	
-	<?php  
-	endif;
-	?>
 	</table>
 </form>
 <br />
 <br />
 <h3><?php echo $t->_('Create a new user'); ?></h3>
-<form id="frmCreateUser" class="form-list">
+<form id="frmCreateUser" class="form-list" action="#">
 	<ul>
 		<li>
 			<label for="new_user_name"><?php echo $t->_('User Name:'); ?></label>

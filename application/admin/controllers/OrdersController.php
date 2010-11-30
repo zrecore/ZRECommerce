@@ -49,44 +49,7 @@ class Admin_OrdersController extends Zend_Controller_Action {
 	 * The default action - show the home page
 	 */
 	public function indexAction() {
-		// TODO Auto-generated OrdersController::indexAction() default action
 		$this->view->title = 'Orders';
-		
-		$request = $this->getRequest();
-		$orderObject = new Zre_Dataset_Orders();
-		$headers = $orderObject->info('cols');
-		$page = $request->getParam('page', 1);
-		$rowCount = $request->getParam('count', 30);
-		
-		$orderCol = strtolower( $request->getParam('col', $headers[0]) );
-		$orderSort = strtolower( $request->getParam('sort', 'asc') );
-		
-		if (!in_array($orderCol, $headers)) $orderCol = $headers[0];
-		if (!in_array($orderSort, array('asc', 'desc'))) $orderSort = 'asc';
-		
-		$options = array(
-			'order' => 'o.' . $orderCol . ' ' . $orderSort,
-			'limit' => array('page' => $page, 'rowCount' => $rowCount)
-		);
-		
-		$orders = $orderObject->listAllComposite(null, $options);
-		
-		$options = array(
-			'from' => array(
-				'name' => $orderObject->getModel()->info('name'), 
-				'cols' => new Zend_Db_Expr('COUNT(*) AS total')
-			)
-		);
-		
-		$count = $orderObject->listAll(null, $options, false)->current()->total;
-		
-		$this->view->col = $orderCol;
-		$this->view->sort = $orderSort;
-		$this->view->page = $page;
-		$this->view->rowCount = $rowCount;
-		
-		$this->view->orders = $orders;
-		$this->view->headers = $headers;
 	}
 	
 	public function jsonListAction() {
@@ -97,27 +60,36 @@ class Admin_OrdersController extends Zend_Controller_Action {
 		try {
 			$t = Zend_Registry::get('Zend_Translate');
 			$settings = Zre_Config::getSettingsCached();
-			
+
+			$pre = $settings->db->table_name_prepend;
+
 			$dataset = new Zre_Dataset_Orders();
-			$products = new Zre_Dataset_Product();
-			
-			$sort = $request->getParam('sort', 'order_id');
+
+			$sort = $request->getParam('sort', 'title');
 			$order = $request->getParam('order', 'ASC');
-			
-			$orderCols = $dataset->info('cols');
-			$productCols = $products->info('cols');
-			
-			$tblName = 'o';
-			if ( in_array($sort, $productCols) ) $tblName = 'p';
-			
+			$page = $request->getParam('pageIndex', 1);
+			$rowCount = $request->getParam('rowCount', 5);
+
 			$options = array(
-				'order' => $tblName . '.' . $sort . ' ' . $order
+				'order' => $sort . ' ' . $order,
+				'limit' => array(
+					'page' => $page,
+					'rowCount' => $rowCount
+				)
 			);
-			
-			$records = $dataset->listAllComposite(null, $options);
-			
+
+			$totalRecords = $dataset->listAll(null, array(
+				'from' => array(
+					'name' => array('u' => $dataset->getModel()->info('name')),
+					'cols' => array(new Zend_Db_Expr('COUNT(*)'))
+				)
+			), false)->current()->offsetGet('COUNT(*)');
+
+			$records = $dataset->getProfiles(null, $options, $pre);
+
 			$data = array(
 				'result' => 'ok',
+				'totalRows' => $totalRecords,
 				'data' => $records
 			);
 			

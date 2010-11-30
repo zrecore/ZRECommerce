@@ -1,13 +1,13 @@
 <?php
 /**
  * ZRECommerce e-commerce web application.
- * 
+ *
  * @author ZRECommerce
- * 
+ *
  * @package Admin
  * @subpackage Orders
  * @category Core
- * 
+ *
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce. See README file.
  * @license GPL v3 or higher. See README file.
@@ -23,18 +23,6 @@ $this->placeholder('title')->set($this->title);
 $vars = $this->getVars();
 if (isset($vars['content'])) echo $vars['content'];
 
-// ...List all order search options
-$searchForm = new Zend_Form();
-$searchFields = array();
-
-$orders = $this->orders;
-$headers = $this->headers;
-
-$sort = $this->sort;
-$col = $this->col;
-$page = $this->page;
-$rowCount = $this->rowCount;
-
 $strMarkAsPending = $t->_('Pending');
 $strMarkAsShipped = $t->_('Shipped');
 $strMarkAsVoid = $t->_('Void');
@@ -47,141 +35,93 @@ $strUpdateOrder = $t->_('Update Order');
 $strStatus = $t->_('Status');
 ?>
 <script type="text/javascript">
-	jQuery(document).ready(function($){
-		function rebindOrderUpdateButtons() {
-//			$('#frmOrders .order-status-select').click(function(ev){ev.preventDefault();});
-			$('#frmOrders').find('.order-update-button').click(function(ev){
-				$(this).parent().parent().parent().parent().hide();
-				var orderId = $(this).attr('id').replace('update_order_','');
-				var newOrderStatus = $('#order_status_' + orderId);
-				
-				$.getJSON(
-					'/admin/orders/json-update',
-					{
-						order_id: orderId,
-						status: newOrderStatus.val()
-					},
-					function(reply) {
-						if (reply.result == 'ok') {
-							
-							$('#frmOrders #order_status_label_' + reply.order_id).html(reply.status);
-						} else {
-							alert(reply.data);
-						}
-					}
-				);
-			});
-		}
-		$('#frmOrders').tableSort({
-			
-			onJsonSuccess: function(response){
-				
-				$('#frmOrders .table-data .table-body').remove();
-				
-				$.each(response.data, function(i, row){
-					
-					$('#frmOrders .table-data').append(
-						'<tbody class="table-body">' + 
-						'	<tr class="table-row">' + 
-						'		<td>' + row.order_id + '</td>' +
-						'		<td>' + row.title + '</td>' + 
-						'		<td>' + row.decision + '</td>' +
-						'		<td>' + row.order_date + '</td>' +
-						'		<td id="order_status_label_' + row.order_id + '">' + row.status + '</td>' + 
-						'	</tr>' + 
-						'	<tr class="table-sub-row">' +
-						'		<td colspan="5">' + 
-						'			<ul class="text-right no-bullets">' + 
-						'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span>' + row.title + '</span></div>' +
-						'				<li><span class="float-box-left">Quantity: </span><span>' + row.quantity + '</span></div>' +
-						'				<li><span class="float-box-left">Price per Unit: </span><span>' + row.unit_price + '</span></div>' +
-						'				<li>' + 
-						'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' + 
-						'					<select class="order-status-select" id="order_status_' + row.order_id + '">' +
-						'						<option value="pending"><?php echo $strMarkAsPending;?></option>' +  
-						'						<option value="shipped"><?php echo $strMarkAsShipped;?></option>' + 
-						'						<option value="void"><?php echo $strMarkAsVoid;?></option>' + 
-						'						<option value="exchanged"><?php echo $strMarkAsExchanged;?></option>' + 
-						'						<option value="refunded"><?php echo $strMarkAsRefunded;?></option>' + 
-						'						<option value="awaiting_return"><?php echo $strMarkAsAwaitingReturn;?></option>' + 
-						'						<option value="complete"><?php echo $strMarkAsComplete;?></option>' + 
-						'					</select>' + 
-						'				</li>' + 
-						'				<li><input type="button" class="order-update-button" id="update_order_' + row.order_id + '" value="<?php echo $strUpdateOrder;?>" /></li>' +
-						'			</ul>' + 
-						'		</td>' +
-						'	</tr>' +
-						'</tbody>'
-					);
-					
-					$('#frmOrders #order_status_' + row.order_id + ' option[value=' + row.status + ']').attr('selected', 'selected');
-					$('#frmOrders #order_status_label_' + row.order_id).html(row.status);
-				});
+    jQuery(document).ready(function($){
+	function rebindOrderUpdateButtons() {
+	    $('#frmOrders').find('.order-update-button').click(function(ev){
+		$(this).parent().parent().parent().parent().hide();
+		var orderId = $(this).attr('id').replace('update_order_','');
+		var newOrderStatus = $('#order_status_' + orderId);
 
-				rebindOrderUpdateButtons();
-			}
+		$.getJSON(
+		'/admin/orders/json-update',
+		{
+		    order_id: orderId,
+		    status: newOrderStatus.val()
+		},
+		function(reply) {
+		    if (reply.result == 'ok') {
+
+			$('#frmOrders #order_status_label_' + reply.order_id).html(reply.status);
+		    } else {
+			alert(reply.data);
+		    }
+		}
+	    );
+	    });
+	}
+	$('#frmOrders').tableSort({
+	    pageIndex: 1,
+	    rowCount: 5,
+	    onJsonSuccess: function(response){
+
+		$('#frmOrders .table-data .table-body').remove();
+
+		$.each(response.data, function(i, row){
+
+		    $('#frmOrders .table-data').append(
+		    '<tbody class="table-body">' +
+			'	<tr class="table-row">' +
+			'		<td>' + row.order_id + '</td>' +
+			'		<td>' + row.title + '</td>' +
+			'		<td>' + row.decision + '</td>' +
+			'		<td>' + row.order_date + '</td>' +
+			'		<td id="order_status_label_' + row.order_id + '">' + row.status + '</td>' +
+			'	</tr>' +
+			'	<tr class="table-sub-row">' +
+			'		<td colspan="5">' +
+			'			<ul class="text-right no-bullets">' +
+			'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span>' + row.title + '</span></div>' +
+			'				<li><span class="float-box-left">Quantity: </span><span>' + row.quantity + '</span></div>' +
+			'				<li><span class="float-box-left">Price per Unit: </span><span>' + row.unit_price + '</span></div>' +
+			'				<li>' +
+			'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' +
+			'					<select class="order-status-select" id="order_status_' + row.order_id + '">' +
+			'						<option value="pending"><?php echo $strMarkAsPending;?></option>' +
+			'						<option value="shipped"><?php echo $strMarkAsShipped;?></option>' +
+			'						<option value="void"><?php echo $strMarkAsVoid;?></option>' +
+			'						<option value="exchanged"><?php echo $strMarkAsExchanged;?></option>' +
+			'						<option value="refunded"><?php echo $strMarkAsRefunded;?></option>' +
+			'						<option value="awaiting_return"><?php echo $strMarkAsAwaitingReturn;?></option>' +
+			'						<option value="complete"><?php echo $strMarkAsComplete;?></option>' +
+			'					</select>' +
+			'				</li>' +
+			'				<li><input type="button" class="order-update-button" id="update_order_' + row.order_id + '" value="<?php echo $strUpdateOrder;?>" /></li>' +
+			'			</ul>' +
+			'		</td>' +
+			'	</tr>' +
+			'</tbody>'
+		);
+
+		    $('#frmOrders #order_status_' + row.order_id + ' option[value=' + row.status + ']').attr('selected', 'selected');
+		    $('#frmOrders #order_status_label_' + row.order_id).html(row.status);
 		});
-		
+
 		rebindOrderUpdateButtons();
+	    }
 	});
+
+	rebindOrderUpdateButtons();
+    });
 </script>
 <h3><?php echo $t->_('Orders');?></h3>
 <form id="frmOrders" action="/admin/orders/json.list">
-	<input type="hidden" class="table-sort-order" value="DESC" />
-	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
-		<tr class="table-header">
-			<th><a href="#order_id"><?php echo $t->_('ID');?></a></th>
-			<th><a href="#title"><?php echo $t->_('Product');?></a></th>
-			<th><a href="#decision"><?php echo $t->_('Payment Decision');?></a></th>
-			<th><a href="#order_date"><?php echo $t->_('Date');?></a></th>
-			<th><a href="#status"><?php echo $t->_('Status');?></a></th>
-		</tr>
-		<?php 
-		$data = $this->orders;
-		if (count($data) > 0) {
-			foreach($data as $row) {
-				$row = (object)$row;
-			?>
-			<tbody class="table-body">
-				<tr class="table-row">
-					<td><?php echo $row->order_id; ?></td>
-					<td><?php echo $row->title; ?></td>
-					<td><?php echo $row->decision; ?></td>
-					<td><?php echo $row->order_date; ?></td>
-					<td id="order_status_label_<?php echo $row->order_id;?>"><?php echo $row->status;?></td>
-				</tr>
-				<tr class="table-sub-row">
-					<td colspan="5">
-						<ul class="text-right no-bullets">
-							<li class="text-right"><span class="float-box-left">Product #<?php echo $row->product_id;?>: </span><span><?php echo $row->title; ?></span></li>
-							<li class="text-right"><span class="float-box-left">Quantity: </span><span><?php echo $row->quantity; ?></span></li>
-							<li class="text-right"><span class="float-box-left">Price per Unit: </span><span><?php echo $row->unit_price; ?></span></li>
-							<li>
-							<span class="float-box-left"><?php echo $strStatus;?>: </span>
-							<select id="order_status_<?php echo $row->order_id;?>">
-								<option value="pending"<?php echo $row->status == 'pending' ? ' selected="selected"' : '';?>><?php echo $strMarkAsPending;?></option>
-								<option value="shipped"<?php echo $row->status == 'shipped' ? ' selected="selected"' : '';?>><?php echo $strMarkAsShipped;?></option>
-								<option value="void"<?php echo $row->status == 'void' ? ' selected="selected"' : '';?>><?php echo $strMarkAsVoid;?></option>
-								<option value="exchanged"<?php echo $row->status == 'exchanged' ? ' selected="selected"' : '';?>><?php echo $strMarkAsExchanged;?></option>
-								<option value="refunded"<?php echo $row->status == 'refunded' ? ' selected="selected"' : '';?>><?php echo $strMarkAsRefunded;?></option>
-								<option value="awaiting_return"<?php echo $row->status == 'awaiting_return' ? ' selected="selected"' : '';?>><?php echo $strMarkAsAwaitingReturn;?></option>
-								<option value="complete"<?php echo $row->status == 'complete' ? ' selected="selected"' : '';?>><?php echo $strMarkAsComplete;?></option>
-							</select>
-							</li>
-							<li><input type="button" class="order-update-button" id="update_order_<?php echo $row->order_id;?>" value="<?php echo $strUpdateOrder;?>" /></li>
-						</ul>
-					</td>
-				</tr>
-			</tbody>
-			<?php 
-			}
-		} else {
-			?>
-			<tbody class="table-body">
-			<tr class="table-row"><td colspan="5"><?php echo $t->_('No records found.');?></td></tr>
-			</tbody>
-			<?php 
-		}
-		//*/?>
-	</table>
+    <table cellspacing="0" cellpadding="0" border="0" class="table-data">
+	<tr class="table-header">
+	    <th><a href="#order_id"><?php echo $t->_('ID');?></a></th>
+	    <th><a href="#title"><?php echo $t->_('Product');?></a></th>
+	    <th><a href="#decision"><?php echo $t->_('Payment Decision');?></a></th>
+	    <th><a href="#order_date"><?php echo $t->_('Date');?></a></th>
+	    <th><a href="#status"><?php echo $t->_('Status');?></a></th>
+	</tr>
+    </table>
 </form>

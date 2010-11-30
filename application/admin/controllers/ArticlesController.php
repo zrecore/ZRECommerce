@@ -52,10 +52,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 	 */
 	public function indexAction()
 	{
-		// ArticlesController::indexAction() default action
 		$this->view->title = 'Articles';
-		$this->view->assign('params', $this->getRequest()->getParams());
-
 	}
 	/**
 	 * Create a new article
@@ -471,10 +468,23 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			
 			$sort = $request->getParam('sort', 'title');
 			$order = $request->getParam('order', 'ASC');
+			$page = $request->getParam('pageIndex', 1);
+			$rowCount = $request->getParam('rowCount', 5);
 			
 			$options = array(
-				'order' => $sort . ' ' . $order
+				'order' => $sort . ' ' . $order,
+				'limit' => array(
+					'page' => $page,
+					'rowCount' => $rowCount
+				)
 			);
+			
+			$totalRecords = $dataset->listAll(null, array(
+				'from' => array(
+					'name' => array('a' => $dataset->getModel()->info('name')),
+					'cols' => array(new Zend_Db_Expr('COUNT(*)'))
+				)
+			), false)->current()->offsetGet('COUNT(*)');
 			
 			$records = $dataset->listAll(null, $options);
 			foreach($records as $i => $r) {
@@ -483,6 +493,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			}
 			$data = array(
 				'result' => 'ok',
+				'totalRows' => $totalRecords,
 				'data' => $records
 			);
 			

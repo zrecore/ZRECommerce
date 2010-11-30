@@ -216,19 +216,33 @@ class Admin_UsersController extends Zend_Controller_Action
 			$settings = Zre_Config::getSettingsCached();
 			$pre = $settings->db->table_name_prepend;
 			
-			$users = new Zre_Dataset_UsersEx();
+			$dataset = new Zre_Dataset_UsersEx();
 			
 			$sort = $request->getParam('sort', 'name');
 			$order = $request->getParam('order', 'ASC');
-			
+			$page = $request->getParam('pageIndex', 1);
+			$rowCount = $request->getParam('rowCount', 5);
+
 			$options = array(
-				'order' => $sort . ' ' . $order
+				'order' => $sort . ' ' . $order,
+				'limit' => array(
+					'page' => $page,
+					'rowCount' => $rowCount
+				)
 			);
 			
-			$records = $users->getProfiles(null, $options, $pre);
+			$totalRecords = $dataset->listAll(null, array(
+				'from' => array(
+					'name' => array('u' => $dataset->getModel()->info('name')),
+					'cols' => array(new Zend_Db_Expr('COUNT(*)'))
+				)
+			), false)->current()->offsetGet('COUNT(*)');
+			
+			$records = $dataset->getProfiles(null, $options, $pre);
 			
 			$data = array(
 				'result' => 'ok',
+				'totalRows' => $totalRecords,
 				'data' => $records
 			);
 			

@@ -92,3 +92,11 @@ body
 	
 input
 { color: #000000; }
+
+/* Override the default location of our tableSort 'sort' select */
+.table-sort-order {float: right; margin: auto; padding: auto;}
+
+/* Override the default paginator appearance */
+.paginator-link {text-decoration: none;}
+.paginator-link:hover {text-decoration: underline;}
+.paginator-this-link {font-weight: bold;}

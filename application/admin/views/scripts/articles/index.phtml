@@ -64,8 +64,10 @@ $strInternalError = $this->translate('Internal error.');
 	jQuery(document).ready(function($){
 		function renderTable(response)
 		{
+			// Clear out the existing HTML table data.
 			$('#frmArticles .table-data .table-body').remove();
 
+			// Fill the HTML table with the new data.
 			$.each(response.data, function(i, row){
 				
 				$('#frmArticles .table-data').append(
@@ -155,9 +157,12 @@ $strInternalError = $this->translate('Internal error.');
 		}
 		
 		$('#frmArticles').tableSort({
-			onJsonSuccess: renderTable
+			onJsonSuccess: renderTable,
+			pageIndex: 1,
+			rowCount: 5
 		});
 
+		
 		$('#new_article_description').wymeditor({
 			postInit: function(wym) {
 				
@@ -217,57 +222,18 @@ $strInternalError = $this->translate('Internal error.');
 						});
 			}
 		});
-		
-		rebindArticleForm();
 	});
 </script>
 <div id="articles_msg_dialog"></div>
+
 <form id="frmArticles" action="/admin/articles/json.list">
-	<input type="hidden" class="table-sort-order" value="ASC" />
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
 			<th><a href="#date_created"><?php echo $t->_('Date Created'); ?></a></th>
-			<th><a href="#title"><?php echo $t->_('Article'); ?></a></th>
+			<th>
+				<a href="#title"><?php echo $t->_('Article'); ?></a>
+			</th>
 		</tr>
-	<?php 
-	
-	/* @todo load dynamically via jQuery tableSort widget. */
-	$articles = new Zre_Dataset_Article();
-	
-	$data = $articles->listAll(null, array('order' => 'title DESC'));
-	
-	if (count($data) > 0) {
-		foreach($data as $row) {
-			$row = (object)$row;
-		?>
-		<tbody class="table-body">
-		<tr class="table-row">
-			<td class="article_date_created"><div><?php echo $row->date_created; ?></div><div class="small-text">Modified: <?php echo $row->date_modified;?></div></td>
-			<td class="article_title"><?php echo $row->title; ?></td>
-		</tr>
-		<tr class="table-sub-row">
-			<td colspan="2">
-				<div class="form-list">
-					<ul>
-						<li>
-							<label><?php echo $strTitle; ?></label><input type="text" size="80" id="article_title_<?php echo $row->article_id; ?>" value="<?php echo stripslashes($row->title);?>" />
-						</li>
-					</ul>
-				</div>
-				<div class="editor" id="article_description_<?php echo $row->article_id;?>"><?php echo stripslashes($row->description); ?></div>
-			</td>
-		</tr>
-		</tbody>
-		<?php 
-		}
-	} else {
-		?>
-		<tbody class="table-body">
-			<tr class="table-row"><td colspan="2"><?php echo $t->_('No records found.');?></td></tr>
-		</tbody>
-		<?php 
-	}
-	?>
 	</table>
 </form>
 <br />

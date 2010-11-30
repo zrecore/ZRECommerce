@@ -10,17 +10,30 @@ class Zre_Dataset_UsersEx extends Data_Set_Abstract
 		$columnOptions = array(
 			'setIntegrityCheck' => false,
 			'from' => array(
-				'name' => array($pre . 'users', $pre . 'users_profile'),
-				'cols' => array(
-					$pre . 'users.user_id',
-					$pre . 'users.name',
-					$pre . 'users.creation_date', 
-					$pre . 'users_profile.*'
-				)
+			    'name' => array('u' => $pre . 'users'),
+			    'cols' => array(
+				'user_id',
+				'name',
+				'creation_date'
+			    )
 			),
-			'leftJoinUsing' => array(
-				'name' => $pre . 'users_profile',
-				'join' => 'user_id'
+			'leftJoin' => array(
+			    'name' => array('uP' => $pre . 'users_profile'),
+			    'cond' => 'uP.user_id = u.user_id',
+			    'cols' => array(
+				'user_profile_id',
+				'email',
+				'date_of_birth',
+				'first_name',
+				'last_name',
+				'country',
+				'state_province',
+				'city',
+				'zipcode',
+				'telephone_primary',
+				'telephone_secondary',
+				'role'
+			    )
 			)
 		);
 		if (isset($options)) {

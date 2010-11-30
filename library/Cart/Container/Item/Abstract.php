@@ -168,12 +168,12 @@ abstract class Cart_Container_Item_Abstract {
 	public function getValidator($key = null) {
 		if (isset($key)) {
 			if ($this->hasValidator($key)) {
-				return $this->_validator[$key];
+				return $this->_validators[$key];
 			} else {
 				return null;
 			}
 		} else {
-			return $this->_validator;
+			return $this->_validators;
 		}
 	}
 	/**
@@ -182,7 +182,7 @@ abstract class Cart_Container_Item_Abstract {
 	 * @return bool
 	 */
 	public function hasValidator($key) {
-		return isset($this->_validator[$key]);
+		return isset($this->_validators[$key]);
 	}
 	/**
 	 * Append or overwrite the specified validator.
