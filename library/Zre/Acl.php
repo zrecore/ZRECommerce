@@ -271,7 +271,7 @@ class Zre_Acl
 	 * Returns an instance of the Zend_Acl object.
 	 * @return Zend_Acl
 	 */
-	public function getInstance()
+	public static function getInstance()
 	{
 		if (!isset(self::$_acl))
 		{
@@ -285,7 +285,7 @@ class Zre_Acl
 	 *
 	 * @param Zend_Acl $acl
 	 */
-	public function setInstance( $acl ) {
+	public static function setInstance( $acl ) {
 		self::$_acl = $acl;
 	}
 	/**
