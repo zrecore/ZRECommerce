@@ -7,7 +7,7 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 	 */
 	public function calculate(Cart_Container $cartContainer)
 	{
-		
+		return $cartContainer->getTotal();
 	}
 	/**
 	 * Charge the total using the specified payment method.
@@ -17,6 +17,6 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 	 */
 	public function pay(Cart_Container $cartContainer, $paymentData)
 	{
-		
+		// @todo Implement using Paypal NVP here!
 	}
 }
