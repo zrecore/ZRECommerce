@@ -4,33 +4,96 @@
  *
  * @author aalbino
  */
-require_once 'PHPUnit/Framework/TestSuite.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 
 /**
  * AllTests class - aggregates all tests of this project
  */
-class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestSuite {
+class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestCase {
 
-	/**
-	 * Constructs the test suite handler.
-	 */
-	public function __construct() {
-		$this->setName ( 'Checkout_Adapter_Paypal_ClientTest' );
+
+
+	public function testDoDirectPayment() {
+
+		require_once 'Zre/Config.php';
+		require_once 'Checkout/Adapter/Paypal/Client.php';
+
+		$settings = Zre_Config::loadSettings(
+			APPLICATION_PATH . '/settings/environment/settings.xml',
+			true
+		);
+
+		$client = new Checkout_Adapter_Paypal_Client($settings->merchant->paypal->api_endpoint_uri);
+
+		$amount = 1.00;
+		$credit_card_type = 'Visa';
+		$credit_card_number = $settings->merchant->paypal->api_test_credit_card_number;
+		$expiration_month = $settings->merchant->paypal->api_test_expiration_month;
+		$expiration_year = $settings->merchant->paypal->api_test_expiration_year;
+		$cvv2 = '321';
+		$first_name = 'phpUnit';
+		$last_name = 'Tester';
+		$address1 = '1 Test Ln';
+		$address2 = null;
+		$city = 'Testerville';
+		$state = 'CA';
+		$zip = '54321';
+		$country = 'US';
+		$currency_code = 'USD';
+
+		$result = $client->doDirectPayment(
+			$amount,
+			$credit_card_type,
+			$credit_card_number,
+			$expiration_month,
+			$expiration_year,
+			$cvv2,
+			$first_name,
+			$last_name,
+			$address1,
+			$address2,
+			$city,
+			$state,
+			$zip,
+			$country,
+			$currency_code
+		);
+
+		$reply = $result->getBody();
+		$ppalResponse = $client->parse($reply);
+
+		$this->assertEquals(true,	$result->isSuccessful());
+		$this->assertEquals(200,	$result->getStatus());
+		$this->assertEquals('Success',	$ppalResponse->ACK);
+		$this->assertEquals('1.00',	$ppalResponse->AMT);
+
+		return $ppalResponse->TRANSACTIONID;
 	}
 
-	public function testConnection()
+	/**
+	 *
+	 * @param string $transaction_id
+	 * @depends testDoDirectPayment
+	 */
+	public function testTransactionDetails($transaction_id)
 	{
-	    $client = new Checkout_Adapter_Paypal_Client();
-	    $request = new stdClass();
+		$settings = Zre_Config::loadSettings(
+			APPLICATION_PATH . '/settings/environment/settings.phpunit.xml',
+			true
+		);
 
-//	    $request->
-	}
+		$client = new Checkout_Adapter_Paypal_Client($settings->merchant->paypal->api_endpoint_uri);
 
-	/**
-	 * Creates the suite.
-	 */
-	public static function suite() {
-		return new self ( );
+		$result = $client->getTransactionDetails($transaction_id);
+		$transactionDetails = $client->parse($result->getBody());
+
+		$resultDump = print_r($transactionDetails, true);
+
+		// ...Assert we had a successful API call.
+		$this->assertEquals('Success', $transactionDetails->ACK, $resultDump);
+		
+		// ...Assert the transaction was for the expected amount.
+		$this->assertEquals(1.00, $transactionDetails->AMT, $resultDump);
 	}
 }
 

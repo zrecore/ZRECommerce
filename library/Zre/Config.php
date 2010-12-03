@@ -16,6 +16,11 @@
  * Zre_Config - Generates, loads, saves, and caches our settings.xml file
  *
  */
+require_once 'Zend/Config.php';
+require_once 'Zend/Config/Xml.php';
+require_once 'Zend/Session.php';
+require_once 'Zend/Session/Namespace.php';
+
 	class Zre_Config  {
 		
 		const DEFAULT_NAMESPACE = "ZRE_CONFIG";
@@ -92,6 +97,9 @@
 			$config->dev->merchant->paypal->api_signature = '000000000000000';
 			$config->dev->merchant->paypal->authorizing_account_emailaddress = 'email@example.com';
 			$config->dev->merchant->paypal->api_endpoint_uri = 'https://api-3t.sandbox.paypal.com/nvp';
+			$config->dev->merchant->paypal->api_test_credit_card_number = 'xxxxxxxxxxxxxxxx';
+			$config->dev->merchant->paypal->api_test_expiration_month = 'MM';
+			$config->dev->merchant->paypal->api_test_expiration_month = 'YYYY';
 			$config->dev->merchant->cybersource = array();
 			$config->dev->merchant->cybersource->merchant_id = 'atest123_api1.fake.com';
 			$config->dev->merchant->cybersource->transaction_key = 'fffffffffffffff';
@@ -284,7 +292,8 @@
 					return false;
 				}
 			} else {
-				return false;
+				$settings = self::loadSettings(APPLICATION_PATH . '/settings/environment/settings.xml', false);
+				return $settings;
 			}
 		}
 		/**
