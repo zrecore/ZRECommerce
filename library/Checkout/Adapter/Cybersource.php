@@ -1,7 +1,11 @@
 <?php
-class Checkout_Adapter_Cybersource {
-	private static $_client;
-	
+class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
+	private $_lastReply = null;
+
+	public function getLastReply()
+	{
+		return $this->_lastReply;
+	}
 	/**
 	 * Calculate the gross total of all items
 	 * @param Cart_Container The cart to calculate.
@@ -14,10 +18,10 @@ class Checkout_Adapter_Cybersource {
 	/**
 	 * Charge the total using the specified payment method.
 	 * @param Cart_Container $cartContainer The items to pay for.
-	 * @param Checkout_Payment_Interface $paymentData
-	 * @return object|null Returns the cybersource reply, or null on failure.
+	 * @param mixed $paymentData
+	 * @return mixed Returns the order ID on success, or null on failure.
 	 */
-	public function pay($cartContainer, $paymentData)
+	public function pay(Cart_Container $cartContainer, $paymentData)
 	{
 		/**
 		 * Get total.
@@ -98,7 +102,68 @@ class Checkout_Adapter_Cybersource {
 //			printf( "requestToken = $reply->requestToken<br>" );
 //			printf( "ccAuthReply->reasonCode = " . $reply->ccAuthReply->reasonCode . "<br>");
 			
-			return $reply;
+			if ($reply->decision == 'ACCEPT')
+			{
+				$db = Zre_Db_Mysql::getInstance();
+
+				$ordersDataset = new Zre_Dataset_Orders();
+				$ordersProductDataset = new Zre_Dataset_OrdersProducts();
+				$ordersCybersourceDataset = new Zre_Dataset_OrdersCybersource();
+				$productDataset = new Zre_Dataset_Product();
+
+				$orderIds = array();
+				$result = $reply;
+				$order = array(
+					'decision' => $result->decision,
+					'order_date' => new Zend_Db_Expr('NOW()'),
+					'merchant' => 'cybersource'
+				);
+
+				$order_id = $ordersDataset->create($order);
+
+				$ordersCybersource = array(
+					'order_id' => $order_id,
+					'decision' => $result->decision,
+					'reason_code' => $result->reasonCode,
+					'request_id' => $result->requestID,
+					'request_token' => $result->requestToken,
+					'currency' => isset($result->purchaseTotals) ?
+							$result->purchaseTotals->currency :
+							'',
+					'cc_auth_blob' => serialize($result->ccAuthReply)
+				);
+
+				$orders_cybersource_id = $ordersCybersourceDataset->create($ordersCybersource);
+
+				foreach($cartContainer->getItems() as $cartItem) {
+					$item = Cart_Container_Item::factory($cartItem);
+					$orderProduct = array(
+						'order_id' => $order_id,
+						'product_id' => $item->getSku(),
+						'unit_price' => $item->getCostOptions()->calculate(),
+						'quantity' => $item->getQuantity()
+					);
+
+					// Update our inventory audit.
+					$prod = $p[$item->getSku()];
+					$productDataset->update(
+						array(
+							'sold' => $prod->sold + $item->getQuantity(),
+							'pending' => $prod->pending - $item->getQuantity(),
+							'allotment' => $prod->allotment - $item->getQuantity()
+						),
+						$db->quoteInto('product_id = ?', $item->getSku())
+					);
+
+					$ordersProductDataset->create($orderProduct);
+				}
+
+				$result = $order_id;
+			} else {
+				$result = null;
+			}
+
+			return $result;
 		} catch (Exception $e) {
 			// Save the result to the database.
 			Debug::logException($e);

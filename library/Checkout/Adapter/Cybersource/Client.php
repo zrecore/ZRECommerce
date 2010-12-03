@@ -21,7 +21,7 @@ class Checkout_Adapter_Cybersource_Client extends SoapClient {
 	}
 
 	// This section inserts the UsernameToken information in the outgoing SOAP message.
-	function __doRequest($request, $location, $action, $version) {
+	function __doRequest($request, $location, $action, $version, $one_way = null) {
 		$settings = Zre_Config::getSettingsCached();
 		
 		$user = (string)$settings->merchant->cybersource->merchant_id;

@@ -11,11 +11,11 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 	}
 	/**
 	 * Charge the total using the specified payment method.
-	 * @param float $total
-	 * @param Checkout_Payment_Interface $payment
-	 * @return unknown_type
+	 * @param Cart_Container $cartContainer
+	 * @param mixed $paymentData
+	 * @return mixed Return the order ID on success, or null on failure.
 	 */
-	public function pay(float $total, Checkout_Payment_Interface $payment)
+	public function pay(Cart_Container $cartContainer, $paymentData)
 	{
 		
 	}

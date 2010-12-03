@@ -20,7 +20,7 @@ class Cart_Container_Item extends Cart_Container_Item_Abstract {
 	public function __construct($sku, $detailOptions, $costOptions, $metricOptions, $quantity, $validators = null, $purchasedMessage = '') {
 		parent::__construct($sku, $detailOptions, $costOptions, $metricOptions, $quantity, $validators, $purchasedMessage);
 	}
-	public function calculateCost() {
+	public function calculateCost($runValidators = true) {
 		return parent::calculateCost();
 	}
 	/**

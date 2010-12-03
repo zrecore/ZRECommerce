@@ -175,7 +175,10 @@ class ShopController extends Zend_Controller_Action {
 	
 	public function checkoutAction() {
 		Cart::loadSession();
-		
+		Checkout_Payment::setAdapter( new Checkout_Adapter_Cybersource() );
+
+		$settings = Zre_Config::getSettingsCached();
+
 		$request = $this->getRequest();
 		$billingSubmitted = $request->getParam('billingSubmitted', null);
 		$cart = Cart::getCartContainer();
@@ -186,9 +189,6 @@ class ShopController extends Zend_Controller_Action {
 		if (isset($billingSubmitted)) {
 			$db = Zre_Db_Mysql::getInstance();
 			
-			$ordersDataset = new Zre_Dataset_Orders();
-			$ordersProductDataset = new Zre_Dataset_OrdersProducts();
-			$ordersCybersourceDataset = new Zre_Dataset_OrdersCybersource();
 			$productDataset = new Zre_Dataset_Product();
 			
 			foreach($cart->getItems() as $cartItem) {
@@ -196,9 +196,7 @@ class ShopController extends Zend_Controller_Action {
 				
 				$p[$item->getSku()] = $productDataset->read($item->getSku())->current();
 			}
-			
-			$checkout = new Checkout_Adapter_Cybersource();
-			
+
 			$data = new stdClass();
 			
 			$data->firstName = $request->getParam('firstName');
@@ -218,56 +216,11 @@ class ShopController extends Zend_Controller_Action {
 			$isValid = true;
 			// @todo do some kind of field validation.
 			if ($isValid == true) {
-				$result = $checkout->pay($cart, $data);
+				$order_id = Checkout_Payment::pay($cart, $data);
 				
 				// Redirect to OK page.
-				if (isset($result)) {
+				if (isset($order_id)) {
 					try {
-						$orders = array();
-						$orderIds = array();
-						
-						$order = array(
-							'decision' => $result->decision,
-							'order_date' => new Zend_Db_Expr('NOW()')
-						);
-						
-						$order_id = $ordersDataset->create($order);
-						Debug::print_r($result);
-						$ordersCybersource = array(
-							'order_id' => $order_id,
-							'decision' => $result->decision,
-							'reason_code' => $result->reasonCode,
-							'request_id' => $result->requestID,
-							'request_token' => $result->requestToken,
-							'currency' => $result->purchaseTotals->currency,
-							'cc_auth_blob' => serialize($result->ccAuthReply)
-						);
-						
-						$orders_cybersource_id = $ordersCybersourceDataset->create($ordersCybersource);
-						
-						foreach($cart->getItems() as $cartItem) {
-							$item = Cart_Container_Item::factory($cartItem);
-							$orderProduct = array(
-								'order_id' => $order_id,
-								'product_id' => $item->getSku(),
-								'unit_price' => $item->getCostOptions()->calculate(),
-								'quantity' => $item->getQuantity()
-							);
-							
-							// Update our inventory audit.
-							$prod = $p[$item->getSku()];
-							$productDataset->update(
-								array(
-									'sold' => $prod->sold + $item->getQuantity(),
-									'pending' => $prod->pending - $item->getQuantity(),
-									'allotment' => $prod->allotment - $item->getQuantity()
-								), 
-								$db->quoteInto('product_id = ?', $item->getSku())
-							);
-							
-							$ordersProductDataset->create($orderProduct);
-						}
-						
 						// Let's keep the order ID secret to prevent someone from just guessing it.
 						/**
 						 * @todo Add this to the settings.xml

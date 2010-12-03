@@ -11,7 +11,7 @@
 		 *
 		 * @param string|array $class
 		 */
-		public static function loadClass($class) {
+		public static function loadClass($class, $dirs = null) {
 			$dir = "../library";
 			$subdirs = explode('_', $class);
 			foreach($subdirs as $subdir) {

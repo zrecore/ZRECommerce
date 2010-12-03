@@ -1,14 +1,14 @@
 <?php
 /**
- * This is the bootstrap file that initializes the Zend MVC for this 
+ * This is the bootstrap file that initializes the Zend MVC for this
  * web application.
- * 
+ *
  * @author ZRECommerce
- * 
+ *
  * @package Boot
  * @subpackage Boot
  * @category Boot
- * 
+ *
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce. See README file.
  * @license GPL v3 or higher. See README file.
@@ -28,122 +28,122 @@ require_once 'Zend/Application.php';
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
-	
-	static function setupPaths() {
-    	if (!defined('BASE_PATH')) define('BASE_PATH', realpath(dirname(__FILE__) . '/../'));
-		if (!defined('APPLICATION_PATH'))  define('APPLICATION_PATH', BASE_PATH . '/application');
-		
-		// Include path
-		set_include_path(
-		    BASE_PATH . '/library'
-		    . PATH_SEPARATOR . get_include_path()
-		);
-		
-		// Define application environment
-		if (!defined('APPLICATION_ENV')) define('APPLICATION_ENV', 'test');
-		defined('APPLICATION_ENV')
-		    || define('APPLICATION_ENV',
-		              (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-		                                         : 'production'));
-		
+
+    static function setupPaths() {
+	if (!defined('BASE_PATH')) define('BASE_PATH', realpath(dirname(__FILE__) . '/../'));
+	if (!defined('APPLICATION_PATH'))  define('APPLICATION_PATH', BASE_PATH . '/application');
+
+	// Include path
+	set_include_path(
+		BASE_PATH . '/library'
+		. PATH_SEPARATOR . get_include_path()
+	);
+
+	// Define application environment
+	if (!defined('APPLICATION_ENV')) define('APPLICATION_ENV', 'test');
+	defined('APPLICATION_ENV')
+		|| define('APPLICATION_ENV',
+		(getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
+		: 'production'));
+
+    }
+
+    public function _initAutoLoader() {
+
+	require_once('../library/Zre/Loader.php');
+	$autoLoader = Zend_Loader_Autoloader::getInstance();
+	$autoLoader->setFallBackAutoloader(true);
+
+	$autoLoader->registerNamespace('Zre_');
+	$autoLoader->unshiftAutoLoader(array('Zre_Loader', 'loadClass'), 'Zre');
+	return $autoLoader;
+    }
+    public function _initSession() {
+	Zend_Session::start();
+    }
+
+    public function _initHelpers() {
+
+	Zend_Controller_Action_HelperBroker::addPath('../application/default/helpers', 'Zend_Controller_Action_Helper');
+	$view = new Zend_View();
+    }
+
+    public function _initModules() {
+
+    }
+
+    public function _initRegistry() {
+
+	Zre_Registry_Session::load();
+    }
+
+    public function _initSettings() {
+
+	$settings = Zre_Config::getSettingsCached();
+
+	if (!$settings) {
+	    $settings_path = APPLICATION_PATH . '/settings/environment/settings.xml';
+	    $settings = Zre_Config::loadSettings($settings_path, true);
+//			$settings = ($settings->runmode->use == 'production')?$settings->production:$settings->dev;
+	}
+
+	$this->settings = $settings;
+	return $settings;
     }
     
-	public function _initAutoLoader() {
-		
-		require_once('../library/Zre/Loader.php');
-		$autoLoader = Zend_Loader_Autoloader::getInstance();
-		$autoLoader->setFallBackAutoloader(true);
-		
-		$autoLoader->registerNamespace('Zre_');
-		$autoLoader->unshiftAutoLoader(array('Zre_Loader', 'loadClass'), 'Zre');
-		return $autoLoader;
-	}
-	public function _initSession() {
-		Zend_Session::start();
-	}
-	
-	public function _initHelpers() {
-		
-		Zend_Controller_Action_HelperBroker::addPath('../application/default/helpers', 'Zend_Controller_Action_Helper');
-		$view = new Zend_View();
-	}
-	
-	public function _initModules() {
-		
-	}
-	
-	public function _initRegistry() {
-		
-		Zre_Registry_Session::load();
-	}
-	
-	public function _initSettings() {
-		
-		$settings = Zre_Config::getSettingsCached();
-		
-		if (!$settings) {
-			$settings_path = APPLICATION_PATH . '/settings/environment/settings.xml';
-			$settings = Zre_Config::loadSettings($settings_path, true);
-//			$settings = ($settings->runmode->use == 'production')?$settings->production:$settings->dev;
-		}
-		
-		$this->settings = $settings;
-		return $settings;
-	}
-	
-	public function _initLocale() {
-		date_default_timezone_set( (string)$this->settings->site->timezone );
-		$zre_locale = new Zre_Locale('auto');
-		return $zre_locale;
-	}
-	
-	protected function _initView() {
-		
-		// Initialize view
-        $view = new Zend_View();
-        $view->doctype('XHTML1_STRICT');
-        $view->headTitle('ZreCommerce');
-        $view->env = APPLICATION_ENV;
+    public function _initLocale() {
+	date_default_timezone_set( (string)$this->settings->site->timezone );
+	$zre_locale = new Zre_Locale('auto');
+	return $zre_locale;
+    }
 
-        // Add it to the ViewRenderer
-        $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper(
-            'ViewRenderer'
-        );
-        $viewRenderer->setView($view);
+    protected function _initView() {
 
-        // Return it, so that it can be stored by the bootstrap
-        return $view;
+	// Initialize view
+	$view = new Zend_View();
+	$view->doctype('XHTML1_STRICT');
+	$view->headTitle('ZreCommerce');
+	$view->env = APPLICATION_ENV;
+
+	// Add it to the ViewRenderer
+	$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper(
+		'ViewRenderer'
+	);
+	$viewRenderer->setView($view);
+
+	// Return it, so that it can be stored by the bootstrap
+	return $view;
+    }
+
+    public function _initHeaderPlugins() {
+	// ...Header plugins
+	$data = Plugin_Dataset_Plugins::listAll('position = ? AND enabled=1', 'header');
+	$headerItems = array();
+
+	foreach ($data as $plugin) {
+	    $pluginName = 'Plugin_' . $plugin['name'];
+	    $headerItems[] = new $pluginName();
 	}
-	
-	public function _initHeaderPlugins() {
-		// ...Header plugins
-		$data = Plugin_Dataset_Plugins::listAll('position = ? AND enabled=1', 'header');
-		$headerItems = array();
-		
-		foreach ($data as $plugin) {
-			$pluginName = 'Plugin_' . $plugin['name'];
-			$headerItems[] = new $pluginName();
-		}
-		
-		Zre_Registry_Session::set('header_items', $headerItems);
+
+	Zre_Registry_Session::set('header_items', $headerItems);
+    }
+
+    public function _initFooterPlugins() {
+	// ...Footer plugins
+	$data = Plugin_Dataset_Plugins::listAll('position = ? AND enabled=1', 'footer');
+	$footerItems = array();
+
+	foreach ($data as $plugin) {
+	    $pluginName = 'Plugin_' . $plugin['name'];
+	    $footerItems[] = new $pluginName();
 	}
-	
-	public function _initFooterPlugins() {
-		// ...Footer plugins
-		$data = Plugin_Dataset_Plugins::listAll('position = ? AND enabled=1', 'footer');
-		$footerItems = array();
-		
-		foreach ($data as $plugin) {
-			$pluginName = 'Plugin_' . $plugin['name'];
-			$footerItems[] = new $pluginName();
-		}
-		
-		Zre_Registry_Session::set('footer_items', $footerItems);
-	}
-	
-	protected function _initRouters() {
-		$routerConfig = APPLICATION_PATH . '/settings/environment/routes.default.php';
-		
-		if (file_exists($routerConfig)) require_once $routerConfig;
-	}
+
+	Zre_Registry_Session::set('footer_items', $footerItems);
+    }
+
+    protected function _initRouters() {
+	$routerConfig = APPLICATION_PATH . '/settings/environment/routes.default.php';
+
+	if (file_exists($routerConfig)) require_once $routerConfig;
+    }
 }

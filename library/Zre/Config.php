@@ -90,6 +90,7 @@
 			$config->dev->merchant->paypal->api_user_name = 'atest123_api1.fake.com';
 			$config->dev->merchant->paypal->api_password = 'fffffffffffffff';
 			$config->dev->merchant->paypal->api_signature = '000000000000000';
+			$config->dev->merchant->paypal->authorizing_account_emailaddress = 'email@example.com';
 			$config->dev->merchant->cybersource = array();
 			$config->dev->merchant->cybersource->merchant_id = 'atest123_api1.fake.com';
 			$config->dev->merchant->cybersource->transaction_key = 'fffffffffffffff';
@@ -114,6 +115,7 @@
 			$config->production->merchant->paypal->api_user_name = 'atest123_api1.fake.com';
 			$config->production->merchant->paypal->api_password = 'fffffffffffffff';
 			$config->production->merchant->paypal->api_signature = '000000000000000';
+			$config->production->merchant->paypal->authorizing_account_emailaddress = 'email@example.com';
 			$config->production->merchant->cybersource = array();
 			$config->production->merchant->cybersource->merchant_id = 'atest123_api1.fake.com';
 			$config->production->merchant->cybersource->transaction_key = 'fffffffffffffff';
