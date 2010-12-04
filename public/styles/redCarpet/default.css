@@ -50,6 +50,7 @@ body
 .text-right {text-align: right;}
 .no-bullets {list-style: none;}
 .small-text {font-size: smaller;}
+.monotype {font-family: monospace !important; font-size: 1.2em !important;}
 .h1 {font-size: 2.2em !important; font-weight: bold;}
 .h2 {font-size: 2.0em !important; font-weight: bold;}
 .h3 {font-size: 1.8em !important; font-weight: bold;}

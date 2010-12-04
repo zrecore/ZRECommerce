@@ -30,7 +30,7 @@ jQuery(document).ready(function($){
 	$('#frmSettings').submit(function(ev){
 		ev.preventDefault();
 		
-		var formValues = $(this).find('input[type=text]');
+		var formValues = $(this).find('textarea').val();
 		var url = '/admin/settings/config-ajax';
 
 		/**
@@ -41,13 +41,17 @@ jQuery(document).ready(function($){
 //		});
 		jQuery.post(
 			url, 
-			formValues, 
+			{'xml' : formValues},
 			function(reply) {
-				
+				if (reply.result == 'ok') {
 				$('#msg').html(reply.desc)
 						 .show()
 						 .delay(3000)
 						 .slideUp();
+				} else {
+					
+					alert(reply.desc);
+				}
 				
 			}, 
 			'json'
@@ -60,7 +64,13 @@ jQuery(document).ready(function($){
 
 if (isset($vars['content'])) echo $vars['content'];
 
-echo $this->form;
+//echo $this->form;
 ?>
 <div id="msg" class="ui-corner-all ui-state-highlight" style="margin-top: 20px; padding: 1em .7em; display: none">
 </div>
+<form action="#frmSettings" method="post" id="frmSettings">
+	<ul class="form-list">
+		<li><label></label><textarea cols="64" rows="42" class="monotype" style="width: 99%; float: left;"><?php echo $this->xml_string; ?></textarea></li>
+		<li><input type="submit" value="Save" /></li>
+	</ul>
+</form>
