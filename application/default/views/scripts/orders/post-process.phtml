@@ -1,0 +1,17 @@
+<?php
+
+$postProcessResult = $this->postProcessResult;
+$source = $this->source;
+
+if ($postProcessResult == true) :
+?>
+<h1><?php echo $this->translate('Thank You'); ?></h1>
+<p><?php echo $this->translate('The order has been updated.'); ?></p>
+<?php
+else:
+?>
+<h1><?php echo $this->translate('Sorry'); ?></h1>
+<p><?php echo $this->translate('The order could not be updated.'); ?></p>
+<?php
+endif;
+?>

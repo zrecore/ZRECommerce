@@ -5,6 +5,7 @@
  * @author aalbino
  */
 require_once 'PHPUnit/Framework/TestCase.php';
+require_once 'Zend/Config/Writer/Xml.php';
 
 /**
  * AllTests class - aggregates all tests of this project
@@ -41,6 +42,7 @@ class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestCase {
 		$country = 'US';
 		$currency_code = 'USD';
 
+		// Do a 'Sale' direct payment (Default).
 		$result = $client->doDirectPayment(
 			$amount,
 			$credit_card_type,
@@ -62,10 +64,12 @@ class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestCase {
 		$reply = $result->getBody();
 		$ppalResponse = $client->parse($reply);
 
-		$this->assertEquals(true,	$result->isSuccessful());
-		$this->assertEquals(200,	$result->getStatus());
-		$this->assertEquals('Success',	$ppalResponse->ACK);
-		$this->assertEquals('1.00',	$ppalResponse->AMT);
+		$resultDump = print_r($ppalResponse, true);
+
+		$this->assertEquals(true,	$result->isSuccessful(), $resultDump);
+		$this->assertEquals(200,	$result->getStatus(), $resultDump);
+		$this->assertEquals('Success',	$ppalResponse->ACK, $resultDump);
+		$this->assertEquals('1.00',	$ppalResponse->AMT, $resultDump);
 
 		return $ppalResponse->TRANSACTIONID;
 	}

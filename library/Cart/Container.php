@@ -142,11 +142,17 @@ class Cart_Container
 	 */
 	public function getTotal() {
 		$total = 0;
-		foreach($this->_items as $cartItem ) {
-			$cartItem = Cart_Container_Item::factory($cartItem);
-			$total += $cartItem->getCostOptions()->calculate() * $cartItem->getQuantity();
+		$output = '';
+
+		if (count($this->_items) > 0) {
+			foreach($this->_items as $cartItem ) {
+				$cartItem = Cart_Container_Item::factory($cartItem);
+				$total += $cartItem->getCostOptions()->calculate() * $cartItem->getQuantity();
+				$output .= "vals: " . $cartItem->getCostOptions()->calculate() . ' * ' . $cartItem->getQuantity() . "\n";
+			}
+		} else {
+			throw new Exception('No items found in cart.');
 		}
-		
 		return $total;
 	}
 	

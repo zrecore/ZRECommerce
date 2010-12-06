@@ -78,8 +78,9 @@ $strInternalError = $this->translate('Internal error.');
 					'	</tr>' +
 					'	<tr class="table-sub-row">'  +
 					'		<td colspan="2">' +
-					'			<div class="form-list"><ul><li><label>' + row.title + '</label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li></ul></div>' + 
-					'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' + 
+					'			<div><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></div>' + 
+					'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' +
+					'			<div class="article_image" id="article_image_' + row.article_id + '"><img src="' + row.image + '" alt="[' + row.title + ']" /></div>' +
 					'		</td>' + 
 					'	</tr>' + 
 					'</tbody>'

@@ -39,10 +39,24 @@ class OrdersController extends Zend_Controller_Action {
 		Zre_Registry_Session::save();
 	}
 	
-	public function processAction() {
-		// @todo If an ok signal was returned, add order to local db records.
-		// @todo Display confirmation page, with printable view.
-		Zre_Registry_Session::set('selectedMenuItem', '');
-		Zre_Registry_Session::save();
+	public function postProccessAction() {
+		//@todo Handle post-order processing here, such as from
+		//	Paypal's Instant Payment Notification, depending on
+		//	the info received.
+		//	
+		//	Uses a pre-defined router!
+
+		$request = $this->getRequest();
+
+		$source = $request->getParam('source', null);
+		$source = preg_replace('[^a-zA-Z]','', $source);
+
+		$postProcessResult = false;
+		if (isset($source)) {
+			$postProcessResult = Checkout_Payment::postProcess($source, $data);
+		}
+
+		$this->view->postProcessResult = $postProcessResult;
+		$this->view->source = $source;
 	}
 }

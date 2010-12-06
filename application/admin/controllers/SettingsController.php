@@ -50,7 +50,6 @@ class Admin_SettingsController extends Zend_Controller_Action
 	 */
 	public function indexAction()
 	{
-		// TODO allow user to update settings.xml file using a form. must be logged in.
 		$t = Zend_Registry::get('Zend_Translate');
 		$this->view->title = $t->_('Settings');
 
@@ -59,6 +58,22 @@ class Admin_SettingsController extends Zend_Controller_Action
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
 		
+	}
+
+	public function overviewAction()
+	{
+		// ..Grab our statistical and status data
+
+		$articles = new Zre_Dataset_Article();
+		$products = new Zre_Dataset_Product();
+		$orders = new Zre_Dataset_Orders();
+
+		$articles->listAll(
+			array(
+				''
+			),
+			array()
+		);
 	}
 	
 	public function configAction()

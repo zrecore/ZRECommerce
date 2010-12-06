@@ -1,4 +1,5 @@
 <?php
+
 class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 	private $_lastReply = null;
 
@@ -32,7 +33,8 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 		try {
 			
 			$adapter = new Checkout_Adapter_Cybersource_Client();
-			
+			$settings = Zre_Config::getSettingsCached();
+
 			$request = new stdClass();
 			
 			$request->merchantID = $adapter->getMerchantId();
@@ -72,7 +74,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			$request->card = $card;
 			
 			$purchaseTotals = new stdClass();
-			$purchaseTotals->currency = "USD";
+			$purchaseTotals->currency = (string)$settings->site->currency;
 			$request->purchaseTotals = $purchaseTotals;
 			
 			$items = array();
@@ -104,7 +106,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			
 			if ($reply->decision == 'ACCEPT')
 			{
-				$db = Zre_Db_Mysql::getInstance();
+				$db = Zend_Db_Table::getDefaultAdapter();
 
 				$ordersDataset = new Zre_Dataset_Orders();
 				$ordersProductDataset = new Zre_Dataset_OrdersProducts();
@@ -149,7 +151,6 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 					$productDataset->update(
 						array(
 							'sold' => $prod->sold + $item->getQuantity(),
-							'pending' => $prod->pending - $item->getQuantity(),
 							'allotment' => $prod->allotment - $item->getQuantity()
 						),
 						$db->quoteInto('product_id = ?', $item->getSku())
@@ -163,9 +164,8 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 				$result = null;
 			}
 
-			return $result;
 		} catch (Exception $e) {
-			// Save the result to the database.
+			// Save the result to the log.
 			Debug::logException($e);
 			$result = null;
 		}

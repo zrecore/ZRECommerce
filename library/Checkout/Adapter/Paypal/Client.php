@@ -90,7 +90,7 @@ class Checkout_Adapter_Paypal_Client extends Zend_Http_Client {
 		$zip,
 		$country,
 		$currency_code,
-		$payment_action = 'Authorization'
+		$payment_action = 'Sale'
 	) {
 		$this->setParameterGet('METHOD', 'DoDirectPayment');
 

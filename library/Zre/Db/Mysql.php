@@ -19,7 +19,22 @@
  */
 class Zre_Db_Mysql
 {
-	private static $db;
+	private static $_db;
+
+	/**
+	 * Set the default adapter.
+	 * @param Zend_Db_Table_Abstract $adapter
+	 */
+	public static function setDefaultAdapter($adapter) {
+		self::$_db = $adapter;
+	}
+	/**
+	 * Get the default adapter;
+	 * @return Zend_Db_Table_Abstract
+	 */
+	public static function getDefaultAdapter() {
+		return self::$_db;
+	}
 	/**
 	 * Singleton class implementation. Retreives the mysql pdo object used for this system.
 	 * 
@@ -27,12 +42,12 @@ class Zre_Db_Mysql
 	 */
 	public static function getInstance()
 	{
-		if (!isset(self::$db))
+		if (!isset(self::$_db))
 		{
-			self::$db = new Zre_Db_Adapter_Mysql();
+			self::$_db = new Zre_Db_Adapter_Mysql();
 		}
 		
-		return self::$db;
+		return self::$_db;
 	}
 }
 ?>

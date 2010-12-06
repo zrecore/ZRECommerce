@@ -29,4 +29,24 @@ class Checkout_Payment {
 	{
 		return self::getAdapter()->pay($cart, $data);
 	}
+	/**
+	 * Post-processing hook for any payment adapters that have a call back
+	 * url setup through the merchant gatway (such as Paypal).
+	 * @param string $source
+	 * @param array $data
+	 */
+	public static function postProcess($adapterName, $data) {
+		$adapterName = preg_replace('[^a-zA-Z]','', $adapterName);
+		$class_exists = @class_exists('Checkout_Adapter_' . $adapterName);
+
+		$result = false;
+		if ($class_exists == true) {
+			$adapterFullName = 'Checkout_Adapter_' . $adapterName;
+			$adapter = new $adapterFullName;
+
+			$adapter->postProcess($data);
+		}
+
+		return $result;
+	}
 }

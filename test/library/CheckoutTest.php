@@ -5,8 +5,9 @@
  * @author aalbino
  */
 require_once 'PHPUnit/Framework/TestSuite.php';
-require_once 'library/Checkout/Adapter/Paypal/ClientTest.php';
 
+require_once 'library/Checkout/Adapter/Paypal/ClientTest.php';
+require_once 'library/Checkout/Adapter/PaypalTest.php';
 /**
  * CheckoutTest class - aggregates all tests of this project
  */
@@ -19,6 +20,7 @@ class CheckoutTest extends PHPUnit_Framework_TestSuite {
 		$this->setName ( 'CheckoutTest' );
 
 		$this->addTestSuite ( 'Checkout_Adapter_Paypal_ClientTest' );
+		$this->addTestSuite ( 'Checkout_Adapter_PaypalTest' );
 
 	}
 

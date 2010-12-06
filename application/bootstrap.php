@@ -48,9 +48,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     }
 
-    public function _initAutoLoader() {
+    public static function setupAutoLoader() {
 
-	require_once('../library/Zre/Loader.php');
+	require_once(BASE_PATH . '/library/Zre/Loader.php');
 	$autoLoader = Zend_Loader_Autoloader::getInstance();
 	$autoLoader->setFallBackAutoloader(true);
 
@@ -58,13 +58,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	$autoLoader->unshiftAutoLoader(array('Zre_Loader', 'loadClass'), 'Zre');
 	return $autoLoader;
     }
+
+    public function _initAutoloader() {
+	    self::setupAutoLoader();
+    }
     public function _initSession() {
 	Zend_Session::start();
     }
 
     public function _initHelpers() {
 
-	Zend_Controller_Action_HelperBroker::addPath('../application/default/helpers', 'Zend_Controller_Action_Helper');
+	Zend_Controller_Action_HelperBroker::addPath(APPLICATION_PATH . '/default/helpers', 'Zend_Controller_Action_Helper');
 	$view = new Zend_View();
     }
 
