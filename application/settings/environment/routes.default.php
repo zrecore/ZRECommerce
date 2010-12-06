@@ -15,13 +15,13 @@ $route = new Zend_Controller_Router_Route(
 	)
 );
 $router->addRoute('indexReadArticle', $route);
-//
-//$route = new Zend_Controller_Router_Route(
-//	'a/:id/:title',
-//	array(
-//		'controller' => 'read',
-//		'action' => 'article',
-//		'module' => 'default'
-//	)
-//);
-//$router->addRoute('indexArticleRead', $route);
+
+$route = new Zend_Controller_Router_Route(
+	'orders/post-process/:source',
+	array(
+		'controller' => 'orders',
+		'action' => 'post-process',
+		'module' => 'default'
+	)
+);
+$router->addRoute('ordersPostProcess', $route);
