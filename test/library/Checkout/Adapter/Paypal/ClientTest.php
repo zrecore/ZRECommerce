@@ -41,6 +41,7 @@ class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestCase {
 		$zip = '54321';
 		$country = 'US';
 		$currency_code = 'USD';
+		$ip_address = '127.0.0.1';
 
 		// Do a 'Sale' direct payment (Default).
 		$result = $client->doDirectPayment(
@@ -58,7 +59,8 @@ class Checkout_Adapter_Paypal_ClientTest extends PHPUnit_Framework_TestCase {
 			$state,
 			$zip,
 			$country,
-			$currency_code
+			$currency_code,
+			$ip_address
 		);
 
 		$reply = $result->getBody();

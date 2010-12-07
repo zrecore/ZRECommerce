@@ -36,7 +36,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 		 */
 		try {
 			$data = new stdClass();
-
+			if (is_object($paymentData)) $paymentData = (array) $paymentData;
 			$data->firstName	= $paymentData['firstName'];
 			$data->lastName		= $paymentData['lastName'];
 			$data->street1		= $paymentData['street1'];

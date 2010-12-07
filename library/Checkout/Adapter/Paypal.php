@@ -32,7 +32,8 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		$db		= Zend_Db_Table::getDefaultAdapter();
 
 		$data = new stdClass();
-
+		if (is_object($paymentData)) $paymentData = (array) $paymentData;
+		
 		$data->firstName	= $paymentData['firstName'];
 		$data->lastName		= $paymentData['lastName'];
 		$data->street1		= $paymentData['street1'];
@@ -42,9 +43,10 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		$data->postalCode	= $paymentData['postalCode'];
 		$data->country		= $paymentData['country'];
 		$data->accountNumber	= $paymentData['accountNumber'];
-		$data->email		= $paymentData['email'];
+		$data->creditCardType	= $paymentData['creditCardType'];
 		$data->expirationMonth	= $paymentData['expirationMonth'];
 		$data->expirationYear	= $paymentData['expirationYear'];
+		$data->cvv2		= $paymentData['cvv2'];
 		$data->ipAddress	= isset($_SERVER['REMOTE_ADDR']) ?
 						$_SERVER['REMOTE_ADDR'] :
 						null;
