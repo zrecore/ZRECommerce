@@ -13,4 +13,21 @@ interface Checkout_Adapter_Interface {
 	 * @return mixed Return the order ID on success, or null on failure.
 	 */
 	public function pay(Cart_Container $cartContainer, $paymentData);
+
+	/**
+	 * Get the list of required fields for this adapter.
+	 * @param array|null $options The array of required fields.
+	 */
+	public function getRequiredFields($options = null);
+	/**
+	 * Get the list of optional fields for this adapter.
+	 * @param array|null $options The array of optional fields.
+	 */
+	public function getOptionalFields($options = null);
+	/**
+	 * 
+	 * @param <type> $data The data to process
+	 * @param <type> $options Additional array of options
+	 */
+	public function postProcess($data, $options = null);
 }

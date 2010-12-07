@@ -69,6 +69,7 @@ class Checkout_Adapter_Paypal_Client extends Zend_Http_Client {
 	 * @param string $zip
 	 * @param string $country
 	 * @param string $currency_code
+	 * @param string $ip_address
 	 * @param string $payment_action Can be 'Authorization' (default) or 'Sale'
 	 *
 	 * @return Zend_Http_Response
@@ -90,6 +91,7 @@ class Checkout_Adapter_Paypal_Client extends Zend_Http_Client {
 		$zip,
 		$country,
 		$currency_code,
+		$ip_address,
 		$payment_action = 'Sale'
 	) {
 		$this->setParameterGet('METHOD', 'DoDirectPayment');
@@ -115,6 +117,7 @@ class Checkout_Adapter_Paypal_Client extends Zend_Http_Client {
 		$this->setParameterGet('ZIP', urlencode($zip));
 		$this->setParameterGet('COUNTRYCODE', urlencode($country));
 		$this->setParameterGet('CURRENCYCODE', urlencode($currency_code));
+		$this->setParameterGet('IPADDRESS', urlencode($ip_address));
 
 		return $this->request(Zend_Http_Client::GET);
 

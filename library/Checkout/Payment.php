@@ -9,9 +9,12 @@ class Checkout_Payment {
 	/**
 	 * Constructor. Set the payment adapter to use for payment.
 	 * @param Checkout_Adapter_Interface $paymentAdapter
+	 * @throws Exception
 	 */
-	
 	public static function getAdapter() {
+		if (!isset(self::$_paymentAdapter))
+			throw new Checkout_Exception('No payment adapter set.');
+		
 		return self::$_paymentAdapter;
 	}
 
@@ -48,5 +51,13 @@ class Checkout_Payment {
 		}
 
 		return $result;
+	}
+	
+	public static function getRequiredFields($options = null) {
+		return self::getAdapter()->getRequiredFields($options);
+	}
+
+	public static function getOptionalFields($options = null) {
+		return self::getAdapter()->getOptionalFields();
 	}
 }

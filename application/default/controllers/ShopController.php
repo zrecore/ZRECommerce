@@ -22,8 +22,11 @@ class ShopController extends Zend_Controller_Action {
 		$settings = Zre_Config::getSettingsCached();
 		
 		if (!Zre_Template::isHttps() && $settings->site->enable_ssl == 'yes') {
-			$this->_redirect('https://' . $settings->site->url . '/shop/', array('exit' => true));
+			$this->_redirect('https://' . $settings->site->url . '/shop/');
 		}
+
+		// @todo Use settings.xml to define the checkout adapter.
+		Checkout_Payment::setAdapter( new Checkout_Adapter_Cybersource() );
 	}
 	/**
 	 * The default action - show the product listing page
@@ -45,7 +48,7 @@ class ShopController extends Zend_Controller_Action {
 	 *
 	 */
 	public function productAction() {
-		// @todo Display product details.
+		
 		$this->view->assign('disable_cache', 1);
 		$this->view->assign('enable_jquery', 1);
 		
@@ -56,7 +59,7 @@ class ShopController extends Zend_Controller_Action {
 		
 		$productId = $this->getRequest()->getParam('id');
 		if (!isset($productId) || !is_numeric($productId)) {
-			$this->_redirect( '/shop/', array('exit' => true) );
+			$this->_redirect( '/shop/');
 		}
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Shop');
@@ -64,7 +67,6 @@ class ShopController extends Zend_Controller_Action {
 	}
 	
 	public function cartAction() {
-		// @todo Display cart
 		
 		$this->view->assign('disable_cache', 1);
 		$this->view->assign('params', $this->getRequest()->getParams());
@@ -140,17 +142,21 @@ class ShopController extends Zend_Controller_Action {
 			$costOptions = new Cart_Container_Item_Options_Cost(array($productPrice));
 			$metricOptions = new Cart_Container_Item_Options_Metrics(array($productWeight));
 			$detailOptions = new Cart_Container_Item_Options_Detail(
-									array(	'desc' => $productDescription, 
-											'weight' => $productWeight,
-											'title' => $productTitle ));
+				array(	'desc' => $productDescription,
+					'weight' => $productWeight,
+					'title' => $productTitle )
+			);
 									
-			$cart->addItem( new Cart_Container_Item(	$productId, 
-														$detailOptions, 
-														$costOptions, 
-														$metricOptions, 
-														(int) $productQuantity, 
-														null, // validators
-														'') );
+			$cart->addItem( new Cart_Container_Item(
+				$productId,
+				$detailOptions,
+				$costOptions,
+				$metricOptions,
+				(int) $productQuantity,
+				null, // validators
+				''
+			));
+			
 			$productDataset = new Zre_Dataset_Product();
 			$productDataset->update(
 				array(
@@ -175,7 +181,6 @@ class ShopController extends Zend_Controller_Action {
 	
 	public function checkoutAction() {
 		Cart::loadSession();
-		Checkout_Payment::setAdapter( new Checkout_Adapter_Cybersource() );
 
 		$settings = Zre_Config::getSettingsCached();
 
@@ -183,7 +188,8 @@ class ShopController extends Zend_Controller_Action {
 		$billingSubmitted = $request->getParam('billingSubmitted', null);
 		$cart = Cart::getCartContainer();
 		$p = array();
-		
+		$fields = Checkout_Payment::getRequiredFields();
+
 		if (count($cart->getItems()) <= 0) $this->_redirect('/shop/checkout-empty');
 		
 		if (isset($billingSubmitted)) {
@@ -197,26 +203,18 @@ class ShopController extends Zend_Controller_Action {
 				$p[$item->getSku()] = $productDataset->read($item->getSku())->current();
 			}
 
-			$data = new stdClass();
 			
-			$data->firstName = $request->getParam('firstName');
-			$data->lastName = $request->getParam('lastName');
-			$data->street1 = $request->getParam('street1');
-			$data->street2 = $request->getParam('street2');
-			$data->city = $request->getParam('city');
-			$data->state = $request->getParam('state');
-			$data->postalCode = $request->getParam('postalCode');
-			$data->country = $request->getParam('country');
-			$data->accountNumber = $request->getParam('accountNumber');
-			$data->email = $request->getParam('email');
-			$data->expirationMonth = $request->getParam('expirationMonth');
-			$data->expirationYear = $request->getParam('expirationYear');
-			$data->ipAddress = $_SERVER["REMOTE_ADDR"];
+			$keys = array_keys($fields);
+			$params = array();
+
+			foreach($keys as $k) {
+				$params[$k] = $request->getParams($k, null);
+			}
 			
 			$isValid = true;
 			// @todo do some kind of field validation.
 			if ($isValid == true) {
-				$order_id = Checkout_Payment::pay($cart, $data);
+				$order_id = Checkout_Payment::pay($cart, $params);
 				
 				// Redirect to OK page.
 				if (isset($order_id)) {
@@ -238,13 +236,15 @@ class ShopController extends Zend_Controller_Action {
 						Debug::logException($e);
 						Debug::mail('Could not save a completed order:' . "\n" . print_r($result, true) . "\n" . print_r($data, true) . "\n" . print_r($cart, true));
 						$this->_forward('checkout-error', 'shop', 'default', array('error' => $e));
-//						$this->_redirect('/shop/checkout-error/error/could-not-save', array('exit' => true));
 					}
 				} else {
 					$this->_redirect('/shop/checkout-error/error/no-result');
 				}
 			}
 		}
+
+		// ...Assign the adapter's required fields to our view.
+		$this->view->fields = $fields;
 	}
 	
 	public function checkoutErrorAction() {

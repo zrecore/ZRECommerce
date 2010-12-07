@@ -4,6 +4,18 @@ if (isset($this->content)) {
 }
 $d = array();
 if (isset($this->data)) $d = $this->data;
+
+$fields = $this->fields;
+
+$billToFields = array(
+	'firstName', 'lastName', 'street1', 'street2',
+	'city', 'state', 'postalCode', 'country',
+	'email'
+);
+$cardFields = array(
+	'accountNumber', 'expirationMonth', 'expirationYear', 'cvv2'
+);
+Debug::print_r($fields);
 ?>
 <form action="/shop/checkout" method="post">
 	<h3>Bill To:</h3>

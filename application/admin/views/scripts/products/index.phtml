@@ -1,13 +1,13 @@
 <?php
 /**
  * ZRECommerce e-commerce web application.
- * 
+ *
  * @author ZRECommerce
- * 
+ *
  * @package Admin
  * @subpackage Products
  * @category Core
- * 
+ *
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce. See README file.
  * @license GPL v3 or higher. See README file.
@@ -22,54 +22,218 @@ $this->placeholder('title')->set($this->title);
 
 $vars = $this->getVars();
 
+$strStatus	= 'Status';
+$strYes		= $this->translate('Yes');
+$strNo		= $this->translate('No');
+$strArchived	= $this->translate('Archived');
+$strUpdateProduct = $this->translate('Update Product');
+
+$strInternalError = $this->translate('There was an internal error.');
+
 // Content
 if (isset($vars['content'])) echo $vars['content'];
-
-// Listing
-$header_map = array(
-	'product_id'	=> 'ID',
-	'article_id' 	=> 'Article',
-	'title' 		=> 'Title',
-	'description' 	=> 'Description',
-	'price' 		=> 'Price',
-	'allotment' 	=> 'Allot.',
-	'pending' 		=> 'Pending',
-	'sold' 			=> 'Sold',
-	'published'		=> 'Live'
-);
-
-$exclude_map = array(
-	'product_id',
-	'article_id',
-	'date_created',
-	'date_modified',
-);
-$product = new Zre_Dataset_Product();
-
-//echo $this->paginationControl( $datagrid->paginator, 'Sliding', '/products/pagination_control.phtml');
-//
-//echo $this->form;
 ?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		function renderTable(response) {
 
-<table cellspacing="0" cellpadding="0" border="0" class="table-data">
-	<tr class="table-header">
-		<th>ID</th>
-		<th>Title</th>
-		<th>Description</th>
-		<th>Price</th>
-		<th>Left</th>
-		<th>Sold</th>
-		<th>Enabled</th>
-	</tr>
-	<?php foreach($product->listAll(null, array('order' => 'title ASC'), false) as $p):?>
-	<tr class="table-row">
-		<td><?php echo $p->product_id;?></td>
-		<td><?php echo $p->title;?></td>
-		<td><img src="<?php echo $p->image;?>" alt="<?php echo $p->title;?>" style="float:left; margin-right: 0.4em; margin-bottom: 0.4em;" /><?php echo $p->description;?></td>
-		<td><?php echo $p->price;?></td>
-		<td><?php echo $p->allotment;?></td>
-		<td><?php echo $p->sold;?></td>
-		<td><?php echo $p->published;?></td>
-	</tr>
-	<?php endforeach;?>
-</table>
+			$('#frmProducts .table-data .table-body').remove();
+
+			$.each(response.data, function(i, row){
+
+				$('#frmProducts .table-data').append(
+				'<tbody class="table-body">' +
+					'	<tr class="table-row">' +
+					'		<td>' + row.product_id + '</td>' +
+					'		<td>' + row.title + '</td>' +
+					'		<td>' + row.description + '</td>' +
+					'		<td>' + row.price + '</td>' +
+					'		<td>' + row.allotment + '</td>' +
+					'		<td>' + row.sold + '</td>' +
+					'		<td id="product_status_label_' + row.product_id + '">' + row.published + '</td>' +
+					'	</tr>' +
+					'	<tr class="table-sub-row">' +
+					'		<td colspan="7">' +
+					'			<ul class="text-right no-bullets">' +
+					'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span>' + row.title + '</span></div>' +
+					'				<li><span class="float-box-left">Allotment: </span><span>' + row.allotment + '</span></div>' +
+					'				<li><span class="float-box-left">Price: </span><span>' + row.price + '</span></div>' +
+					'				<li>' +
+					'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' +
+					'					<select class="product-status-select" id="product_status_' + row.product_id + '">' +
+					'						<option value="yes"><?php echo $strYes;?></option>' +
+					'						<option value="no"><?php echo $strNo;?></option>' +
+					'						<option value="archived"><?php echo $strArchived;?></option>' +
+					'					</select>' +
+					'				</li>' +
+					'				<li><input type="button" class="product-update-button" id="update_product_' + row.order_id + '" value="<?php echo $strUpdateProduct;?>" /></li>' +
+					'			</ul>' +
+					'		</td>' +
+					'	</tr>' +
+					'</tbody>'
+				);
+
+				$('#frmProducts #product_status_' + row.product_id + ' option[value=' + row.status + ']').attr('selected', 'selected');
+				$('#frmProducts #product_status_label_' + row.product_id).html(row.status);
+			});
+
+			rebindProductUpdateButtons();
+		}
+
+		function rebindProductUpdateButtons() {
+			$('#frmProducts').find('.product-update-button').click(function(ev){
+				$(this).parent().parent().parent().parent().hide();
+				var productId = $(this).attr('id').replace('update_product_','');
+				var newProductStatus = $('#product_status_' + productId);
+
+				$.getJSON(
+				'/admin/products/json-update',
+				{
+					order_id: productId,
+					status: newProductStatus.val()
+				},
+				function(reply) {
+					if (reply.result == 'ok') {
+
+						$('#frmProducts #product_status_label_' + reply.product_id).html(reply.status);
+					} else {
+						alert(reply.data);
+					}
+				}
+			);
+			});
+		}
+
+		$('#frmProducts').tableSort({
+			pageIndex: 1,
+			rowCount: 5,
+			onJsonSuccess: renderTable
+		});
+
+		$('#new_product_description').wymeditor({
+			postInit: function(wym) {
+
+				//construct the button's html
+				var html = "<li class='wym_tools_newbutton'>"
+					+ "<a name='SaveButton' href='#'"
+					+ " style='background-image:"
+					+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
+					+ "Save"
+					+ "</a></li>";
+
+				//add the button to the tools box
+				jQuery(wym._box)
+				.find(wym._options.toolsSelector + wym._options.toolsListSelector)
+				.prepend(html);
+
+				//handle click event
+				jQuery(wym._box)
+				.find('li.wym_tools_newbutton a').click(function() {
+					//do something
+					var htmlData = wym.html();
+
+					var product_title = jQuery('#new_product_title').val();
+					var product_image = jQuery('#new_product_image').val();
+					var article_id = jQuery('#new_product_article_id').val();
+					var allotment = jQuery('#new_product_allotment').val();
+					var published = jQuery('#new_product_published').val();
+
+					jQuery.getJSON(
+					'/admin/products/json-create',
+					{
+						description: htmlData,
+						title: product_title,
+						image: product_image,
+						article_id: article_id,
+						allotment: allotment,
+						published: published
+					},
+					function (reply) {
+						if (reply > 0) {
+							jQuery.getJSON(
+							'/admin/products/json-list',
+							{
+								sort: 'date_created',
+								order: 'DESC'
+							},
+							function(response) {
+								renderTable(response);
+
+								jQuery('#new_product_title').val('');
+								jQuery('#new_product_image').val('');
+								wym.html('');
+							}
+						);
+						} else {
+							alert('<?php echo $strInternalError; ?>');
+						}
+					}
+				);
+
+					return(false);
+				});
+			}
+		});
+
+		rebindProductUpdateButtons();
+	});
+</script>
+<form id="frmProducts" action="/admin/products/json.list">
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th><a href="product_id">ID</a></th>
+			<th><a href="title">Title</a></th>
+			<th><a href="description">Description</a></th>
+			<th><a href="price">Price</a></th>
+			<th><a href="allotment">Left</a></th>
+			<th><a href="sold">Sold</a></th>
+			<th><a href="published">Enabled</a></th>
+		</tr>
+	</table>
+</form>
+<br />
+<br />
+<h3><?php echo $this->translate('Create a new product'); ?></h3>
+<div>
+	<ul class="form-list">
+		<li>
+			<label for="new_product_title"><?php echo $this->translate('Title:'); ?></label>
+			<input type="text" id="new_product_title" value="" />
+		</li>
+		<li>
+			<label for="new_product_image"><?php echo $this->translate('Image:'); ?></label>
+			<input type="text" id="new_product_image" value="/images/dummy.png" />
+		</li>
+		<li>
+			<label for="new_product_allotment"><?php echo $this->translate('Allotment:'); ?></label>
+			<input type="text" id="new_product_allotment" value="0" />
+		</li>
+		<li>
+			<label for="new_product_article_id"><?php echo $this->translate('Article:'); ?></label>
+			<select id="new_product_article_id">
+				<?php
+				if ($this->articles->count() > 0):
+					foreach($this->articles as $a):
+						?>
+				<option value="<?php echo $a->article_id;?>"><?php echo $a->title;?></option>
+					<?php
+					endforeach;
+				else:
+					?>
+				<option value="">None.</option>
+				<?php
+				endif;
+				?>
+			</select>
+		</li>
+		<li>
+			<label for="new_product_published"><?php echo $this->translate('Status:'); ?></label>
+			<select id="new_product_published">
+				<option value="yes"><?php echo $this->translate('Yes');?></option>
+				<option value="no" selected="selected"><?php echo $this->translate('No');?></option>
+				<option value="archived"><?php echo $this->translate('Archived');?></option>
+			</select>
+		</li>
+	</ul>
+	<div id="new_product_description"></div>
+</div>

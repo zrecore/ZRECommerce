@@ -26,25 +26,44 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		 * Fields can be merged from multiple adapters, if products use
 		 * different adapters per product.
 		 */
-		$order_id = null;
-		$adapter = new Checkout_Adapter_Paypal_Client();
-		$settings = Zre_Config::getSettingsCached();
-		$db = Zend_Db_Table::getDefaultAdapter();
+		$order_id	= null;
+		$adapter	= new Checkout_Adapter_Paypal_Client();
+		$settings	= Zre_Config::getSettingsCached();
+		$db		= Zend_Db_Table::getDefaultAdapter();
 
-		$credit_card_type	= $paymentData->creditCardType;
-		$credit_card_number	= $paymentData->accountNumber;
-		$expiration_month	= $paymentData->expirationMonth;
-		$expiration_year	= $paymentData->expirationYear;
-		$cvv2			= $paymentData->cvv2;
-		$first_name		= $paymentData->firstName;
-		$last_name		= $paymentData->lastName;
-		$address1		= $paymentData->street1;
-		$address2		= $paymentData->street2;
-		$city			= $paymentData->city;
-		$state			= $paymentData->state;
-		$zip			= $paymentData->postalCode;
-		$country		= $paymentData->country;
+		$data = new stdClass();
+
+		$data->firstName	= $paymentData['firstName'];
+		$data->lastName		= $paymentData['lastName'];
+		$data->street1		= $paymentData['street1'];
+		$data->street2		= $paymentData['street2'];
+		$data->city		= $paymentData['city'];
+		$data->state		= $paymentData['state'];
+		$data->postalCode	= $paymentData['postalCode'];
+		$data->country		= $paymentData['country'];
+		$data->accountNumber	= $paymentData['accountNumber'];
+		$data->email		= $paymentData['email'];
+		$data->expirationMonth	= $paymentData['expirationMonth'];
+		$data->expirationYear	= $paymentData['expirationYear'];
+		$data->ipAddress	= isset($_SERVER['REMOTE_ADDR']) ?
+						$_SERVER['REMOTE_ADDR'] :
+						null;
+
+		$credit_card_type	= $data->creditCardType;
+		$credit_card_number	= $data->accountNumber;
+		$expiration_month	= $data->expirationMonth;
+		$expiration_year	= $data->expirationYear;
+		$cvv2			= $data->cvv2;
+		$first_name		= $data->firstName;
+		$last_name		= $data->lastName;
+		$address1		= $data->street1;
+		$address2		= $data->street2;
+		$city			= $data->city;
+		$state			= $data->state;
+		$zip			= $data->postalCode;
+		$country		= $data->country;
 		$currency_code		= (string)$settings->site->currency;
+		$ip_address		= $data->ipAddress;
 
 		$amount			= $cartContainer->getTotal();
 
@@ -63,7 +82,8 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 			$state,
 			$zip,
 			$country,
-			$currency_code
+			$currency_code,
+			$ip_address
 		);
 
 		if ($reply->isSuccessful()) {
@@ -136,7 +156,157 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		return $order_id;
 	}
 
-	public function postProcess($data) {
+	public function getRequiredFields($options = null) {
+		$credit_card_type	= $paymentData->creditCardType;
+		$credit_card_number	= $paymentData->accountNumber;
+		$expiration_month	= $paymentData->expirationMonth;
+		$expiration_year	= $paymentData->expirationYear;
+		$cvv2			= $paymentData->cvv2;
+		$first_name		= $paymentData->firstName;
+		$last_name		= $paymentData->lastName;
+		$address1		= $paymentData->street1;
+		$address2		= $paymentData->street2;
+		$city			= $paymentData->city;
+		$state			= $paymentData->state;
+		$zip			= $paymentData->postalCode;
+		$country		= $paymentData->country;
+
+		$us_ccards = array(
+			'Visa'		=> 'Visa',
+			'MasterCard'	=> 'MasterCard',
+			'Discover'	=> 'Discover',
+			'Amex'		=> 'American Express'
+		);
+
+		$uk_ccards = array(
+			'Maestro'	=> 'Maestro',
+			'Solo'		=> 'Solo',
+			'MasterCard'	=> 'MasterCard',
+			'Discover'	=> 'Discover',
+			'Visa'		=> 'Visa'
+		);
+
+		$ca_ccards = array(
+			'MasterCard'	=> 'MasterCard',
+			'Visa'		=> 'Visa'
+		);
+
+		$ccard_types = $us_ccards;
+
+		if (isset($options)) {
+			if (isset($options['credit_card_country'])) {
+				$ccard_country = $optinons['credit_card_country'];
+
+				switch ($ccard_country) {
+					case 'UK':
+						$ccard_types = $uk_ccards;
+						break;
+					case 'CA':
+						$ccard_types = $ca_ccards;
+						break;
+					case 'US': // Break statement omitted.
+					default:
+						$ccard_types = $us_ccards;
+						break;
+				}
+			}
+		}
+
+		
+		$expMonths = array(
+			'01' => 'Jan',
+			'02' => 'Feb',
+			'03' => 'Mar',
+			'04' => 'Apr',
+			'05' => 'May',
+			'06' => 'Jun',
+			'07' => 'Jul',
+			'08' => 'Aug',
+			'09' => 'Sep',
+			'10' => 'Oct',
+			'11' => 'Nov',
+			'12' => 'Dec'
+		);
+
+		$thisYear = date('Y');
+		$expYears = array();
+
+		for ($i = 0; $i < 5; $i++) {
+			$expYears[] = $thisYear + $i;
+		}
+
+		$countries = array(
+			'ca' => 'Canada',
+			'us' => 'United States',
+			'uk' => 'United Kingdom'
+		);
+
+		$values = array(
+			'creditCardType'	=> array(
+							'label' => 'Card Type',
+							'type' => $ccard_types
+						),
+			'creditCardNumber'	=> array(
+							'label' => 'Card Number',
+							'type' => $ccard_types
+						),
+			'expirationMonth'	=> array(
+							'label' => 'Exp. Month',
+							'type' => $expMonths
+						),
+			'expirationYear'	=> array(
+							'label' => 'Exp. Year',
+							'type' => $expYears
+						),
+			'cvv2'			=> array(
+							'label' => 'CVV2',
+							'type' => 'text'
+						),
+			'firstName'		=> array(
+							'label' => 'First Name',
+							'type' => 'text'
+						),
+			'lastName'		=> array(
+							'label' => 'Last Name',
+							'type' => 'text'
+						),
+			'street1'		=> array(
+							'label' => 'Street',
+							'type' => 'text'
+						),
+			'street2'		=> array(
+							'label' => 'Street (Line 2)',
+							'type' => 'text'
+						),
+			'city'			=> array(
+							'label' => 'City',
+							'type' => 'text'
+						),
+			'state'			=> array(
+							'label' => 'State',
+							'type' => 'text'
+						),
+			'postalCode'		=> array(
+							'label' => 'Zip',
+							'type' => 'text'
+						),
+			'country'		=> $countries,
+		);
+
+		return $values;
+	}
+
+	/**
+	 * There are no optional fields for this adapter.
+	 * @param array|null $options
+	 * @return array|null No optional fields for this adapter.
+	 */
+	public function getOptionalFields($options = null) {
+		// ...No optional fields.
+		return null;
+	}
+
+	public function postProcess($data, $options = null) {
 
 	}
 }
