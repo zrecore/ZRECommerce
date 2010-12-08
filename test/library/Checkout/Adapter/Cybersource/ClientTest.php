@@ -1,4 +1,7 @@
 <?php
+
+require_once 'PHPUnit/Framework/TestCase.php';
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -16,4 +19,11 @@
  * Maestro (UK Domestic)6759 4111 0000 0008
  * Solo			6334 5898 9800 0001
  */
+
+class Checkout_Adapter_Cybersource_ClientTest extends PHPUnit_Framework_TestCase
+{
+	public function testDoRequest() {
+		$this->markTestSkipped('This is adapter uses a SOAP client API. SKIPPED.');
+	}
+}
 ?>

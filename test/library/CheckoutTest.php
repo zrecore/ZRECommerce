@@ -6,6 +6,7 @@
  */
 require_once 'PHPUnit/Framework/TestSuite.php';
 
+require_once 'library/Checkout/Adapter/Cybersource/ClientTest.php';
 require_once 'library/Checkout/Adapter/Paypal/ClientTest.php';
 require_once 'library/Checkout/Adapter/PaypalTest.php';
 /**
@@ -19,6 +20,7 @@ class CheckoutTest extends PHPUnit_Framework_TestSuite {
 	public function __construct() {
 		$this->setName ( 'CheckoutTest' );
 
+		$this->addTestSuite ( 'Checkout_Adapter_Cybersource_ClientTest' );
 		$this->addTestSuite ( 'Checkout_Adapter_Paypal_ClientTest' );
 		$this->addTestSuite ( 'Checkout_Adapter_PaypalTest' );
 
