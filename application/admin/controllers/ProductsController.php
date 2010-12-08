@@ -173,7 +173,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$date = new Zend_Date(null, 'yyyy-MM-dd HH:mm:ss');
 			$date_modified = $date->get('yyyy-MM-dd HH:mm:ss');
 
-			if (!isset($article_id)) throw new Zend_Exception('No product ID specified.');
+			if (!isset($product_id)) throw new Zend_Exception('No product ID specified.');
 
 			$updateData = array(
 				'product_id' => $product_id,
