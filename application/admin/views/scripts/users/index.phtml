@@ -1,13 +1,13 @@
 <?php
 /**
  * ZRECommerce e-commerce web application.
- * 
+ *
  * @author ZRECommerce
- * 
+ *
  * @package Admin
  * @subpackage Users
  * @category Core
- * 
+ *
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce. See README file.
  * @license GPL v3 or higher. See README file.
@@ -23,7 +23,22 @@ $this->placeholder('title')->set($this->title);
 $vars = $this->getVars();
 
 if (isset($vars['content'])) echo $vars['content'];
-$strPassword = $t->_('Password');
+
+$strPassword		= $this->translate('Password');
+$strPasswordMatch	= $this->translate('Password (again)');
+$strChangePassword	= $this->translate('Change Password');
+
+$strRole		= $this->translate('Role');
+$strCity		= $this->translate('City');
+$strState		= $this->translate('State');
+$strZipcode		= $this->translate('Zipcode');
+$strCountry		= $this->translate('Country');
+$strUpdateProfile	= $this->translate('Update Profile');
+
+$roles = '<option value="administrator">' . $this->translate('Administrator') . '</option>';
+$roles .= '<option value="editor">' . $this->translate('Editor') . '</option>';
+$roles .= '<option value="staff">' . $this->translate('Staff') . '</option>';
+$roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 
 /**
  * @todo implement pagination jquery plugin.
@@ -32,7 +47,7 @@ $strPassword = $t->_('Password');
 <script type="text/javascript">
 	jQuery(document).ready(function($){
 		$('#btnCreateUser').click(function(ev){
-			// ...Create the article via getJSON()
+			// ...Create a user via getJSON()
 		});
 
 		$('#frmUsers').tableSort({
@@ -40,31 +55,134 @@ $strPassword = $t->_('Password');
 			rowCount: 5,
 			onJsonSuccess: function(response){
 				if (response.result == 'ok') {
+					var strChangePassword = '<?php echo $strChangePassword;?>';
+					var strUpdateProfile = '<?php echo $strUpdateProfile;?>';
 
-				    $('#frmUsers .table-data .table-body').remove();
+					$('#frmUsers .table-data .table-body').remove();
 
-				    $.each(response.data, function(i, row){
+					$.each(response.data, function(i, row){
 
-					    $('#frmUsers .table-data').append(
-						    '<tbody class="table-body">' +
-						    '<tr class="table-row">' +
-						    '	<td>' + row.user_id + '</td>' +
-						    '	<td>' + row.name + '</td>' +
-						    '	<td>' + row.email + '</td>' +
-						    '	<td>' + row.role + '</td>' +
-						    '	<td>' + row.city + '</td>' +
-						    '	<td>' + row.state_province + '</td>' +
-						    '	<td>' + row.zipcode + '</td>' +
-						    '	<td>' + row.country + '</td>' +
-						    '</tr>' +
-						    '<tr class="table-sub-row">' +
-						    '	<td colspan="8"><?php echo $strPassword;?>: <input type="password" class="input-user-password" value="" /></td>' +
-						    '</tr>' +
-						    '</tbody>'
-					    );
-				    });
+						$('#frmUsers .table-data').append(
+						'<tbody class="table-body">' +
+							'<tr class="table-row">' +
+							'	<td>' + row.user_id + '</td>' +
+							'	<td>' + row.name + '</td>' +
+							'	<td>' + row.email + '</td>' +
+							'	<td>' + row.role + '</td>' +
+							'	<td>' + row.city + '</td>' +
+							'	<td>' + row.state_province + '</td>' +
+							'	<td>' + row.zipcode + '</td>' +
+							'	<td>' + row.country + '</td>' +
+							'</tr>' +
+							'<tr class="table-sub-row">' +
+							'	<td colspan="3" style="vertical-align: top">' +
+							'		<ul class="form-list">' +
+							'			<li><label><?php echo $strPassword;?>:</label><input type="password" id="user_password_' + row.user_id + '" class="user-password" value="" /></li>' +
+							'			<li><label><?php echo $strPasswordMatch;?>:</label><input type="password" id="user_password_match_' + row.user_id + '" class="user-password-match" /></li>' +
+							'			<li><input type="button" value="' + strChangePassword + '" class="change-password-button" /></li>' +
+							'		</ul>' +
+							'	</td>' +
+							'	<td colspan="5" style="vertical-align: top;">' +
+							'		<ul class="form-list">' +
+							'			<li><label><?php echo $strRole;?></label><select id="user_role_' + row.user_id + '" class="user-role"><?php echo $roles;?></select></li>' +
+							'			<li><label><?php echo $strCity;?></label><input type="text" id="user_city_' + row.user_id + '" class="user-city" value="' + row.city + '" /></li>' +
+							'			<li><label><?php echo $strZipcode;?></label><input type="text" id="user_zipcode_' + row.user_id + '" class="user-zipcode" value="' + row.state_province + '" /></li>' +
+							'			<li><label><?php echo $strState;?></label><input type="text" id="user_state_province_' + row.user_id + '" class="user-state-province" value="' + row.zipcode + '" /></li>' +
+							'			<li><label><?php echo $strCountry;?></label><input type="text" id="user_country_' + row.user_id + '" class="user-country" value="' + row.country + '" /></li>' +
+							'			<li><input type="button" value="' + strUpdateProfile + '" class="update-profile-button" /></li>' +
+							'		</ul>' +
+							'	</td>' +
+							'</tr>' +
+							'</tbody>'
+					);
+
+						$('#frmUsers .table-data .user-role').each(function(i, obj){
+							$(obj).find("option[value='" + row.role + "']").attr('selected', 'selected');
+						});
+
+						$('#frmUsers .table-data .change-password-button').each(function(i, obj){
+							$(obj).click(function(ev) {
+								var formList = $(this).parent().parent();
+
+								var password = $(formList.find('.user-password'));
+								var password_match = $(formList.find('.user-password-match'));
+
+								var user_id = password.attr('id').replace('user_password_', '');
+
+								$.getJSON(
+								'/admin/users/json-update/',
+								{
+									user_id: user_id,
+									password: password.val(),
+									password_match: password_match.val()
+								},
+								function (reply) {
+									if (reply.result == 'error') {
+										alert(reply.data);
+									} else {
+										var lastColor = formList.parent().css('background-color');
+										formList.parent().css(
+											'background-color', '#0c0'
+										);
+										formList.parent().animate(
+											{
+												backgroundColor: lastColor
+											},
+											3000,
+											function(){}
+										);
+									}
+								}
+							);
+							});
+						});
+
+						$('#frmUsers .table-data .update-profile-button').each(function(i, obj){
+							$(obj).click(function(ev) {
+								var formList = $(this).parent().parent();
+
+								var role = $(formList.find('.user-role'));
+								var city = $(formList.find('.user-city'));
+								var state_province = $(formList.find('.user-state-province'));
+								var zipcode = $(formList.find('.user-zipcode'));
+								var country = $(formList.find('.user-country'));
+
+								var user_id = role.attr('id').replace('user_role_', '');
+
+								$.getJSON(
+								'/admin/users/json-update/',
+								{
+									user_id: user_id,
+									role: role.val(),
+									city: city.val(),
+									state_province: state_province.val(),
+									zipcode: zipcode.val(),
+									country: country.val()
+								},
+								function (reply) {
+									if (reply.result == 'error') {
+										alert(reply.data);
+									} else {
+										var lastColor = formList.parent().css('background-color');
+										formList.parent().css(
+											'background-color', '#0c0'
+										);
+										formList.parent().animate(
+											{
+												backgroundColor: lastColor
+											},
+											3000,
+											function(){}
+										);
+									}
+								}
+								);
+							});
+						});
+
+					});
 				} else {
-				    alert('Error: ' + response.data);
+					alert('Error: ' + response.data);
 				}
 			}
 		});
@@ -100,12 +218,12 @@ $strPassword = $t->_('Password');
 		<li>
 			<label for="new_user_role"><?php echo $t->_('Role:'); ?></label>
 			<select id="new_user_role">
-				<?php 
+				<?php
 				$roles = new Zre_Dataset_Acl_Role();
 				$data = $roles->listAll(null, array('order' => 'name ASC'));
 				foreach ($data as $row) {
 					$row = (object) $row;
-					?><option value="<?php echo $row->acl_row_id; ?>"><?php echo $row->name; ?></option><?php 
+					?><option value="<?php echo $row->acl_row_id; ?>"><?php echo $row->name; ?></option><?php
 				}
 				?>
 			</select>

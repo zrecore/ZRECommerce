@@ -67,4 +67,14 @@ class Zre_Dataset_UsersEx extends Data_Set_Abstract
 		
 		return $userId;
 	}
+
+	public function updateProfile($data, $user_id) {
+		$db = Zend_Db_Table::getDefaultAdapter();
+
+		$usersProfileTable = new Zre_Dataset_Model_UsersProfile();
+		$userProfileData = Data::filterColumns($data, $usersProfileTable);
+		$rowsAffected = $usersProfileTable->update( $userProfileData, $db->quoteInto('user_id = ?', $user_id) );
+		
+		return $rowsAffected;
+	}
 }

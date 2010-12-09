@@ -45,12 +45,9 @@ class Zre_Ui_Form_Login extends Zend_Form
 		$password->setLabel('Password');
 		$password->setRequired(true);
 		
-		$stringLength = new Zend_Validate_StringLength(8);
-		$stringLength->setMessage( 'Invalid password length. Try eight (8) characters or longer.', Zend_Validate_StringLength::TOO_SHORT );
 		
 		$password->setValidators(array(
-			new Zend_Validate_NotEmpty(),
-			$stringLength
+			new Zend_Validate_NotEmpty()
 		));
 		
 		$submit = new Zend_Form_Element_Submit('submit');
