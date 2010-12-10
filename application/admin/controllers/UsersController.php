@@ -247,15 +247,24 @@ class Admin_UsersController extends Zend_Controller_Action {
 	public function jsonCreateAction() {
 		$request = $this->getRequest();
 		$data = null;
-
+		$reply = null;
 		try {
 			$users = new Zre_Dataset_UsersEx();
 			$data = $users->createProfile($request->getParams());
+
+			$reply = array(
+				'result' => 'ok',
+				'data' => $data
+			);
 		} catch (Exception $e) {
-			Debug::log((string)$e);
+			Debug::log( var_export($request->getParams(), true) . "\n\n" . (string)$e);
+			$reply = array(
+				'result' => 'error',
+				'data' => (string)$e
+			);
 		}
 
-		$this->_helper->json($data);
+		$this->_helper->json($reply);
 	}
 
 	public function jsonUpdateAction() {
@@ -269,6 +278,10 @@ class Admin_UsersController extends Zend_Controller_Action {
 			$dataset = new Zre_Dataset_UsersEx();
 
 			$user_id	= $request->getParam('user_id', null);
+			$first_name	= $request->getParam('first_name', null);
+			$last_name	= $request->getParam('last_name', null);
+			$date_of_birth	= $request->getParam('date_of_birth', null);
+
 			$role		= $request->getParam('role', null);
 			$email		= $request->getParam('email', null);
 			
@@ -300,8 +313,14 @@ class Admin_UsersController extends Zend_Controller_Action {
 				if (!isset($user_id)) throw new Zend_Exception( $t->_('No user ID specified.') );
 
 				$updateData = array(
+					'first_name' => $first_name,
+					'last_name' => $last_name,
+					'date_of_birth' => $date_of_birth,
 					'role' => $role,
-					'email' => $email
+					'email' => $email,
+					'city' => $city,
+					'state_province' => $state,
+					'zipcode' => $zipcode
 				);
 
 				$result = $dataset->updateProfile(

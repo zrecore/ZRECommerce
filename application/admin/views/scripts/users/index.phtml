@@ -28,6 +28,8 @@ $strPassword		= $this->translate('Password');
 $strPasswordMatch	= $this->translate('Password (again)');
 $strChangePassword	= $this->translate('Change Password');
 
+$strFirstAndLastName	= $this->translate('First and Last Name');
+$strDateOfBirth		= $this->translate('Date of Birth');
 $strRole		= $this->translate('Role');
 $strCity		= $this->translate('City');
 $strState		= $this->translate('State');
@@ -35,10 +37,20 @@ $strZipcode		= $this->translate('Zipcode');
 $strCountry		= $this->translate('Country');
 $strUpdateProfile	= $this->translate('Update Profile');
 
-$roles = '<option value="administrator">' . $this->translate('Administrator') . '</option>';
-$roles .= '<option value="editor">' . $this->translate('Editor') . '</option>';
-$roles .= '<option value="staff">' . $this->translate('Staff') . '</option>';
-$roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
+$roles = new Zre_Dataset_Acl_Role();
+$optionRoles = '';
+$jsonRoles = '';
+$arrRoles = array();
+
+$data = $roles->listAll(null, array('order' => 'name ASC'));
+
+foreach ($data as $row) {
+	$row = (object) $row;
+	$optionRoles .= '<option value="' . $row->acl_role_id . '">' . $row->name . '</option>';
+	$arrRoles[$row->acl_role_id] = $row->name;
+}
+
+$jsonRoles = Zend_Json::encode($arrRoles);
 
 /**
  * @todo implement pagination jquery plugin.
@@ -46,14 +58,63 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
+		var jsonRoles = <?php echo $jsonRoles?>;
+		
 		$('#btnCreateUser').click(function(ev){
 			// ...Create a user via getJSON()
+
+			var user_name = $('#new_user_name');
+			var first_name = $('#new_user_first_name');
+			var last_name = $('#new_user_last_name');
+			var date_of_birth = $('#new_user_date_of_birth');
+
+			var email = $('#new_user_email');
+			var role = $('#new_user_role');
+			var city = $('#new_user_city');
+			var state_province = $('#new_user_state_province');
+			var zipcode = $('#new_user_zipcode');
+			var country = $('#new_user_country');
+
+			$.getJSON(
+				'/admin/users/json-create',
+				{
+					name: user_name.val(),
+					first_name: first_name.val(),
+					last_name: last_name.val(),
+					date_of_birth: date_of_birth.val(),
+					email: email.val(),
+					role: role.val(),
+					city: city.val(),
+					state_province: state_province.val(),
+					zipcode: zipcode.val(),
+					country: country.val()
+				},
+				function (reply) {
+					try {
+						if (reply.result == 'ok') {
+							$.getJSON(
+								'/admin/users/json-list',
+								null,
+								renderTable
+							);
+						} else {
+							alert(reply.data);
+						}
+					} catch (e) {
+						alert(e.toString());
+					}
+
+				}
+			);
 		});
 
 		$('#frmUsers').tableSort({
 			pageIndex: 1,
 			rowCount: 5,
-			onJsonSuccess: function(response){
+			onJsonSuccess: renderTable
+		});
+
+		function renderTable(response){
 				if (response.result == 'ok') {
 					var strChangePassword = '<?php echo $strChangePassword;?>';
 					var strUpdateProfile = '<?php echo $strUpdateProfile;?>';
@@ -68,7 +129,7 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 							'	<td>' + row.user_id + '</td>' +
 							'	<td>' + row.name + '</td>' +
 							'	<td>' + row.email + '</td>' +
-							'	<td>' + row.role + '</td>' +
+							'	<td>' + jsonRoles[row.role] + '</td>' +
 							'	<td>' + row.city + '</td>' +
 							'	<td>' + row.state_province + '</td>' +
 							'	<td>' + row.zipcode + '</td>' +
@@ -84,7 +145,9 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 							'	</td>' +
 							'	<td colspan="5" style="vertical-align: top;">' +
 							'		<ul class="form-list">' +
-							'			<li><label><?php echo $strRole;?></label><select id="user_role_' + row.user_id + '" class="user-role"><?php echo $roles;?></select></li>' +
+							'			<li><label><?php echo $strFirstAndLastName;?></label><input type="text" id="user_first_name_' + row.user_id + '" class="user-first-name" value="' + row.first_name + '" /><input type="text" id="user_last_name_' + row.user_id + '" class="user-last-name" value="' + row.last_name + '" /></li>' +
+							'			<li><label><?php echo $strDateOfBirth;?></label><input type="text" id="user_date_of_birth_' + row.user_id + '" class="user-date-of-birth" value="' + row.date_of_birth + '" /></li>' +
+							'			<li><label><?php echo $strRole;?></label><select id="user_role_' + row.user_id + '" class="user-role"><?php echo $optionRoles;?></select></li>' +
 							'			<li><label><?php echo $strCity;?></label><input type="text" id="user_city_' + row.user_id + '" class="user-city" value="' + row.city + '" /></li>' +
 							'			<li><label><?php echo $strZipcode;?></label><input type="text" id="user_zipcode_' + row.user_id + '" class="user-zipcode" value="' + row.state_province + '" /></li>' +
 							'			<li><label><?php echo $strState;?></label><input type="text" id="user_state_province_' + row.user_id + '" class="user-state-province" value="' + row.zipcode + '" /></li>' +
@@ -94,11 +157,11 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 							'	</td>' +
 							'</tr>' +
 							'</tbody>'
-					);
+						);
 
-						$('#frmUsers .table-data .user-role').each(function(i, obj){
-							$(obj).find("option[value='" + row.role + "']").attr('selected', 'selected');
-						});
+						$('#frmUsers .table-data #user_role_' + row.user_id)
+							.find("option[value='" + row.role + "']")
+							.attr('selected', 'selected');
 
 						$('#frmUsers .table-data .change-password-button').each(function(i, obj){
 							$(obj).click(function(ev) {
@@ -141,6 +204,9 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 							$(obj).click(function(ev) {
 								var formList = $(this).parent().parent();
 
+								var first_name = $(formList.find('.user-first-name'));
+								var last_name = $(formList.find('.user-last-name'));
+								var date_of_birth = $(formList.find('.user-date-of-birth'));
 								var role = $(formList.find('.user-role'));
 								var city = $(formList.find('.user-city'));
 								var state_province = $(formList.find('.user-state-province'));
@@ -153,6 +219,9 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 								'/admin/users/json-update/',
 								{
 									user_id: user_id,
+									first_name: first_name.val(),
+									last_name: last_name.val(),
+									date_of_birth: date_of_birth.val(),
 									role: role.val(),
 									city: city.val(),
 									state_province: state_province.val(),
@@ -185,7 +254,6 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 					alert('Error: ' + response.data);
 				}
 			}
-		});
 	});
 </script>
 <form id="frmUsers" action="/admin/users/json.list">
@@ -208,23 +276,37 @@ $roles .= '<option value="guest">' . $this->translate('Guest') . '</option>';
 <form id="frmCreateUser" class="form-list" action="#">
 	<ul>
 		<li>
-			<label for="new_user_name"><?php echo $t->_('User Name:'); ?></label>
+			<label for="new_user_name"><?php echo $t->_('User Name'); ?></label>
 			<input type="text" id="new_user_name" value="" />
 		</li>
 		<li>
-			<label for="new_user_email"><?php echo $t->_('E-Mail:'); ?></label>
+			<label for="new_user_first_name"><?php echo $t->_('First and Last Name'); ?></label>
+			<input type="text" id="new_user_first_name" value="" />
+			<input type="text" id="new_user_last_name" value="" />
+		</li>
+		<li>
+			<label for="new_user_date_of_birth"><?php echo $t->_('Date of Birth (YYYY-MM-DD)'); ?></label>
+			<input type="text" id="new_user_date_of_birth" value="" />
+		</li>
+		<li>
+			<label for="new_user_email"><?php echo $t->_('E-Mail'); ?></label>
 			<input type="text" id="new_user_email" value="" />
 		</li>
 		<li>
-			<label for="new_user_role"><?php echo $t->_('Role:'); ?></label>
+			<label for="new_city"><?php echo $t->_('City, State/Province, Zip'); ?></label>
+			<input type="text" id="new_user_city" value="" />
+			<input type="text" id="new_user_state_province" value="" style="width: 2.2em;" />
+			<input type="text" id="new_user_zipcode" value="" />
+		</li>
+		<li>
+			<label for="new_user_country"><?php echo $t->_('Country'); ?></label>
+			<input type="text" id="new_user_country" value="" style="width: 2.2em;" />
+		</li>
+		<li>
+			<label for="new_user_role"><?php echo $t->_('Role'); ?></label>
 			<select id="new_user_role">
 				<?php
-				$roles = new Zre_Dataset_Acl_Role();
-				$data = $roles->listAll(null, array('order' => 'name ASC'));
-				foreach ($data as $row) {
-					$row = (object) $row;
-					?><option value="<?php echo $row->acl_row_id; ?>"><?php echo $row->name; ?></option><?php
-				}
+				echo $optionRoles;
 				?>
 			</select>
 		</li>

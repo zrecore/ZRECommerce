@@ -7,6 +7,8 @@
 
 require_once 'application/default/controllers/IndexControllerTest.php';
 require_once 'application/default/controllers/OrdersControllerTest.php';
+require_once 'application/default/controllers/ReadControllerTest.php';
+require_once 'application/default/controllers/ShopControllerTest.php';
 
 require_once 'application/admin/controllers/AclControllerTest.php';
 require_once 'application/admin/controllers/ArticlesControllerTest.php';
@@ -26,6 +28,9 @@ require_once 'application/admin/controllers/UsersControllerTest.php';
  */
 class ControllerTests extends PHPUnit_Framework_TestSuite 
 {
+	public function setUp() {
+		Zend_Session::$_unitTestEnabled = true;
+	}
 	/**
 	 * Constructs the test suite handler.
 	 */
@@ -34,6 +39,8 @@ class ControllerTests extends PHPUnit_Framework_TestSuite
 		
 		$this->addTestSuite ( 'IndexControllerTest' );
 		$this->addTestSuite ( 'OrdersControllerTest' );
+		$this->addTestSuite ( 'ReadControllerTest' );
+		$this->addTestSuite ( 'ShopControllerTest' );
 		
 //		$this->addTestSuite ( 'Admin_AclControllerTest' );
 //		$this->addTestSuite ( 'Admin_ArticlesControllerTest' );
