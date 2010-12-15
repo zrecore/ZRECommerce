@@ -4,7 +4,8 @@ class Zre_Dataset_UsersEx extends Data_Set_Abstract
 	protected $_modelName = 'Zre_Dataset_Model_Users';
 
 	public function getProfiles($data = null, $options = null, $table_name_prepend = null) {
-		$pre = '';
+		$settings = Zre_Config::getSettingsCached();
+		$pre = $settings->db->table_name_prepend;
 		if (isset($table_name_prepend)) $pre = $table_name_prepend;
 		
 		$columnOptions = array(

@@ -83,14 +83,13 @@ if (isset($vars['content'])) echo $vars['content'];
 			
 		</div>
 	</div>
+	<?php /* ?>
 	<div class="productAreaBody">
 		<div class="productAreaReview">
 			
 				<div class="productReviewRatingBackground">
 					<?php 
-					/**
-					 * display 5 star rating, out of total amount of reviews.
-					 */
+					// ...Display 5 star rating, out of total amount of reviews.
 							
 					$productRating = 75; //percent out of 100
 					$productTotalReviews = 765;
@@ -104,14 +103,13 @@ if (isset($vars['content'])) echo $vars['content'];
 			<h3 class="productReviewTitle"><?php echo $t->_('Latest User Reviews'); ?></h3>
 			<div class="productReviewText">
 				<?php 
-					/**
-					 * Display excerpts from latest reviews.
-					 */
+					// ...Display excerpts from latest reviews.
 					echo str_repeat('foobarbaz this is a test. ', 20);
 				?>
 			</div>
 		</div>
 	</div>
+	<?php //*/ ?>
 	<div class="productAreaFooter">
 		<div class="productDescription">
 			<h3 class="productDescriptionTitle">
@@ -169,14 +167,13 @@ if (isset($vars['content'])) echo $vars['content'];
 		<div class="productOptionsArea">
 			<div class="boxLargeTop"></div>
 			<div class="boxLargeCenter">
+				<?php /* ?>
 				<h3 class="productOptionsTitle"><?php echo $t->_('Product Options'); ?></h3>
 				<ul class="productOptionsList">
 					<?php 
-						/**
-						 * @todo List product options here. changing properties
-						 * 		 here should update the hidden fields in the
-						 * 		 "Add" form.
-						 */
+						// @todo List product options here. changing properties
+						// here should update the hidden fields in the
+						// 		 "Add" form.
 					?>
 					<li>Size: <select>
 						<optgroup label="Red">
@@ -193,6 +190,7 @@ if (isset($vars['content'])) echo $vars['content'];
 						</optgroup>
 					</select></li>
 				</ul>
+				<?php //*/ ?>
 			</div>
 			<div class="boxLargeBottom"></div>
 		</div>

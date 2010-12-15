@@ -17,7 +17,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 		return $cartContainer->getTotal();
 	}
 	/**
-	 * Charge the total using the specified payment method.
+	 * Performs an 'Authorization' and a 'Capture' of funds in one call.
 	 * NOTE: You must configure the Smart Authorization settings in the
 	 * Business Center before you accept orders! See page seven (7) of the
 	 * Cybersource 'Small_Business_API_Guide.pdf'
@@ -39,6 +39,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			if (is_object($paymentData)) $paymentData = (array) $paymentData;
 			$data->firstName	= $paymentData['firstName'];
 			$data->lastName		= $paymentData['lastName'];
+			$data->email		= $paymentData['email'];
 			$data->street1		= $paymentData['street1'];
 			$data->street2		= $paymentData['street2'];
 			$data->city		= $paymentData['city'];
@@ -46,6 +47,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			$data->postalCode	= $paymentData['postalCode'];
 			$data->country		= $paymentData['country'];
 			$data->accountNumber	= $paymentData['accountNumber'];
+			$data->creditCardType	= $paymentData['creditCardType'];
 			$data->email		= $paymentData['email'];
 			$data->expirationMonth	= $paymentData['expirationMonth'];
 			$data->expirationYear	= $paymentData['expirationYear'];
@@ -73,7 +75,12 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			    // service with complete billing, payment card, and purchase (two items) information.
 			$ccAuthService = new stdClass();
 			$ccAuthService->run	= "true";
+
+			$ccCaptureService = new stdClass();
+			$ccCaptureService->run = "true";
+
 			$request->ccAuthService	= $ccAuthService;
+			$request->ccCaptureService = $ccCaptureService;
 			
 			$billTo = new stdClass();
 			$billTo->firstName	= $data->firstName;
@@ -92,6 +99,7 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			$card->accountNumber	= $data->accountNumber;
 			$card->expirationMonth	= $data->expirationMonth;
 			$card->expirationYear	= $data->expirationYear;
+			$card->cardType = $data->creditCardType;
 
 			$request->card		= $card;
 			
@@ -169,21 +177,18 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 					);
 
 					// Update our inventory audit.
-					$prod = $p[$item->getSku()];
-					$productDataset->update(
-						array(
-							'sold' => $prod->sold + $item->getQuantity(),
-							'allotment' => $prod->allotment - $item->getQuantity()
-						),
-						$db->quoteInto('product_id = ?', $item->getSku())
-					);
-
+					$prod = $productDataset->read($item->getSku())->current();
+					$prod->sold += $item->getQuantity();
+					$prod->pending -= $item->getQuantity();
+					$prod->save();
+					
 					$ordersProductDataset->create($orderProduct);
 				}
 
 				$result = $order_id;
 			} else {
-				$result = null;
+				Debug::log('Internal error' . var_export($request, true) . "\n\n" . var_export($reply, true));
+				throw new Exception('Order was denied by payment gateway');
 			}
 
 		} catch (Exception $e) {
@@ -196,23 +201,24 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 
 	public function getRequiredFields($options = null) {
 
+		// @see http://apps.cybersource.com/library/documentation/sbc/credit_cards/html/
 		$vital_ccards = array(
-			'Visa'			=> 'Visa',
-			'MasterCard'		=> 'MasterCard',
-			'American Express'	=> 'American Express',
-			'Discover'		=> 'Discover'
+			'001'		=> 'Visa',
+			'002'		=> 'MasterCard',
+			'003'		=> 'American Express',
+			'004'		=> 'Discover'
 		);
 
 		$fdms_nashville_ccards = array(
-			'Visa'			=> 'Visa',
-			'MasterCard'		=> 'MasterCard'
+			'001'		=> 'Visa',
+			'002'		=> 'MasterCard'
 		);
 
 		$fdms_south_ccards = array(
-			'Visa'			=> 'Visa',
-			'MasterCard'		=> 'MasterCard',
-			'American Express'	=> 'American Express',
-			'Discover'		=> 'Discover'
+			'001'		=> 'Visa',
+			'002'		=> 'MasterCard',
+			'003'		=> 'American Express',
+			'004'		=> 'Discover'
 		);
 
 		$ccard_types = $vital_ccards;
@@ -235,26 +241,42 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			}
 		}
 
+		$expMonths = array(
+			'01' => 'Jan',
+			'02' => 'Feb',
+			'03' => 'Mar',
+			'04' => 'Apr',
+			'05' => 'May',
+			'06' => 'Jun',
+			'07' => 'Jul',
+			'08' => 'Aug',
+			'09' => 'Sep',
+			'10' => 'Oct',
+			'11' => 'Nov',
+			'12' => 'Dec'
+		);
+		
 		$thisYear = date('Y');
 		$expYears = array();
 
-		for ($i = 0; $i < 5; $i++) {
-			$expYears[] = $thisYear + $i;
+		for ($i = $thisYear; $i < ($thisYear + 5); $i++) {
+			$expYears[$i] = $i;
 		}
 
+		// @see http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf
 		$countries = array(
-			'ca' => 'Canada',
-			'us' => 'United States',
-			'uk' => 'United Kingdom'
+			'CA' => 'Canada',
+			'US' => 'United States',
+			'UK' => 'United Kingdom'
 		);
 		
 		$values = array(
-			'creditCardType'	=> array(
-							'label' => 'Card Type',
-							'type' => $ccard_types
-						),
 			'accountNumber'	=> array(
 							'label' => 'Card Number',
+							'type' => 'text'
+						),
+			'creditCardType'	=> array(
+							'label' => 'Card Type',
 							'type' => $ccard_types
 						),
 			'expirationMonth'	=> array(
@@ -275,6 +297,10 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 						),
 			'lastName'		=> array(
 							'label' => 'Last Name',
+							'type' => 'text'
+						),
+			'email'			=> array(
+							'label' => 'E-Mail',
 							'type' => 'text'
 						),
 			'street1'		=> array(

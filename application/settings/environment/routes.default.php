@@ -25,3 +25,5 @@ $route = new Zend_Controller_Router_Route(
 	)
 );
 $router->addRoute('ordersPostProcess', $route);
+
+$front->setRouter($router);

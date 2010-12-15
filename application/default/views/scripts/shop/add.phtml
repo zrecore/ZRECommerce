@@ -20,7 +20,6 @@ if (empty($this->title)) $this->title = (string)$settings->site->title;
 $this->placeholder('title')->set($this->title);
 
 $vars = $this->getVars();
-$params = $vars['params'];
 
 if (isset($vars['content'])) echo $vars['content'];
 ?>

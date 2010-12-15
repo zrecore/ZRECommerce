@@ -95,7 +95,7 @@ input
 { color: #000000; }
 
 /* Override the default location of our tableSort 'sort' select */
-.table-sort-order {float: right; margin: auto; padding: auto;}
+.table-sort-order {float: right; margin: auto; padding: inherit;}
 
 /* Override the default paginator appearance */
 .paginator-link {text-decoration: none;}

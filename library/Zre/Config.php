@@ -568,9 +568,6 @@ require_once 'Zend/Session/Namespace.php';
 					in_array($id . '.tar.gz', $currentListing)) {
 					
 					$delete = Zre_File::delete('../backup/' . $id . '.tar.gz');
-					if ($delete) {
-						Zre_Log::log('deleted? ' . (int)$delete);
-					}
 				}
 			}
 			

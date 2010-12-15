@@ -101,7 +101,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	return $zre_locale;
     }
 
-    protected function _initView() {
+    public function _initView() {
 
 	// Initialize view
 	$view = new Zend_View();
@@ -145,9 +145,31 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	Zre_Registry_Session::set('footer_items', $footerItems);
     }
 
-    protected function _initRouters() {
-	$routerConfig = APPLICATION_PATH . '/settings/environment/routes.default.php';
+    public function _initRouters() {
+	$front = Zend_Controller_Front::getInstance();
+	$router = $front->getRouter();
 
-	if (file_exists($routerConfig)) require_once $routerConfig;
+	// ...'Read' controller routes
+	$route = new Zend_Controller_Router_Route(
+		'a/:id/:title',
+		array(
+			'controller' => 'read',
+			'action' => 'article',
+			'module' => 'default'
+		)
+	);
+	$router->addRoute('indexReadArticle', $route);
+
+	$route = new Zend_Controller_Router_Route(
+		'orders/post-process/:source',
+		array(
+			'controller' => 'orders',
+			'action' => 'post-process',
+			'module' => 'default'
+		)
+	);
+	$router->addRoute('ordersPostProcess', $route);
+
+	$front->setRouter($router);
     }
 }

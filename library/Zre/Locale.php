@@ -36,7 +36,7 @@ class Zre_Locale
 					try {
 						$locale = new Zend_Locale($locale);
 					} catch (Zend_Locale_Exception $e) {
-						Zre_Log::log($e->getMessage(), LOG_NOTICE);
+						
 						$locale = new Zend_Locale( (string)$settings->site->locale ); 
 					}
 					

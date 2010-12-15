@@ -98,13 +98,13 @@ class Zre_File {
 		if (file_exists($file)) {
 		    $obj = new Archive_Tar($file); // name of TAR file
 		} else {
-		    Zre_Log::log('File does not exist: ' . $file, LOG_NOTICE);
+		    throw new Exception('File does not exist: ' . $file, LOG_NOTICE);
 		}
 		
 		if ($obj->extract($dest)) {
 		    $result = true;
 		} else {
-			Zre_Log::log('Error extracting file(s): ' . $file, LOG_NOTICE);
+			throw new Exception('Error extracting file(s): ' . $file, LOG_NOTICE);
 		}
 		
 		return $result;

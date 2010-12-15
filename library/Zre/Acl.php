@@ -289,8 +289,8 @@ class Zre_Acl
 		self::$_acl = $acl;
 	}
 	/**
-	 * Checks to see if the current user is allowed the specified priviledge on 
-	 * the specified resource.
+	 * Checks to see if the current user is allowed the specified
+	 * priviledge on the specified resource.
 	 *
 	 * @param string $resource
 	 * @param string $priviledge

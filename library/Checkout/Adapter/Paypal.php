@@ -159,19 +159,19 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 	}
 
 	public function getRequiredFields($options = null) {
-		$credit_card_type	= $paymentData->creditCardType;
-		$credit_card_number	= $paymentData->accountNumber;
-		$expiration_month	= $paymentData->expirationMonth;
-		$expiration_year	= $paymentData->expirationYear;
-		$cvv2			= $paymentData->cvv2;
-		$first_name		= $paymentData->firstName;
-		$last_name		= $paymentData->lastName;
-		$address1		= $paymentData->street1;
-		$address2		= $paymentData->street2;
-		$city			= $paymentData->city;
-		$state			= $paymentData->state;
-		$zip			= $paymentData->postalCode;
-		$country		= $paymentData->country;
+//		$credit_card_type	= $paymentData->creditCardType;
+//		$credit_card_number	= $paymentData->accountNumber;
+//		$expiration_month	= $paymentData->expirationMonth;
+//		$expiration_year	= $paymentData->expirationYear;
+//		$cvv2			= $paymentData->cvv2;
+//		$first_name		= $paymentData->firstName;
+//		$last_name		= $paymentData->lastName;
+//		$address1		= $paymentData->street1;
+//		$address2		= $paymentData->street2;
+//		$city			= $paymentData->city;
+//		$state			= $paymentData->state;
+//		$zip			= $paymentData->postalCode;
+//		$country		= $paymentData->country;
 
 		$us_ccards = array(
 			'Visa'		=> 'Visa',
@@ -233,8 +233,8 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		$thisYear = date('Y');
 		$expYears = array();
 
-		for ($i = 0; $i < 5; $i++) {
-			$expYears[] = $thisYear + $i;
+		for ($i = $thisYear; $i <= ($thisYear + 5); $i++) {
+			$expYears[$i] = $i;
 		}
 
 		$countries = array(
@@ -244,12 +244,12 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 		);
 
 		$values = array(
+			'accountNumber'		=> array(
+							'label' => 'Card Number',
+							'type' => 'text'
+						),
 			'creditCardType'	=> array(
 							'label' => 'Card Type',
-							'type' => $ccard_types
-						),
-			'creditCardNumber'	=> array(
-							'label' => 'Card Number',
 							'type' => $ccard_types
 						),
 			'expirationMonth'	=> array(
@@ -292,7 +292,10 @@ class Checkout_Adapter_Paypal implements Checkout_Adapter_Interface {
 							'label' => 'Zip',
 							'type' => 'text'
 						),
-			'country'		=> $countries,
+			'country'		=> array(
+							'label' => 'Country',
+							'type' => $countries
+						),
 		);
 
 		return $values;

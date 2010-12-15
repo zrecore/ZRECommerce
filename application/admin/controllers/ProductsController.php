@@ -94,7 +94,6 @@ class Admin_ProductsController extends Zend_Controller_Action {
 		$data = null;
 
 		try {
-			$t = Zend_Registry::get('Zend_Translate');
 			$settings = Zre_Config::getSettingsCached();
 
 			$pre = $settings->db->table_name_prepend;
@@ -167,8 +166,11 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$dataset = new Zre_Dataset_Product();
 
 			$product_id = $request->getParam('product_id', null);
-			$description = $request->getParam('description', null);
 			$product_title = $request->getParam('title', null);
+			$published = $request->getParam('published', null);
+			$description = $request->getParam('description', null);
+			$price = $request->getParam('price', null);
+			$allotment = $request->getParam('allotment', null);
 
 			$date = new Zend_Date(null, 'yyyy-MM-dd HH:mm:ss');
 			$date_modified = $date->get('yyyy-MM-dd HH:mm:ss');
@@ -177,8 +179,11 @@ class Admin_ProductsController extends Zend_Controller_Action {
 
 			$updateData = array(
 				'product_id' => $product_id,
-				'description' => $description,
 				'title' => $product_title,
+				'published' => $published,
+				'description' => $description,
+				'price' => $price,
+				'allotment' => $allotment,
 				'date_modified' => $date_modified
 			);
 
@@ -192,6 +197,13 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$reply = array(
 				'result' => 'ok',
 				'product_id' => $product_id,
+				'price' => $record->price,
+				'allotment' => $record->allotment,
+				'pending' => $record->pending,
+				'sold' => $record->sold,
+				'description' => $record->description,
+				'title' => $record->title,
+				'published' => $record->published,
 				'date_modified' => $record->date_modified,
 				'date_created' => $record->date_created,
 				'data' => $result

@@ -68,7 +68,7 @@ class Zre_Dataset_Users extends Zre_Dataset_Abstract
 	 * @param array $data
 	 * @return boolean;
 	 */
-	public static function create( $data )
+	public static function create( $data = null )
 	{
 		$values_users = array();
 		$values_users_profile = array();
@@ -122,7 +122,7 @@ class Zre_Dataset_Users extends Zre_Dataset_Abstract
 	 * @param int $userId
 	 * @return array
 	 */
-	public static function read( $userId )
+	public static function readWithProfile( $userId  )
 	{
     	$data = array();
     	
@@ -153,7 +153,7 @@ class Zre_Dataset_Users extends Zre_Dataset_Abstract
 	 * @param array $data
 	 * @return boolean
 	 */
-	public static function update( $userId, $data )
+	public static function updateWithProfile( $userId, $data )
 	{
 		$values_users = array();
 		$values_users_profile = array();
@@ -218,7 +218,7 @@ class Zre_Dataset_Users extends Zre_Dataset_Abstract
 	 * @param int $userId
 	 * @return array
 	 */
-	public static function delete( $userId )
+	public static function deleteWithProfile( $userId )
 	{	
 		$usersTable = self::getUsersTable();
 		$usersTable->delete( $usersTable->getAdapter()->quoteInto('user_id = ?', $userId) );

@@ -95,6 +95,22 @@ class ShopController extends Zend_Controller_Action {
 		/**
 		 * Flush the cart, redirect to the shop index page.
 		 */
+		Cart::loadSession();
+		
+		$cart = Cart::getCartContainer();
+		echo print_r($cart, true);
+		if (isset($cart) && count($cart->getItems()) > 0) {
+			$productDataset = new Zre_Dataset_Product();
+			foreach($cart->getItems() as $cartItem) {
+				$item = Cart_Container_Item::factory($cartItem);
+
+				$p = $productDataset->read($item->getSku())->current();
+				$p->pending -= $item->getQuantity();
+				$p->save();
+
+				unset($p);
+			}
+		}
 		Cart::flushSession();
 		
 		$this->_redirect('/shop/');
@@ -122,7 +138,6 @@ class ShopController extends Zend_Controller_Action {
 		$productPrice = $product['price'];
 		$productWeight = $product['weight'];
 		$productSize = $product['size'];
-		$productPropertyId = $product['property_id'];
 		
 		/**
 		 * @todo Grab product properties here
@@ -158,12 +173,15 @@ class ShopController extends Zend_Controller_Action {
 			));
 			
 			$productDataset = new Zre_Dataset_Product();
-			$productDataset->update(
-				array(
-					'pending' => $productPending + $productQuantity
-				), 
-				$productId
-			);
+//			$productDataset->update(
+//				array(
+//					'pending' => $productPending + $productQuantity
+//				),
+//				$productId
+//			);
+			$p = $productDataset->read($productId)->current();
+			$p->pending += $productQuantity;
+			$p->save();
 			
 			Cart::setCartContainer($cart);
 			Cart::saveSession();
@@ -188,6 +206,8 @@ class ShopController extends Zend_Controller_Action {
 		$billingSubmitted = $request->getParam('billingSubmitted', null);
 		$cart = Cart::getCartContainer();
 		$p = array();
+
+		Checkout_Payment::setAdapter(new Checkout_Adapter_Cybersource());
 		$fields = Checkout_Payment::getRequiredFields();
 
 		if (count($cart->getItems()) <= 0) $this->_redirect('/shop/checkout-empty');
@@ -199,16 +219,32 @@ class ShopController extends Zend_Controller_Action {
 			
 			foreach($cart->getItems() as $cartItem) {
 				$item = Cart_Container_Item::factory($cartItem);
-				
-				$p[$item->getSku()] = $productDataset->read($item->getSku())->current();
-			}
 
+				$p = $productDataset->read($item->getSku())->current();
+
+				if ($p->pending <= 0) {
+					// ...Something doesn't add up!
+					// ...Don't allow this item.
+
+					$cart->removeItem($p->product_id);
+				}
+
+				unset($p);
+			}
+			
+			Cart::setCartContainer($cart);
+			Cart::saveSession();
+
+			if (count($cart->getItems()) <= 0) {
+				// Emptied cart, no valid items.
+				$this->_redirect('/shop/cart/');
+			}
 			
 			$keys = array_keys($fields);
 			$params = array();
 
 			foreach($keys as $k) {
-				$params[$k] = $request->getParams($k, null);
+				$params[$k] = $request->getParam($k, null);
 			}
 			
 			$isValid = true;
@@ -278,6 +314,7 @@ class ShopController extends Zend_Controller_Action {
 		}
 		
 		if (isset($orderHash) && $orderHash == crypt($orderId, $cryptSalt) ) {
+
 			Cart::flushSession();
 			Cart::saveSession();
 			

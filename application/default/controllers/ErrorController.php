@@ -29,11 +29,17 @@ class ErrorController extends Zend_Controller_Action
     public function errorAction()
     {
         $errors = $this->_getParam('error_handler');
+	$this->view->errorType = $errors->type;
+
         switch ($errors->type) {
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_CONTROLLER:
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ACTION:
                 // 404 error -- controller or action not found                
                 $this->getResponse()->setRawHeader('HTTP/1.1 404 Not Found');
+
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		
                 $this->view->title = 'HTTP/1.1 404 Not Found';
                 break;
             default:

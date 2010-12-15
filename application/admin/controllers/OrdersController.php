@@ -35,7 +35,6 @@ class Admin_OrdersController extends Zend_Controller_Action {
 		{
 //			Zend_Session::rememberUntil( (int)$settings->site->session_timeout );
 		} else {
-			Zre_Log::log(Zre_Acl::isAllowed('administration', 'ALL'), LOG_DEBUG);
 			$this->_redirect('/admin/login', array('exit'=>'true'));
 		}
 		

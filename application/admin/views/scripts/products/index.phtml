@@ -22,7 +22,7 @@ $this->placeholder('title')->set($this->title);
 
 $vars = $this->getVars();
 
-$strStatus	= 'Status';
+$strStatus	= 'Published';
 $strYes		= $this->translate('Yes');
 $strNo		= $this->translate('No');
 $strArchived	= $this->translate('Archived');
@@ -46,28 +46,28 @@ if (isset($vars['content'])) echo $vars['content'];
 					'	<tr class="table-row">' +
 					'		<td>' + row.product_id + '</td>' +
 					'		<td>' + row.title + '</td>' +
-					'		<td>' + row.description + '</td>' +
 					'		<td>' + row.price + '</td>' +
 					'		<td>' + row.allotment + '</td>' +
+					'		<td>' + row.pending + '</td>' +
 					'		<td>' + row.sold + '</td>' +
 					'		<td id="product_status_label_' + row.product_id + '">' + row.published + '</td>' +
 					'	</tr>' +
 					'	<tr class="table-sub-row">' +
 					'		<td colspan="7">' +
 					'			<ul class="text-right no-bullets">' +
-					'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span>' + row.title + '</span></div>' +
-					'				<li><span class="float-box-left">Allotment: </span><span>' + row.allotment + '</span></div>' +
-					'				<li><span class="float-box-left">Price: </span><span>' + row.price + '</span></div>' +
+					'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span><input type="text" class="product-title" id="product_title_' + row.product_id + '" value="' + row.title + '" /></span></div>' +
+					'				<li><span class="float-box-left">Allotment: </span><span><input type="text" class="product-allotment" id="product_allotment_' + row.product_id + '" value="' + row.allotment + '" /></span></div>' +
+					'				<li><span class="float-box-left">Price: </span><span><input type="text" class="product-price" id="product_price_' + row.product_id + '" value="' + row.price + '" /></span></div>' +
 					'				<li>' +
 					'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' +
-					'					<select class="product-status-select" id="product_status_' + row.product_id + '">' +
+					'					<select class="product-published-select" id="product_published_' + row.product_id + '">' +
 					'						<option value="yes"><?php echo $strYes;?></option>' +
 					'						<option value="no"><?php echo $strNo;?></option>' +
 					'						<option value="archived"><?php echo $strArchived;?></option>' +
 					'					</select>' +
 					'				</li>' +
-					'				<li><input type="button" class="product-update-button" id="update_product_' + row.order_id + '" value="<?php echo $strUpdateProduct;?>" /></li>' +
 					'			</ul>' +
+					'			<div class="editor" id="product_description_' + row.product_id + '">' + row.description + '</div>' +
 					'		</td>' +
 					'	</tr>' +
 					'</tbody>'
@@ -77,30 +77,83 @@ if (isset($vars['content'])) echo $vars['content'];
 				$('#frmProducts #product_status_label_' + row.product_id).html(row.status);
 			});
 
-			rebindProductUpdateButtons();
+			rebindProductEditors();
 		}
 
-		function rebindProductUpdateButtons() {
-			$('#frmProducts').find('.product-update-button').click(function(ev){
-				$(this).parent().parent().parent().parent().hide();
-				var productId = $(this).attr('id').replace('update_product_','');
-				var newProductStatus = $('#product_status_' + productId);
+		function rebindProductEditors() {
 
-				$.getJSON(
-				'/admin/products/json-update',
-				{
-					order_id: productId,
-					status: newProductStatus.val()
-				},
-				function(reply) {
-					if (reply.result == 'ok') {
+			$('#frmProducts .table-data .editor').each(function (i, obj) {
+				var content = $(obj).html();
+				$(obj).wymeditor({
+					html: content,
+					postInit: function(wym) {
 
-						$('#frmProducts #product_status_label_' + reply.product_id).html(reply.status);
-					} else {
-						alert(reply.data);
+						//construct the button's html
+						var html = "<li class='wym_tools_newbutton'>"
+							+ "<a name='SaveButton' href='#'"
+							+ " style='background-image:"
+							+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
+							+ "Save"
+							+ "</a></li>";
+
+						//add the button to the tools box
+						jQuery(wym._box)
+							.find(wym._options.toolsSelector + wym._options.toolsListSelector)
+							.prepend(html);
+
+							//handle click event
+							jQuery(wym._box)
+								.find('li.wym_tools_newbutton a').click(function() {
+									//do something
+									var htmlData = wym.html();
+									var product_id = jQuery(this).parent().parent().parent().parent().parent().parent().find('.editor').attr('id').replace('product_description_', '');
+									var product_title = jQuery('#product_title_' + product_id).val();
+									var product_published = $('#product_published_' + product_id).val();
+									var product_allotment = $('#product_allotment_' + product_id).val();
+									var product_price = $('#product_price_' + product_id).val();
+
+									var subRow = $('#product_description_' + product_id).parent().parent();
+									var row = subRow.prev();
+
+									row.find('.product_title').html(product_title);
+
+									jQuery.getJSON(
+										'/admin/products/json-update',
+										{
+											product_id: product_id,
+											description: htmlData,
+											title: product_title,
+											published: product_published,
+											allotment: product_allotment,
+											price: product_price
+										},
+										function (reply) {
+											var responseColor = '';
+											var subRow = $('#product_description_' + reply.product_id).parent().parent();
+											var row = subRow.prev();
+
+											if (reply.result == 'ok') {
+												responseColor = '#0c0';
+												row.find('.product_date_created').html('<div>' + reply.date_created + '</div><div class="small-text">' + reply.date_modified + '</div>');
+												row.find('.product_price').html(reply.price);
+												row.find('.product_allotment').html(reply.allotment);
+											} else {
+												responseColor = '#c00';
+												$('#product_msg_dialog').show().html('<div class="ui-state-error ui-corner-all">' + reply.data + '</div>').delay(5000).fadeOut();
+											}
+											var bgColor = subRow.css('background-color');
+
+											subRow.css('background-color', responseColor);
+											subRow.animate({backgroundColor: bgColor}, 3000, function(){
+												$('#frmProducts').tableSort('load', null);
+											});
+										}
+									);
+
+									return(false);
+								});
 					}
-				}
-			);
+				});
 			});
 		}
 
@@ -134,9 +187,9 @@ if (isset($vars['content'])) echo $vars['content'];
 
 					var product_title = jQuery('#new_product_title').val();
 					var product_image = jQuery('#new_product_image').val();
-					var article_id = jQuery('#new_product_article_id').val();
 					var allotment = jQuery('#new_product_allotment').val();
 					var published = jQuery('#new_product_published').val();
+					var price = jQuery('#new_product_price').val();
 
 					jQuery.getJSON(
 					'/admin/products/json-create',
@@ -144,26 +197,13 @@ if (isset($vars['content'])) echo $vars['content'];
 						description: htmlData,
 						title: product_title,
 						image: product_image,
-						article_id: article_id,
-						allotment: allotment,
-						published: published
+						published: published,
+						price: price,
+						allotment: allotment
 					},
 					function (reply) {
 						if (reply > 0) {
-							jQuery.getJSON(
-							'/admin/products/json-list',
-							{
-								sort: 'date_created',
-								order: 'DESC'
-							},
-							function(response) {
-								renderTable(response);
-
-								jQuery('#new_product_title').val('');
-								jQuery('#new_product_image').val('');
-								wym.html('');
-							}
-						);
+							$('#new_product_description').option('load', renderTable);
 						} else {
 							alert('<?php echo $strInternalError; ?>');
 						}
@@ -174,20 +214,19 @@ if (isset($vars['content'])) echo $vars['content'];
 				});
 			}
 		});
-
-		rebindProductUpdateButtons();
 	});
 </script>
+<div id="product_msg_dialog"></div>
 <form id="frmProducts" action="/admin/products/json.list">
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
-			<th><a href="product_id">ID</a></th>
-			<th><a href="title">Title</a></th>
-			<th><a href="description">Description</a></th>
-			<th><a href="price">Price</a></th>
-			<th><a href="allotment">Left</a></th>
-			<th><a href="sold">Sold</a></th>
-			<th><a href="published">Enabled</a></th>
+			<th><a href="product_id"><?php echo $this->translate('ID'); ?></a></th>
+			<th><a href="title"><?php echo $this->translate('Title'); ?></a></th>
+			<th><a href="price"><?php echo $this->translate('Price'); ?></a></th>
+			<th><a href="allotment"><?php echo $this->translate('Left'); ?></a></th>
+			<th><a href="pending"><?php echo $this->translate('Pending'); ?></a></th>
+			<th><a href="sold"><?php echo $this->translate('Sold'); ?></a></th>
+			<th><a href="published"><?php echo $this->translate('Enabled'); ?></a></th>
 		</tr>
 	</table>
 </form>
@@ -197,19 +236,19 @@ if (isset($vars['content'])) echo $vars['content'];
 <div>
 	<ul class="form-list">
 		<li>
-			<label for="new_product_title"><?php echo $this->translate('Title:'); ?></label>
+			<label for="new_product_title"><?php echo $this->translate('Title'); ?></label>
 			<input type="text" id="new_product_title" value="" />
 		</li>
 		<li>
-			<label for="new_product_image"><?php echo $this->translate('Image:'); ?></label>
+			<label for="new_product_image"><?php echo $this->translate('Image'); ?></label>
 			<input type="text" id="new_product_image" value="/images/dummy.png" />
 		</li>
 		<li>
-			<label for="new_product_allotment"><?php echo $this->translate('Allotment:'); ?></label>
+			<label for="new_product_allotment"><?php echo $this->translate('Allotment'); ?></label>
 			<input type="text" id="new_product_allotment" value="0" />
 		</li>
 		<li>
-			<label for="new_product_article_id"><?php echo $this->translate('Article:'); ?></label>
+			<label for="new_product_article_id"><?php echo $this->translate('Article'); ?></label>
 			<select id="new_product_article_id">
 				<?php
 				if ($this->articles->count() > 0):
@@ -227,12 +266,16 @@ if (isset($vars['content'])) echo $vars['content'];
 			</select>
 		</li>
 		<li>
-			<label for="new_product_published"><?php echo $this->translate('Status:'); ?></label>
+			<label for="new_product_published"><?php echo $this->translate('Published'); ?></label>
 			<select id="new_product_published">
 				<option value="yes"><?php echo $this->translate('Yes');?></option>
 				<option value="no" selected="selected"><?php echo $this->translate('No');?></option>
 				<option value="archived"><?php echo $this->translate('Archived');?></option>
 			</select>
+		</li>
+		<li>
+			<label for="new_product_price"><?php echo $this->translate('Price'); ?></label>
+			<input type="text" id="new_product_price" value="0.00" />
 		</li>
 	</ul>
 	<div id="new_product_description"></div>
