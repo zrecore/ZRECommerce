@@ -7,16 +7,42 @@
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
-		var checkoutAdapter = null;
+		$('#frmCheckoutAdapter').submit(function(ev){
+			ev.preventDefault();
 
-		$('frmCheckoutAdapter')
-		.find('.checkout-adapter')
-		.each(function(i, row) {
-			
+			var selectedAdapter = $(this).find(".checkout-adapter:checked");
+
+			var url = '/admin/settings/config-checkout-ajax';
+			var data = {
+				com: 'set_adapter',
+				adapter: selectedAdapter.val()
+			};
+			$.getJSON(
+				url,
+				data,
+				function (reply) {
+					
+					if (reply.result == 'ok') {
+						var element = $('#checkout_adapters li');
+						var bgColor = element.css('background-color');
+
+						element.css('background-color', '#0a0')
+							.animate(
+								{backgroundColor: bgColor},
+								1000,
+								function(){
+									element.css('background-color', null)
+								}
+							);
+					} else {
+						alert(reply.desc);
+					}
+				}
+			);
 		});
 	});
 </script>
-<form id="frmCheckoutAdapter" action="/admin/settings/json-update/" method="post">
+<form id="frmCheckoutAdapter" action="/admin/settings/config-checkout-ajax/" method="post">
 	<input type="hidden" id="com" value="checkout_adapter" />
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
@@ -24,15 +50,21 @@
 		</tr>
 		<tr class="table-row">
 			<td>
-				<ul class="form-list">
+				<ul class="form-list" id="checkout_adapters">
 					<?php foreach ($this->adapters as $adapter):?>
 					<li>
 						<label><?php echo $this->translate($adapter);?></label>
-						<input type="radio" name="checkout_adapter" class="checkout-adapter" value="<?php echo $adapter;?>" />
+						<input
+							type="radio"
+							name="checkout_adapter"
+							class="checkout-adapter"
+							<?php echo ($this->selectedAdapter == $adapter ? 'checked="checked"' : '') ?>
+							value="<?php echo $adapter;?>" />
 					</li>
 					<?php endforeach;?>
 				</ul>
 			</td>
 		</tr>
 	</table>
+	<input type="submit" value="Save" />
 </form>

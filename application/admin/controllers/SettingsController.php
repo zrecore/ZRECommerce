@@ -61,6 +61,10 @@ class Admin_SettingsController extends Zend_Controller_Action
 	public function checkoutAction() {
 		$t = Zend_Registry::get('Zend_Translate');
 		$this->view->title = $t->_('Checkout');
+		$settings = Zre_Config::getSettingsCached();
+
+		$adapter = (string)$settings->merchant->adapter;
+		$this->view->selectedAdapter = $adapter;
 
 		// ...Get list of adapters
 		$dir = BASE_PATH . '/library/Checkout/Adapter/';
@@ -283,44 +287,10 @@ class Admin_SettingsController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		
 		//@todo - This should probably be a define or something instead of hardcoded in two places
-		$settingsPath = realpath(APPLICATION_PATH . '/settings/environment/settings.xml');;
-//		$object = simplexml_load_file($settingsPath);
-//
-//		$formSettingsClass = new Zre_Ui_Form_Settings($object, true);
-//		$form = $formSettingsClass->getFormObject();
-//		$formValues = $this->getRequest()->getParams();
-
+		$settingsPath = realpath(APPLICATION_PATH . '/settings/environment/settings.xml');
+		
 		$xmlString = Zre_File::read($settingsPath);
 		$this->view->xml_string = $xmlString;
-		
-//		if (isset($xmlString)) {
-//
-//		    if($form->isValid($formValues)) {
-//
-//			unset($formValues['Submit']);
-//			unset($formValues['is_submitted']);
-//			unset($formValues['action']);
-//			unset($formValues['controller']);
-//			unset($formValues['module']);
-//
-//			$config = new Zend_Config($formValues, true);
-//			$config->setExtend('dev', 'production');
-//
-//			Zre_Config::saveSettings($config, $settingsPath);
-//			Zre_Config::flush();
-//			Zre_Config::loadSettings($settingsPath, false);
-//
-//			$this->view->assign('content', '<div class="ok">'.$t->_('Ok:').' '. $t->_('Your new settings have been saved.') .'</div>'. str_pad('', 48, '<br />'));
-//			$form = null;
-//
-//
-//		    }
-//		    else {
-//			//Do nothing right now
-//		    }
-//		}
-//
-//		$this->view->form = $form;
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
@@ -355,6 +325,53 @@ class Admin_SettingsController extends Zend_Controller_Action
 				'desc' => (string) $e
 			);
 		}
+		$this->_helper->json($reply, true);
+	}
+
+	public function configCheckoutAjaxAction() {
+		try {
+			$request = $this->getRequest();
+			$reply = null;
+
+			$settingsPath = realpath(APPLICATION_PATH . '/settings/environment/settings.xml');
+
+			$com = $request->getParam('com', null);
+
+			switch ($com) {
+				case 'set_adapter':
+					$selectedAdapter = $request->getParam('adapter');
+					$xml = Zre_File::read($settingsPath);
+					
+					$config = new Zend_Config_Xml($xml, null, true);
+					$config = Zre_Config::parseSettings($config, $config->runmode);
+					
+					$runMode = $config->runmode->use;
+
+					$config->{$runMode}->merchant->adapter = $selectedAdapter;
+
+					Zre_Config::saveSettings($config, $settingsPath);
+					Zre_Config::loadSettings($settingsPath, true);
+					$reply = array(
+						'result' => 'ok',
+						'desc' => 1
+					);
+
+					break;
+				default:
+					$reply = array(
+						'result' => 'error',
+						'desc' => 'No command specified.'
+					);
+					break;
+			}
+
+		} catch (Exception $e) {
+			$reply = array(
+				'result' => 'error',
+				'desc' => (string) $e
+			);
+		}
+
 		$this->_helper->json($reply, true);
 	}
 	

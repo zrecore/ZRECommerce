@@ -88,6 +88,7 @@ require_once 'Zend/Session/Namespace.php';
 			 * Fill in each merchant entry with relevant info, such as merchant id, etc...
 			 */
 			$config->dev->merchant = array();
+			$config->dev->merchant->adapter = 'Cybersource';
 			$config->dev->merchant->google = array();
 			$config->dev->merchant->google->merchant_id = '000000000000000';
 			$config->dev->merchant->google->merchant_key = 'ffffffffffffffffffffff';
@@ -117,6 +118,7 @@ require_once 'Zend/Session/Namespace.php';
 			 * Fill in each merchant entry with relevant info, such as merchant id, etc...
 			 */
 			$config->production->merchant = array();
+			$config->production->merchant->adapter = 'Cybersource';
 			$config->production->merchant->google = array();
 			$config->production->merchant->google->merchant_id = '000000000000000';
 			$config->production->merchant->google->merchant_key = 'ffffffffffffffffffffff';

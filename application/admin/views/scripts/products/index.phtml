@@ -203,7 +203,7 @@ if (isset($vars['content'])) echo $vars['content'];
 					},
 					function (reply) {
 						if (reply > 0) {
-							$('#new_product_description').option('load', renderTable);
+							$('#new_product_description').tableSort('load', renderTable);
 						} else {
 							alert('<?php echo $strInternalError; ?>');
 						}

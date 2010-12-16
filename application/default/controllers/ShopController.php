@@ -32,7 +32,6 @@ class ShopController extends Zend_Controller_Action {
 	 * The default action - show the product listing page
 	 */
 	public function indexAction() {
-
 		$this->view->assign('disable_cache', 1);
 		$this->view->assign('params', $this->getRequest()->getParams());
 		
@@ -207,7 +206,13 @@ class ShopController extends Zend_Controller_Action {
 		$cart = Cart::getCartContainer();
 		$p = array();
 
-		Checkout_Payment::setAdapter(new Checkout_Adapter_Cybersource());
+		$adapter = isset($settings->merchant->adapter) ?
+				$settings->merchant->adapter :
+				'Cybersource';
+		$adapterClass = 'Checkout_Adapter_' . $adapter;
+		
+		Checkout_Payment::setAdapter(new $adapterClass);
+		
 		$fields = Checkout_Payment::getRequiredFields();
 
 		if (count($cart->getItems()) <= 0) $this->_redirect('/shop/checkout-empty');
