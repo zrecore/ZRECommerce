@@ -53,8 +53,6 @@ class Admin_SettingsController extends Zend_Controller_Action
 		$t = Zend_Registry::get('Zend_Translate');
 		$this->view->title = $t->_('Settings');
 
-//		$this->view->settingsXml =
-
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
 		
@@ -100,7 +98,8 @@ class Admin_SettingsController extends Zend_Controller_Action
 		/**
 		 * Article count
 		 */
-		$articleCount = $articles->listAll(
+		// ...Published article count.
+		$publishedArticleCount = $articles->listAll(
 			array(
 				'published' => 'yes'
 			),
@@ -113,11 +112,44 @@ class Admin_SettingsController extends Zend_Controller_Action
 			false
 		)->current();
 
-		$this->view->articleCount = $articleCount;
+		$this->view->publishedArticleCount = $publishedArticleCount;
+
+		// ...Non-published article count.
+		$notPublishedArticleCount = $articles->listAll(
+			array(
+				'published' => 'no'
+			),
+			array(
+				'from' => array(
+					'name' => array('a' => $pre . 'article'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->notPublishedArticleCount = $notPublishedArticleCount;
+
+		// ...Archived article count.
+		$archivedArticleCount = $articles->listAll(
+			array(
+				'published' => 'archived'
+			),
+			array(
+				'from' => array(
+					'name' => array('a' => $pre . 'article'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->archivedArticleCount = $archivedArticleCount;
 
 		/**
 		 * Product count
 		 */
+		// ...Published product count.
 		$productCount = $products->listAll(
 			array(
 				'published' => 'yes'

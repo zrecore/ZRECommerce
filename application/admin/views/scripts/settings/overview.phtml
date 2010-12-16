@@ -4,7 +4,10 @@
  * and open the template in the editor.
  */
 
-$articleCount = $this->articleCount->total;
+$publishedArticleCount = $this->publishedArticleCount->total;
+$notPublishedArticleCount = $this->notPublishedArticleCount->total;
+$archivedArticleCount = $this->archivedArticleCount->total;
+
 $productCount = $this->productCount->total;
 
 $completeOrderCount		= $this->completeOrderCount->total;
@@ -29,7 +32,13 @@ $pendingOrderCount		= $this->pendingOrderCount->total;
 
 				<ul class="form-list">
 					<li>
-						<p><?php echo $this->translate('Published') ?>: <?php echo $articleCount;?></p>
+						<p><?php echo $this->translate('Published') ?>: <?php echo $publishedArticleCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Not Published') ?>: <?php echo $notPublishedArticleCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Archived') ?>: <?php echo $archivedArticleCount;?></p>
 					</li>
 				</ul>
 			</td>
