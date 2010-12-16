@@ -26,8 +26,8 @@ interface Checkout_Adapter_Interface {
 	public function getOptionalFields($options = null);
 	/**
 	 * 
-	 * @param <type> $data The data to process
-	 * @param <type> $options Additional array of options
+	 * @param array $data The data to process
+	 * @param array $options Additional array of options
 	 */
 	public function postProcess($data, $options = null);
 }

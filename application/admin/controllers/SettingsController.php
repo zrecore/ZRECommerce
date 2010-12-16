@@ -53,27 +53,194 @@ class Admin_SettingsController extends Zend_Controller_Action
 		$t = Zend_Registry::get('Zend_Translate');
 		$this->view->title = $t->_('Settings');
 
-		$this->view->settingsXml =
+//		$this->view->settingsXml =
 
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
 		
 	}
 
+	public function checkoutAction() {
+		$t = Zend_Registry::get('Zend_Translate');
+		$this->view->title = $t->_('Checkout');
+
+		// ...Get list of adapters
+		$dir = BASE_PATH . '/library/Checkout/Adapter/';
+		$files = Zre_File::ls($dir);
+		
+		$adapters = array();
+		foreach($files as $file) {
+			
+			if (file_exists($dir . $file . '.php')) {
+				$info = pathinfo($dir . $file . '.php');
+				
+				if ($info['extension'] == 'php' && $info['filename'] != 'Interface') {
+					$adapters[] = $info['filename'];
+				}
+				unset($info);
+			}
+		}
+
+		$this->view->adapters = $adapters;
+
+		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
+		Zre_Registry_Session::save();
+	}
+
 	public function overviewAction()
 	{
 		// ..Grab our statistical and status data
+		$settings = Zre_Config::getSettingsCached();
+		$pre = $settings->db->table_name_prepend;
 
 		$articles = new Zre_Dataset_Article();
 		$products = new Zre_Dataset_Product();
 		$orders = new Zre_Dataset_Orders();
 
-		$articles->listAll(
+		/**
+		 * Article count
+		 */
+		$articleCount = $articles->listAll(
 			array(
-				''
+				'published' => 'yes'
 			),
-			array()
-		);
+			array(
+				'from' => array(
+					'name' => array('a' => $pre . 'article'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->articleCount = $articleCount;
+
+		/**
+		 * Product count
+		 */
+		$productCount = $products->listAll(
+			array(
+				'published' => 'yes'
+			),
+			array(
+				'from' => array(
+					'name' => array('p' => $pre . 'product'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+
+		$this->view->productCount = $productCount;
+
+		/**
+		 * Order count
+		 */
+		$pendingOrderCount = $orders->listAll(
+			array(
+				'status' => 'pending'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->pendingOrderCount = $pendingOrderCount;
+
+		$shippedOrderCount = $orders->listAll(
+			array(
+				'status' => 'shipped'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->shippedOrderCount = $shippedOrderCount;
+
+		$voidOrderCount = $orders->listAll(
+			array(
+				'status' => 'void'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->voidOrderCount = $voidOrderCount;
+
+		$exchangedOrderCount = $orders->listAll(
+			array(
+				'status' => 'exchanged'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->exchangedOrderCount = $exchangedOrderCount;
+
+		$refundedOrderCount = $orders->listAll(
+			array(
+				'status' => 'refunded'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->refundedOrderCount = $refundedOrderCount;
+
+		$awaitingReturnOrderCount = $orders->listAll(
+			array(
+				'status' => 'awaiting_return'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->awaitingReturnOrderCount = $awaitingReturnOrderCount;
+
+		$completeOrderCount = $orders->listAll(
+			array(
+				'status' => 'complete'
+			),
+			array(
+				'from' => array(
+					'name' => array('o' => $pre . 'orders'),
+					'cols' => array('total' => new Zend_Db_Expr('COUNT(*)'))
+				)
+			),
+			false
+		)->current();
+
+		$this->view->completeOrderCount = $completeOrderCount;
 	}
 	
 	public function configAction()

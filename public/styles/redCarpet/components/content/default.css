@@ -85,7 +85,7 @@ legend
 { color: #000 !important; }
 
 .form-list 
-{border: solid 1px #aaa; text-align: right;}
+{border: solid 1px #aaa; text-align: right; vertical-align: top;}
 
 .form-list li 
 {list-style-type: none; padding: 0; margin: 0; text-align: right; background-color: #fff;}
@@ -109,7 +109,7 @@ legend
 {background-color: #fff;}
 
 .table-data .table-row td
-{padding: 0.4em; cursor: pointer; background-color: #ddd; border-bottom: solid 1px #999;}
+{padding: 0.4em; cursor: pointer; background-color: #ddd; border-bottom: solid 1px #999; vertical-align: top;}
 
 .table-data .table-sub-row
 {display: none; padding: 0.8em; background-color: #fff;}

@@ -1,0 +1,38 @@
+<?php
+/* 
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		var checkoutAdapter = null;
+
+		$('frmCheckoutAdapter')
+		.find('.checkout-adapter')
+		.each(function(i, row) {
+			
+		});
+	});
+</script>
+<form id="frmCheckoutAdapter" action="/admin/settings/json-update/" method="post">
+	<input type="hidden" id="com" value="checkout_adapter" />
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th><?php echo $this->translate('Select the adapter that will handle payments');?></th>
+		</tr>
+		<tr class="table-row">
+			<td>
+				<ul class="form-list">
+					<?php foreach ($this->adapters as $adapter):?>
+					<li>
+						<label><?php echo $this->translate($adapter);?></label>
+						<input type="radio" name="checkout_adapter" class="checkout-adapter" value="<?php echo $adapter;?>" />
+					</li>
+					<?php endforeach;?>
+				</ul>
+			</td>
+		</tr>
+	</table>
+</form>

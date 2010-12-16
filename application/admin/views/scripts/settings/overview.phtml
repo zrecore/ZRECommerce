@@ -4,4 +4,69 @@
  * and open the template in the editor.
  */
 
+$articleCount = $this->articleCount->total;
+$productCount = $this->productCount->total;
+
+$completeOrderCount		= $this->completeOrderCount->total;
+$awaitingReturnOrderCount	= $this->awaitingReturnOrderCount->total;
+$refundedOrderCount		= $this->refundedOrderCount->total;
+$exchangedOrderCount		= $this->exchangedOrderCount->total;
+$voidOrderCount			= $this->voidOrderCount->total;
+$shippedOrderCount		= $this->shippedOrderCount->total;
+$pendingOrderCount		= $this->pendingOrderCount->total;
+
 ?>
+
+<div>
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th>Articles</th>
+			<th>Products</th>
+			<th>Orders</th>
+		</tr>
+		<tr class="table-row">
+			<td>
+
+				<ul class="form-list">
+					<li>
+						<p><?php echo $this->translate('Published') ?>: <?php echo $articleCount;?></p>
+					</li>
+				</ul>
+			</td>
+			<td>
+
+				<ul class="form-list">
+					<li>
+						<p><?php echo $this->translate('Published') ?>: <?php echo $productCount;?></p>
+					</li>
+				</ul>
+			</td>
+			<td>
+
+				<ul class="form-list">
+					<li>
+						<p><?php echo $this->translate('Complete') ?>: <?php echo $completeOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Awaiting Return') ?>: <?php echo $awaitingReturnOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Refunded') ?>: <?php echo $refundedOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Exchanged') ?>: <?php echo $exchangedOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Void') ?>: <?php echo $voidOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Shipped') ?>: <?php echo $shippedOrderCount;?></p>
+					</li>
+					<li>
+						<p><?php echo $this->translate('Pending') ?>: <?php echo $pendingOrderCount;?></p>
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+</div>
