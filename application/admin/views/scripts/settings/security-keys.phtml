@@ -1,0 +1,65 @@
+<?php
+
+$salt = $this->cryptographicSalt;
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		$('#frmCryptographicSalt').submit(function(ev){
+			ev.preventDefault();
+
+			var cryptographicSalt = $(this).find('.cryptographic-salt');
+			var url = '/admin/settings/config-security-keys-ajax/';
+			var data = {
+				com: 'set_salt',
+				salt: cryptographicSalt.val()
+			};
+
+			$.getJSON(
+				url,
+				data,
+				function(reply) {
+                                
+					if (reply.result == 'ok') {
+						var form = $('#frmCryptographicSalt');
+						var li = form.find('.form-list li');
+						var bgColor = li.css('background-color');
+						
+						li
+						.css('background-color', '#0a0')
+						.animate(
+							{
+								backgroundColor: bgColor
+							},
+							1000,
+							function(){
+								li.css('background-color', null);
+							}
+
+						);
+
+					} else {
+						alert(reply.desc);
+					}
+				}
+			);
+		});
+	});
+</script>
+<form id="frmCryptographicSalt" method="post" action="#">
+	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+		<tr class="table-header">
+			<th><?php echo $this->translate('Password Salt'); ?></th>
+		</tr>
+		<tr class="table-row">
+			<td>
+				<ul class="form-list">
+					<li>
+						<label><?php echo $this->translate('Salt');?></label>
+						<input class="cryptographic-salt" type="text" value="<?php echo isset($salt) ? $salt : '';?>" />
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<input type="submit" value="Save" />
+</form>

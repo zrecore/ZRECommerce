@@ -27,8 +27,7 @@ if (isset($vars['content'])) echo $vars['content'];
 	 * type here.
 	 * 
 	 */
-	$articles = new Zre_Dataset_Article();
-	$articleData = $articles->listAll(null, array('order' => 'date_created DESC'), true);
+	$articleData = $this->articles;
 //	$readArticle = new Zre_Ui_Datagrid_Read(1, 'yes', 'home');
 //	
 //	$articleData = $readArticle->getData();

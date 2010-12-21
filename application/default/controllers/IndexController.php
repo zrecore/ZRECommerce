@@ -34,23 +34,25 @@ class IndexController extends Zend_Controller_Action {
 	public function indexAction() {
 		$this->view->assign('disable_cache', 1); // Disable caching for this view?
 
-		$content = new Zre_Ui_Datagrid_Read();
-		$output = $content->__toString();
-
-		$this->view->assign('content', $output);
 		$cssBase = substr( Zre_Template::baseCssTemplateUrl(), 1 );
 
 		$this->view->assign('extra_css', array( $cssBase . '/components/content/article.css' ));
 
+                $articles = new Zre_Dataset_Article();
+                $articleData = $articles->listAll(
+                        array(
+                            'published' => 'yes'
+                        ),
+                        array(
+                            'order' => 'date_created DESC'
+                        ),
+                        true
+                );
+
+                $this->view->articles = $articleData;
+                
 		Zre_Registry_Session::set('selectedMenuItem', 'Home');
 		Zre_Registry_Session::save();
 	}
 
-	public function testAction() {
-		echo "<pre>";
-		$db = Zend_Db_Table::getDefaultAdapter();
-		var_export($db->describeTable('zre_orders'));
-		echo "</pre>";
-		exit;
-	}
 }

@@ -32,7 +32,6 @@ class ShopController extends Zend_Controller_Action {
 	 * The default action - show the product listing page
 	 */
 	public function indexAction() {
-		$this->view->assign('disable_cache', 1);
 		$this->view->assign('params', $this->getRequest()->getParams());
 		
 		$cssBase = substr( Zre_Template::baseCssTemplateUrl(), 1 );
@@ -47,9 +46,6 @@ class ShopController extends Zend_Controller_Action {
 	 *
 	 */
 	public function productAction() {
-		
-		$this->view->assign('disable_cache', 1);
-		$this->view->assign('enable_jquery', 1);
 		
 		$cssBase = substr( Zre_Template::baseCssTemplateUrl(), 1 );
 		
@@ -67,7 +63,6 @@ class ShopController extends Zend_Controller_Action {
 	
 	public function cartAction() {
 		
-		$this->view->assign('disable_cache', 1);
 		$this->view->assign('params', $this->getRequest()->getParams());
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Shop');
@@ -75,7 +70,6 @@ class ShopController extends Zend_Controller_Action {
 	}
 	
 	public function updateAction() {
-		$this->view->assign('disable_cache', 1);
 		$this->_helper->layout->disableLayout();
 		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
 		
@@ -87,7 +81,6 @@ class ShopController extends Zend_Controller_Action {
 	}
 	
 	public function flushAction() {
-		$this->view->assign('disable_cache', 1);
 		$this->_helper->layout->disableLayout();
 		$this->_helper->getExistingHelper('ViewRenderer')->setNoRender(true);
 		
@@ -172,12 +165,7 @@ class ShopController extends Zend_Controller_Action {
 			));
 			
 			$productDataset = new Zre_Dataset_Product();
-//			$productDataset->update(
-//				array(
-//					'pending' => $productPending + $productQuantity
-//				),
-//				$productId
-//			);
+
 			$p = $productDataset->read($productId)->current();
 			$p->pending += $productQuantity;
 			$p->save();
@@ -305,9 +293,12 @@ class ShopController extends Zend_Controller_Action {
 		$isLoaded = Cart::loadSession();
 		
 		if (!$isLoaded) $this->_redirect('/shop', array('exit' => true));
-		
+		$settings = Zre_Config::getSettingsCached();
+
 		$request = $this->getRequest();
-		$cryptSalt = 'salty.Pop!c0rN';
+		$cryptSalt = isset($settings->site->cryptographicSalt) ?
+					$settings->site->cryptographicSalt :
+					'salty.Pop!c0rN';
 		
 		$cart = Cart::getCartContainer();
 		

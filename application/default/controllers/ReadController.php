@@ -39,8 +39,6 @@ class ReadController extends Zend_Controller_Action {
 		$node_id = $this->getRequest()->getParam('id');
 		if (!isset($node_id)) $node_id = 0;
 		
-		$output = new Zre_Ui_Datagrid_Read();
-		$this->view->assign('content', $output->__toString() );
 		$this->view->assign('params', $this->getRequest()->getParams());
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Read');
@@ -74,7 +72,7 @@ class ReadController extends Zend_Controller_Action {
 			$records = $article->read( $id );
 			
 			// ...Is this a valid record?
-			if ($records->count() > 0) {
+			if ($records->count() > 0 && $records->current()->published == 'yes') {
 				$data = $records->current()->toArray();
 				$this->view->data = $data;
 			} else {

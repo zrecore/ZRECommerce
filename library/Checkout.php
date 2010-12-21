@@ -1,8 +1,7 @@
 <?php
+/**
+ * Add static methods here.
+ */
 class Checkout {
-	private $_adapter;
-	
-	public static function getInstance() {
 		
-	}	
 }

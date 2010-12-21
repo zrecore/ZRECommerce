@@ -536,6 +536,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			$article_id = $request->getParam('article_id', null);
 			$description = $request->getParam('description', null);
 			$article_title = $request->getParam('title', null);
+			$published = $request->getParam('published');
 			
 			$date = new Zend_Date(null, 'yyyy-MM-dd HH:mm:ss');
 			$date_modified = $date->get('yyyy-MM-dd HH:mm:ss');
@@ -546,7 +547,8 @@ class Admin_ArticlesController extends Zend_Controller_Action
 				'article_id' => $article_id,
 				'description' => $description,
 				'title' => $article_title,
-				'date_modified' => $date_modified
+				'date_modified' => $date_modified,
+				'published' => $published
 			);
 			
 			$dataset = new Zre_Dataset_Article();

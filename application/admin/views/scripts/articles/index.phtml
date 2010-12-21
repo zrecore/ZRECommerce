@@ -64,6 +64,9 @@ $strInternalError = $this->translate('Internal error.');
 	jQuery(document).ready(function($){
 		function renderTable(response)
 		{
+			var strYes = '<?php echo $this->translate('Yes');?>';
+			var strNo = '<?php echo $this->translate('No');?>';
+			var strArchived = '<?php echo $this->translate('Archived');?>';
 			// Clear out the existing HTML table data.
 			$('#frmArticles .table-data .table-body').remove();
 
@@ -78,7 +81,12 @@ $strInternalError = $this->translate('Internal error.');
 					'	</tr>' +
 					'	<tr class="table-sub-row">'  +
 					'		<td colspan="2">' +
-					'			<div><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></div>' + 
+					'			<div><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></div>' +
+					'			<div><label>' + '<?php echo $this->translate('Published'); ?>' + '</label><select id="article_published_' + row.article_id + '">' +
+					'				<option value="yes"' + (row.published == 'yes' ? 'selected="selected"' : '') + '>' + strYes +'</option>' +
+					'				<option value="no"' + (row.published == 'no' ? 'selected="selected"' : '') + '>' + strNo +'</option>' +
+					'				<option value="archived"' + (row.published == 'archived' ? 'selected="selected"' : '') + '>' + strArchived +'</option>' +
+					'			</select></div>' +
 					'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' +
 					'			<div class="article_image" id="article_image_' + row.article_id + '"><img src="' + row.image + '" alt="[' + row.title + ']" /></div>' +
 					'		</td>' + 
@@ -118,6 +126,7 @@ $strInternalError = $this->translate('Internal error.');
 									var htmlData = wym.html();
 									var article_id = jQuery(this).parent().parent().parent().parent().parent().parent().find('.editor').attr('id').replace('article_description_', '');
 									var article_title = jQuery('#article_title_' + article_id).val();
+									var article_published = jQuery('#article_published_' + article_id).val();
 
 									var subRow = $('#article_description_' + article_id).parent().parent();
 									var row = subRow.prev();
@@ -129,7 +138,8 @@ $strInternalError = $this->translate('Internal error.');
 										{
 											article_id: article_id,
 											description: htmlData,
-											title: article_title
+											title: article_title,
+											published: article_published
 										},
 										function (reply) {
 											var responseColor = '';

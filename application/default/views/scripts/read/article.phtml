@@ -35,7 +35,10 @@ if (isset($this->content)) echo $this->content;
 	$articleImage 		= $articleData['image'];
 	
 	if (!$articleImage) $articleImage = '/images/dummy.png';
-	
+
+        /**
+         * @todo this should really be generated in the admin area.
+         */
 	$titleSlug = Zre_Template::createSlug($articleTitle);
 ?>
 <div class="articleContainer">

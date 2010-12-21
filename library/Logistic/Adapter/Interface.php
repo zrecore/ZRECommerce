@@ -3,18 +3,12 @@
 interface Logistic_Adapter_Interface {
 	/**
 	 * Calculate the logistical cost of all items
-	 * @param Cart_Container The cart to calculate.
-	 * @return float The total.
+	 * @param Cart_Container $cartContainer The cart to calculate.
+         * @param array|null $options Additional options, if any.
+	 * @return array The totals for each item.
 	 */
-	public function calculate(Cart_Container $cartContainer);
-	/**
-	 * Charge the logistical cost using the specified logistic data.
-	 * @param Cart_Container $cartContainer The items to calculate for.
-	 * @param mixed $logisticData
-	 * @return mixed Return data on success, or null on failure.
-	 */
-	public function pay(Cart_Container $cartContainer, $logisticData);
-
+	public function calculate(Cart_Container $cartContainer, $options = null);
+	
 	/**
 	 * Get the list of required fields for this adapter.
 	 * @param array|null $options The array of required fields.

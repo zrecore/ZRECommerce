@@ -44,7 +44,9 @@ echo $this->form;
 	
 	$where = null;
 	if (isset($categoryParentId)) {
-		$where = array('parent_id' => $categoryParentId);
+		$where = array(
+                    'parent_id' => $categoryParentId
+                );
 	}
 	$categories = $articleContainer->listAll( $where );
 ?>
@@ -52,9 +54,9 @@ echo $this->form;
 <?php 
 //$readArticle = new Zre_Ui_Datagrid_Read($categoryParentId, 'yes', null);
 	if (isset($categoryParentId)) {
-		$readArticle = $article->listAll( array('article_container_id' => $categoryParentId) );
+		$readArticle = $article->listAll( array('article_container_id' => $categoryParentId, 'published' => 'yes') );
 	} else {
-		$readArticle = $article->listAll();
+		$readArticle = $article->listAll( array('published' => 'yes') );
 	}
 	
 	foreach($readArticle as $index => $a) {
