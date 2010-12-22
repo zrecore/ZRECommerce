@@ -54,205 +54,205 @@ class Admin_ArticlesController extends Zend_Controller_Action
 	{
 		$this->view->title = 'Articles';
 	}
-	/**
-	 * Create a new article
-	 */
-	public function newAction()
-	{
-		if (!Zre_Acl::isAllowed('articles', 'new')) {
-			$this->_redirect('/admin/', array('exit'=>'true'));
-		}
-		// Create a new article
-		$this->view->title = 'New article';
-		
-		$this->view->assign('enable_dojo', 	true);
-		$this->view->assign('enable_jquery', 1);
-		
-		$this->view->assign('extra_jquery_css', array("scripts/jquery/jqueryFileTree/jqueryFileTree.css"));
-		
-		$form = new Zre_Ui_Form_Article();
-		
-		$is_submitted = $this->getRequest()->getParam('is_submitted', false);
-		// ... Is the form submitted?
-		if ($is_submitted == true) {
-			$is_valid = $form->isValid($this->getRequest()->getParams());
-			
-			if ($is_valid)
-			{
-				$values = $form->getValues();
-				$article = new Zre_Dataset_Article();
-				$article->create( $values );
-				
-				$this->_redirect('/admin/articles/');
-			}
-		}
-		// ...Set our form.
-		$this->view->form = $form;
-		
-	}
-	/**
-	 * Edit an existing article
-	 */
-	public function editAction() 
-	{
-		$article = new Zre_Dataset_Article();
-		
-		if (Zre_Acl::isAllowed('articles', 'update')) {
-			// @todo ArticlesController::newAction() Creates a new article
-			$this->view->title = 'Edit article';
-			
-			$this->view->assign('enable_dojo', 	1);
-			$this->view->assign('enable_jquery', 1);
-			
-			$this->view->assign('extra_jquery_css', array("scripts/jquery/jqueryFileTree/jqueryFileTree.css"));
-			$this->view->assign('params', $this->getRequest()->getParams());
-			// See if we have any listing parameters.
-			$params = '';
-			
-			$start_index = $this->getRequest()->getParam('start_index');
-			$max_per_page = $this->getRequest()->getParam('max_per_page');
-			
-			$params_array = array( 
-				'start_index' => isset($start_index)?$start_index:0, 
-				'max_per_page' => $max_per_page?$max_per_page:10
-			);
-			
-			// Grab our key/value POST vars, for use with our datagrid links.
-			foreach($params_array as $key => $value)
-			{
-				$params .= '/'.$key . '/' . $value;
-			}
-	    	$url_params = $params;
-	    	$this->view->assign('url_params', 	$url_params);
-	    	$this->view->assign('start_index', 	$params_array['start_index']);
-	    	$this->view->assign('max_per_page', $params_array['max_per_page']);
-	    	
-			$form = new Zre_Ui_Form_Article(null, '/admin/articles/index'.$url_params);
-			
-			$form->setAction('/admin/articles/edit/');
-			
-			$is_submitted = $this->getRequest()->getParam('is_submitted');
-			
-			// ... Is the form submitted?
-			if ($is_submitted == true) {
-				$is_valid = $form->isValid($this->getRequest()->getParams());
-				
-				if ($is_valid == true)
-				{
-					$values = $this->getRequest()->getParams();
-					$article->update( $values );
-					
-					// See if we have any listing parameters.
-					$params = '';
-					
-					$start_index = $this->getRequest()->getParam('start_index');
-					$max_per_page = $this->getRequest()->getParam('max_per_page');
-					
-					$params_array = array( 
-						'start_index' => isset($start_index) ? $start_index : 0, 
-						'max_per_page' => $max_per_page ? $max_per_page : 10
-					);
-					
-					// Grab our key/value POST vars, for use with our datagrid links.
-					foreach($params_array as $key => $value)
-					{
-						$params .= '/'.$key . '/' . $value;
-					}
-			    	$url_params = $params;
-			    	$this->view->assign('url_params', 	$url_params);
-			    	$this->view->assign('start_index', 	$params_array['start_index']);
-			    	$this->view->assign('max_per_page', $params_array['max_per_page']);
-			    	
-					$this->_redirect('/admin/articles/');
-				}
-			} else {
-				
-				// Not submitted... load up default values if an article is specified
-				$values = $article->read( $this->getRequest()->getParam('id') );
-				
-				$values['description'] = stripcslashes( $values['description'] );
-				
-				$form->populate($values);
-			}
-			
-			// ...Set our form.
-			$this->view->form = $form;
-		} else {
-			$this->_redirect('/admin/', array('exit'=>'true'));
-		}
-	}
-	/**
-	 * Remove an existing article
-	 */
-	public function removeAction()
-	{
-		if (Zre_Acl::isAllowed('articles', 'remove')) {
-			// Remove an article, after user has confirmed this action.
-			$this->view->title = 'Remove article';
-			
-			$t = Zend_Registry::get('Zend_Translate');
-			
-			$node_id = $this->getRequest()->getParam('node_id');
-			
-			// See if we have any listing parameters.
-			$params = '';
-			
-			$start_index = $this->getRequest()->getParam('start_index');
-			$max_per_page = $this->getRequest()->getParam('max_per_page');
-			
-			$params_array = array( 
-				'start_index' => isset($start_index)?$start_index:0, 
-				'max_per_page' => $max_per_page?$max_per_page:10
-			);
-			
-			// Grab our key/value POST vars, for use with our datagrid links.
-			foreach($params_array as $key => $value)
-			{
-				$params .= '/'.$key . '/' . $value;
-			}
-	    	$url_params = $params;
-	    	$this->view->assign('url_params', 	$url_params);
-	    	$this->view->assign('start_index', 	$params_array['start_index']);
-	    	$this->view->assign('max_per_page', $params_array['max_per_page']);
-			
-			$form = new Zre_Ui_Form_Dialog_YesNoAbort();
-			$form->setAction('/admin/articles/remove/node_id/'.$node_id);
-			
-			$is_submitted = $this->getRequest()->getParam('is_submitted');
-			
-			// Prompt the user for a confirmation.
-			if ( $is_submitted == true && isset($node_id) )
-			{
-				$values = $this->getRequest()->getParams();
-				
-				switch($values['yes_no_abort'])
-				{
-					case 'yes':
-						
-						$form = null;
-						Zre_Dataset_Article::delete( $node_id );
-						$this->view->assign('content', '<div class="ok">' . $t->_('Ok:') . ' ' . $t->_('Update complete.') . '</div>');
-						
-						break;
-					case 'no':
-						
-						$form = null;
-						$this->view->assign('content', '<div><b>' . $t->_('Cancelled:') . '</b> ' . $t->_('No update was performed.') . '</div>');
-						
-						break;
-					case 'abort':	// This case statement intentionally left blank.
-					default:
-						$this->_redirect('/admin/articles/');
-						break;
-				}
-				
-			}
-			
-			$this->view->form = $form;
-		} else {
-			$this->_redirect('/admin/', array('exit'=>'true'));
-		}
-	}
+//	/**
+//	 * Create a new article
+//	 */
+//	public function newAction()
+//	{
+//		if (!Zre_Acl::isAllowed('articles', 'new')) {
+//			$this->_redirect('/admin/', array('exit'=>'true'));
+//		}
+//		// Create a new article
+//		$this->view->title = 'New article';
+//
+//		$this->view->assign('enable_dojo', 	true);
+//		$this->view->assign('enable_jquery', 1);
+//
+//		$this->view->assign('extra_jquery_css', array("scripts/jquery/jqueryFileTree/jqueryFileTree.css"));
+//
+//		$form = new Zre_Ui_Form_Article();
+//
+//		$is_submitted = $this->getRequest()->getParam('is_submitted', false);
+//		// ... Is the form submitted?
+//		if ($is_submitted == true) {
+//			$is_valid = $form->isValid($this->getRequest()->getParams());
+//
+//			if ($is_valid)
+//			{
+//				$values = $form->getValues();
+//				$article = new Zre_Dataset_Article();
+//				$article->create( $values );
+//
+//				$this->_redirect('/admin/articles/');
+//			}
+//		}
+//		// ...Set our form.
+//		$this->view->form = $form;
+//
+//	}
+//	/**
+//	 * Edit an existing article
+//	 */
+//	public function editAction()
+//	{
+//		$article = new Zre_Dataset_Article();
+//
+//		if (Zre_Acl::isAllowed('articles', 'update')) {
+//			// @todo ArticlesController::newAction() Creates a new article
+//			$this->view->title = 'Edit article';
+//
+//			$this->view->assign('enable_dojo', 	1);
+//			$this->view->assign('enable_jquery', 1);
+//
+//			$this->view->assign('extra_jquery_css', array("scripts/jquery/jqueryFileTree/jqueryFileTree.css"));
+//			$this->view->assign('params', $this->getRequest()->getParams());
+//			// See if we have any listing parameters.
+//			$params = '';
+//
+//			$start_index = $this->getRequest()->getParam('start_index');
+//			$max_per_page = $this->getRequest()->getParam('max_per_page');
+//
+//			$params_array = array(
+//				'start_index' => isset($start_index)?$start_index:0,
+//				'max_per_page' => $max_per_page?$max_per_page:10
+//			);
+//
+//			// Grab our key/value POST vars, for use with our datagrid links.
+//			foreach($params_array as $key => $value)
+//			{
+//				$params .= '/'.$key . '/' . $value;
+//			}
+//	    	$url_params = $params;
+//	    	$this->view->assign('url_params', 	$url_params);
+//	    	$this->view->assign('start_index', 	$params_array['start_index']);
+//	    	$this->view->assign('max_per_page', $params_array['max_per_page']);
+//
+//			$form = new Zre_Ui_Form_Article(null, '/admin/articles/index'.$url_params);
+//
+//			$form->setAction('/admin/articles/edit/');
+//
+//			$is_submitted = $this->getRequest()->getParam('is_submitted');
+//
+//			// ... Is the form submitted?
+//			if ($is_submitted == true) {
+//				$is_valid = $form->isValid($this->getRequest()->getParams());
+//
+//				if ($is_valid == true)
+//				{
+//					$values = $this->getRequest()->getParams();
+//					$article->update( $values );
+//
+//					// See if we have any listing parameters.
+//					$params = '';
+//
+//					$start_index = $this->getRequest()->getParam('start_index');
+//					$max_per_page = $this->getRequest()->getParam('max_per_page');
+//
+//					$params_array = array(
+//						'start_index' => isset($start_index) ? $start_index : 0,
+//						'max_per_page' => $max_per_page ? $max_per_page : 10
+//					);
+//
+//					// Grab our key/value POST vars, for use with our datagrid links.
+//					foreach($params_array as $key => $value)
+//					{
+//						$params .= '/'.$key . '/' . $value;
+//					}
+//			    	$url_params = $params;
+//			    	$this->view->assign('url_params', 	$url_params);
+//			    	$this->view->assign('start_index', 	$params_array['start_index']);
+//			    	$this->view->assign('max_per_page', $params_array['max_per_page']);
+//
+//					$this->_redirect('/admin/articles/');
+//				}
+//			} else {
+//
+//				// Not submitted... load up default values if an article is specified
+//				$values = $article->read( $this->getRequest()->getParam('id') );
+//
+//				$values['description'] = stripcslashes( $values['description'] );
+//
+//				$form->populate($values);
+//			}
+//
+//			// ...Set our form.
+//			$this->view->form = $form;
+//		} else {
+//			$this->_redirect('/admin/', array('exit'=>'true'));
+//		}
+//	}
+//	/**
+//	 * Remove an existing article
+//	 */
+//	public function removeAction()
+//	{
+//		if (Zre_Acl::isAllowed('articles', 'remove')) {
+//			// Remove an article, after user has confirmed this action.
+//			$this->view->title = 'Remove article';
+//
+//			$t = Zend_Registry::get('Zend_Translate');
+//
+//			$node_id = $this->getRequest()->getParam('node_id');
+//
+//			// See if we have any listing parameters.
+//			$params = '';
+//
+//			$start_index = $this->getRequest()->getParam('start_index');
+//			$max_per_page = $this->getRequest()->getParam('max_per_page');
+//
+//			$params_array = array(
+//				'start_index' => isset($start_index)?$start_index:0,
+//				'max_per_page' => $max_per_page?$max_per_page:10
+//			);
+//
+//			// Grab our key/value POST vars, for use with our datagrid links.
+//			foreach($params_array as $key => $value)
+//			{
+//				$params .= '/'.$key . '/' . $value;
+//			}
+//	    	$url_params = $params;
+//	    	$this->view->assign('url_params', 	$url_params);
+//	    	$this->view->assign('start_index', 	$params_array['start_index']);
+//	    	$this->view->assign('max_per_page', $params_array['max_per_page']);
+//
+//			$form = new Zre_Ui_Form_Dialog_YesNoAbort();
+//			$form->setAction('/admin/articles/remove/node_id/'.$node_id);
+//
+//			$is_submitted = $this->getRequest()->getParam('is_submitted');
+//
+//			// Prompt the user for a confirmation.
+//			if ( $is_submitted == true && isset($node_id) )
+//			{
+//				$values = $this->getRequest()->getParams();
+//
+//				switch($values['yes_no_abort'])
+//				{
+//					case 'yes':
+//
+//						$form = null;
+//						Zre_Dataset_Article::delete( $node_id );
+//						$this->view->assign('content', '<div class="ok">' . $t->_('Ok:') . ' ' . $t->_('Update complete.') . '</div>');
+//
+//						break;
+//					case 'no':
+//
+//						$form = null;
+//						$this->view->assign('content', '<div><b>' . $t->_('Cancelled:') . '</b> ' . $t->_('No update was performed.') . '</div>');
+//
+//						break;
+//					case 'abort':	// This case statement intentionally left blank.
+//					default:
+//						$this->_redirect('/admin/articles/');
+//						break;
+//				}
+//
+//			}
+//
+//			$this->view->form = $form;
+//		} else {
+//			$this->_redirect('/admin/', array('exit'=>'true'));
+//		}
+//	}
 	public function typesAction() {
 		$this->view->assign('disable_cache', 1);
 		$this->view->assign('enable_jquery', 1);

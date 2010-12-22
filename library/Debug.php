@@ -60,6 +60,14 @@ class Debug {
 			return null;
 		}
 	}
+
+        public static function var_export($expression, $return = false) {
+            if ($return == true) {
+                return "<pre>" . var_export($expression, true) . "</pre>";
+            } else {
+                echo "<pre>" . var_export($expression, true) . "</pre>";
+            }
+        }
 	
 	public static function microTime() {
 		if (PHP_MAJOR_VERSION >= 5) {

@@ -1,1 +1,142 @@
 <?php
+
+?>
+<style type="text/css">
+    .scaled-image {
+	max-width: 99%;
+    }
+</style>
+<script type="text/javascript">
+    jQuery(document).ready(function($){
+        function renderTable(response) {
+            // Clear out the existing HTML table data.
+            $('#frmImages .table-data .table-body').remove();
+
+            // Fill the HTML table with the new data.
+            var timeStamp = new Date();
+
+            if (response.result == 'ok') {
+                $.each(response.data, function(i, row){
+
+                        $('#frmImages .table-data').append(
+                                '<tbody class="table-body">' +
+                                '	<tr class="table-row">' +
+                                '           <td class="image_id">' + row.image_id + '</td>' +
+                                '		<td class="image_file">' + row.file + '</td>' +
+                                '		<td class="image_date_submitted"><div>' + row.date_submitted + '</div><div class="small-text">Modified: ' + row.date_modified + '</div></td>' +
+                                '	</tr>' +
+                                '	<tr class="table-sub-row">'  +
+                                '		<td colspan="3">' +
+                                '                   <img class="scaled-image" src="/admin/images/render/image_id/' + row.image_id + '/' + timeStamp.getTime() + '" alt="' + row.file + '" /><br />' +
+                                '                   <input type="button" class="delete-image" id="delete_image_' + row.image_id + '" value="Delete" />' +
+                                '		</td>' +
+                                '	</tr>' +
+                                '</tbody>'
+                        );
+                });
+
+                rebindImageForm();
+            } else {
+                alert(response.data);
+            }
+        }
+
+        function rebindImageForm() {
+	    $('#frmImages').find('img').each(function(i, obj) {
+		var src = $(obj).attr('src');
+		$(obj).wrap('<a href="' + src + '" target="_blank" />');
+	    });
+            $('#frmImages').find('.delete-image').each(function(i, obj){
+                var btnDelete = $(obj);
+                var id = btnDelete.attr('id').replace('delete_image_', '');
+
+                btnDelete.click(function (ev) {
+                
+                    $.getJSON(
+                        '/admin/images/json-delete/',
+                        {
+                            key: id
+                        },
+                        function (response) {
+                            
+                            if (response.result == 'ok') {
+                                $('#frmImages').tableSort('load', null);
+                            } else {
+                                alert(response.data);
+                            }
+                        }
+                    );
+                });
+            });
+        }
+        $('#frmImages').tableSort({
+            onJsonSuccess: renderTable,
+            pageIndex: 1,
+            rowCount: 5
+        });
+
+        $('#frmNewImageFilepath').submit(function(ev){
+            ev.preventDefault();
+	    var newFile = $(this).find('#new_image_filepath');
+            $.getJSON(
+                '/admin/images/json-create',
+                {
+                    file: newFile.val()
+                },
+                function (response) {
+
+                    if (response.result == 'ok') {
+                        var row = $('#frmNewImageFilepath .form-list li');
+                        var bgColor = row.css('background-color');
+                        
+                        row.css('background-color', '#0a0')
+                            .animate({backgroundColor: bgColor}, 1000, function(){
+                                $('#frmImages').tableSort('load', null);
+                            });
+                    } else {
+                        alert(response.data);
+                    }
+                }
+            );
+        });
+    });
+</script>
+<form id="frmImages" action="/admin/images/json-list" method="post">
+    <table cellspacing="0" cellpadding="0" border="0" class="table-data">
+        <tr class="table-header">
+            <th><a href="#image_id"><?php echo $this->translate('ID');?></a></th>
+            <th><a href="#file"><?php echo $this->translate('File');?></a></th>
+            <th><a href="#date_submitted"><?php echo $this->translate('Submitted');?></a></th>
+        </tr>
+    </table>
+</form>
+<hr>
+<form id="frmNewImage" action="/admin/images/upload" method="post" enctype="mulitpart/form-data">
+    <table cellspacing="0" cellpadding="0" border="0" class="table-data">
+        <tr class="table-row">
+            <td>
+                <ul class="form-list">
+                    <li>
+                        <label><?php echo $this->translate('Upload a new image');?></label>
+                        <input type="file" id="new_image" name="new_image" /><input type="submit" value="<?php echo $this->translate('Upload');?>" />
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="frmNewImageFilepath" action="/admin/images/upload">
+    <table cellspacing="0" cellpadding="0" border="0" class="table-data">
+        <tr class="table-row">
+            <td>
+                <ul class="form-list">
+                    <li>
+                        <label><?php echo $this->translate('Or, specify from the /images directory');?></label>
+                        <input type="text" id="new_image_filepath" value="dummy.png" />
+			<input type="submit" value="<?php echo $this->translate('Save');?>" />
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</form>

@@ -209,20 +209,12 @@ $strInternalError = $this->translate('Internal error.');
 								},
 								function (reply) {
 									if (reply > 0) {
-										jQuery.getJSON(
-											'/admin/articles/json-list',
-											{
-												sort: 'date_created',
-												order: 'DESC'
-											},
-											function(response) {
-												renderTable(response);
+                                                                            $('#frmArticles').tableSort('load', null);
 
-												jQuery('#new_article_title').val('');
-												jQuery('#new_article_image').val('');
-												wym.html('');
-											}
-										);
+                                                                            jQuery('#new_article_title').val('');
+                                                                            jQuery('#new_article_image').val('');
+                                                                            wym.html('');
+
 									} else {
 										alert('<?php echo $strInternalError; ?>');
 									}
