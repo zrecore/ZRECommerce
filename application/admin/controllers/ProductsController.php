@@ -71,7 +71,9 @@ class Admin_ProductsController extends Zend_Controller_Action {
 		$pre = $settings->db->table_name_prepend;
 		
 		$articleListing = $articles->listAll(
-			null,
+			array(
+			    'published' => 'yes'
+			),
 			array(
 				'setIntegrityCheck' => false,
 				'from' => array(

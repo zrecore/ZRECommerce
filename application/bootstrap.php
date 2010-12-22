@@ -50,12 +50,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     public static function setupAutoLoader() {
 
-	require_once(BASE_PATH . '/library/Zre/Loader.php');
+//	require_once(BASE_PATH . '/library/Zre/Loader.php');
+	require_once('Zend/Loader/Autoloader.php');
 	$autoLoader = Zend_Loader_Autoloader::getInstance();
 	$autoLoader->setFallBackAutoloader(true);
 
-	$autoLoader->registerNamespace('Zre_');
-	$autoLoader->unshiftAutoLoader(array('Zre_Loader', 'loadClass'), 'Zre');
+//	$autoLoader->registerNamespace('Zend_');
+//	$autoLoader->registerNamespace('Zre_');
+	
+//	$autoLoader->unshiftAutoLoader(array('Zre_Loader', 'loadClass'), 'Zre');
 	return $autoLoader;
     }
 
