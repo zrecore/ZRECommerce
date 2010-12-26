@@ -25,9 +25,19 @@ interface Checkout_Adapter_Interface {
 	 */
 	public function getOptionalFields($options = null);
 	/**
+	 * Get the data needed to post-process using the cart and the request
+	 * variables.
+	 *
+	 * @param Cart_Container $cart
+	 * @param array $request
+	 * @return array
+	 */
+	public function getPostProcessFields($cart, $request);
+	/**
 	 * 
 	 * @param array $data The data to process
 	 * @param array $options Additional array of options
+	 * @return bool
 	 */
 	public function postProcess($data, $options = null);
 }

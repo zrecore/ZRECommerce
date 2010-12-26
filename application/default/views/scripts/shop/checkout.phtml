@@ -7,25 +7,15 @@ if (isset($this->data)) $d = $this->data;
 
 $fields = $this->fields;
 
-$cardFields = array(
-	'accountNumber',
-	'creditCardType',
-	'expirationMonth',
-	'expirationYear',
-	'cvv2'
-);
-
-//Debug::print_r($fields);
 ?>
 
 <form action="/shop/checkout" method="post">
-	<h3>Bill To:</h3>
 	<ul class="form-list">
 		<?php
 		foreach ($fields as $key => $value):
 			
-			if (!in_array($key, $cardFields)) {
-				if (is_array($value['type'])) {
+			
+			if (is_array($value['type'])) {
 		?>
 		<li>
 			<label><?php echo $this->translate($value['label']);?></label>
@@ -43,62 +33,37 @@ $cardFields = array(
 				} else {
 		?>
 		<li>
+			<?php if (!empty($value['label'])):?>
 			<label><?php echo $this->translate($value['label']);?></label>
+			<?php 
+			    endif;
+			    switch ($value['type']):
+				case 'text':
+			?>
 			<input type="text" name="<?php echo $key;?>" value="<?php echo isset($d->{$key}) ? $d->{$key} : '';?>" />
+			<?php	    break;?>
+
+			<?php	case 'image':?>
+			<input type="image" name="<?php echo $key;?>" src="<?php echo isset($value['url']) ? $value['url'] : '';?>" alt="<?php echo $key ?>" />
+			<?php	    break;?>
+
+			<?php	case 'hidden':?>
+			<input type="hidden" name="<?php echo $key;?>" value="<?php echo isset($d->{$key}) ? $d->{$key} : isset($value['value']) ? $value['value'] : '';?>" />
+			<?php	    break;?>
+
+			<?php	case 'image_link':?>
+			<a href="<?php echo isset($value['href']) ? $value['href'] : '';?>" name="<?php echo $key;?>"><img src="<?php echo isset($value['url']) ? $value['url'] : '';?>" alt="<?php echo $key ?>" /></a>
+			<?php	    break;?>
+
+			<?php	case 'submit':?>
+			<input type="submit" name="<?php echo $key; ?>" value="<?php echo !empty($value['value']) ? $this->translate($value['value']) : $this->translate('Submit') ?>" />
+			<?php	    break;?>
+
+			<?php endswitch;?>
 		</li>
 		<?php
-				}
 			}
-		endforeach;
-		/*
-		?>
-		<li><label>First Name:</label><input type="text" name="firstName" value="<?php echo isset($d->firstName) ? $d->firstName : '';?>" /></li>
-		<li><label>Last Name:</label><input type="text" name="lastName" value="<?php echo isset($d->lastName) ? $d->lastName : '';?>" /></li>
-		<li><label>Address (line 1):</label><input type="text" name="street1" value="<?php echo isset($d->street1) ? $d->street1 : '';?>" /></li>
-		<li><label>Address (line 2):</label><input type="text" value="<?php echo isset($d->street2) ? $d->street2 : '';?>" /></li>
-		<li><label>City:</label><input type="text" name="city" value="<?php echo isset($d->city) ? $d->city : '';?>" /></li>
-		<li><label>State:</label><select name="state"><option value="CA"<?php echo isset($d->state) && $d->state == 'CA' ? ' selected="selected"' : '' ?>>California</option></select></li>
-		<li><label>Zip:</label><input type="text" name="postalCode" value="<?php echo isset($d->postalCode) ? $d->postalCode : '';?>" /></li>
-		<li><label>Country:</label><select name="country"><option value="US"<?php echo isset($d->country) && $d->country == 'US' ? ' selected="selected"' : '' ?>>United States of America</option></select></li>
-		<li><label>E-Mail:</label><input type="text" name="email"  value="<?php echo isset($d->email) ? $d->email : '';?>" /></li>
-		<?php //*/ ?>
+			
+		endforeach;?>
 	</ul>
-	<h3>Credit Card:</h3>
-	<ul class="form-list">
-		<?php
-		foreach ($fields as $key => $value):
-			if (in_array($key, $cardFields)) {
-				if (is_array($value['type'])) {
-		?>
-		<li>
-			<label><?php echo $this->translate($value['label']);?></label>
-			<select name="<?php echo $key;?>">
-				<?php
-				foreach($value['type'] as $v => $option):
-					?>
-				<option value="<?php echo $v;?>"><?php echo $this->translate($option);?></option>
-					<?php
-				endforeach;
-				?>
-			</select>
-		</li>
-		<?php
-				} else {
-		?>
-		<li>
-			<label><?php echo $this->translate($value['label']);?></label>
-			<input type="text" name="<?php echo $key;?>" value="<?php echo isset($d->{$key}) ? $d->{$key} : '';?>" />
-		</li>
-		<?php
-				}
-			}
-		endforeach;
-		/*
-		?>
-		<li><label>Account Number:</label><input type="text" name="accountNumber" /></li>
-		<li><label>Expiration Month (MM):</label><input type="text" name="expirationMonth" /></li>
-		<li><label>Expiration Year (YYYY):</label><input type="text" name="expirationYear" /></li>
-		<?php //*/?>
-	</ul>
-	<input type="submit" name="billingSubmitted" value="Pay Now" />
 </form>

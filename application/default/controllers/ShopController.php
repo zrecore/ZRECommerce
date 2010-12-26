@@ -252,7 +252,9 @@ class ShopController extends Zend_Controller_Action {
 						/**
 						 * @todo Add this to the settings.xml
 						 */
-						$cryptSalt = 'salty.Pop!c0rN';
+						$cryptSalt = isset($settings->site->cryptographicSalt) ?
+						$settings->site->cryptographicSalt :
+						'salty.Pop!c0rN';
 						
 						$order_hash = crypt($order_id , $cryptSalt);
 						Zre_Registry_Session::load();
@@ -306,7 +308,8 @@ class ShopController extends Zend_Controller_Action {
 		if (Zre_Registry_Session::isRegistered('shop.checkout.order_id')) {
 			$orderId = Zre_Registry_Session::get('shop.checkout.order_id');
 		} else {
-			$this->_redirect('/shop/', array('exit' => true));
+			$this->_redirect('/shop/');
+			return;
 		}
 		
 		if (isset($orderHash) && $orderHash == crypt($orderId, $cryptSalt) ) {
@@ -323,7 +326,60 @@ class ShopController extends Zend_Controller_Action {
 			$this->view->assign('order_id', $orderId);
 		} else {
 			// What? No security hash?
-			$this->_redirect('/shop/', array('exit' => true));
+			$this->_redirect('/shop/');
+			return;
 		}
+	}
+
+	public function paymentCompleteAction() {
+
+	    $action = 'checkout-complete';
+	    $controller = 'shop';
+	    $module = 'default';
+
+	    $request = $this->getRequest();
+	    Cart::loadSession();
+	    $cart = Cart::getCartContainer();
+
+
+	    $settings = Zre_Config::getSettingsCached();
+	    $adapter = isset($settings->merchant->adapter) ?
+			    $settings->merchant->adapter :
+			    'Cybersource';
+	    $adapterClass = 'Checkout_Adapter_' . $adapter;
+	    $adapter = new $adapterClass;
+	    Checkout_Payment::setAdapter($adapter);
+
+	    $data = $adapter->getPostProcessFields($cart, $request->getParams());
+	    
+	    $order_id = Checkout_Payment::pay($cart, $data);
+	    
+	    // Redirect to OK page.
+	    if (isset($order_id)) {
+		    try {
+			    // Let's keep the order ID secret to prevent someone from just guessing it.
+			    $cryptSalt = isset($settings->site->cryptographicSalt) ?
+			    $settings->site->cryptographicSalt :
+			    'salty.Pop!c0rN';
+
+			    $order_hash = crypt($order_id , $cryptSalt);
+			    Zre_Registry_Session::load();
+			    Zre_Registry_Session::set('shop.checkout.order_id', $order_id);
+			    Zre_Registry_Session::save();
+
+			    $this->_redirect('/shop/checkout-complete/order/' . rawurlencode( $order_hash ), array('exit' => true) );
+
+		    } catch (Exception $e) {
+			    Debug::logException($e);
+			    Debug::mail('Could not save a completed order:' . "\n" . print_r($result, true) . "\n" . print_r($data, true) . "\n" . print_r($cart, true));
+			    $this->_forward('checkout-error', 'shop', 'default', array('error' => $e));
+		    }
+	    } else {
+		    $this->_redirect('/shop/checkout-error/error/no-result');
+	    }
+	}
+
+	public function paymentCancelledAction() {
+
 	}
 }

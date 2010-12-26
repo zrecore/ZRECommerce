@@ -60,12 +60,11 @@ class Admin_SettingsController extends Zend_Controller_Action
 
 		$adapters = array();
 		foreach($files as $file) {
-
-			if (file_exists($dir . $file . '.php')) {
-				$info = pathinfo($dir . $file . '.php');
-
+			if (file_exists($dir . $file) && !is_dir($dir . $file)) {
+				$info = pathinfo($dir . $file);
+				
 				if ($info['extension'] == 'php' && $info['filename'] != 'Interface') {
-					$adapters[] = $info['filename'];
+					$adapters[] = basename($info['filename']);
 				}
 				unset($info);
 			}
@@ -77,25 +76,7 @@ class Admin_SettingsController extends Zend_Controller_Action
 		Zre_Registry_Session::save();
 	}
 
-	public function xmlConfigAction()
-	{
-
-		$t = Zend_Registry::get('Zend_Translate');
-		$this->view->title = $t->_('Configuration');
-		$request = $this->getRequest();
-
-		//@todo - This should probably be a define or something instead of hardcoded in two places
-		$settingsPath = realpath(APPLICATION_PATH . '/settings/environment/settings.xml');
-
-		$xmlString = Zre_File::read($settingsPath);
-		$this->view->xml_string = $xmlString;
-
-		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
-		Zre_Registry_Session::save();
-
-	}
-
-        public function configAjaxAction()
+	public function configAjaxAction()
 	{
 		try {
 			$request = $this->getRequest();
@@ -295,6 +276,52 @@ class Admin_SettingsController extends Zend_Controller_Action
 		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
 		Zre_Registry_Session::save();
 		
+	}
+
+	public function mergeXmlAction() {
+	    $request = $this->getRequest();
+	    
+	    try {
+		$file = basename($request->getParam('file', null));
+		$other = basename($request->getParam('other', null));
+
+		$filePath = APPLICATION_PATH . '/settings/environment/' . $file;
+		$otherPath = APPLICATION_PATH . '/settings/environment/' . $other;
+
+		$xml = '';
+		
+		if (!empty($file) && file_exists($filePath) ) {
+
+		    if (!empty($other)) {
+			$xml = Zre_File::read($filePath);
+			$config = new Zend_Config_Xml($xml, null, true);
+
+			$xml = Zre_File::read($otherPath);
+			$otherConfig = new Zend_Config_Xml($xml, null, true);
+
+			$config->merge($otherConfig);
+			Zre_Config::saveSettings($config, $filePath);
+
+			$xml = Zre_File::read($filePath);
+		    } else {
+			throw new Exception('Invalid destination specified.');
+		    }
+		} else {
+		    throw new Exception('Invalid file specified.');
+		}
+		
+		$reply = array(
+		    'result' => 'ok',
+		    'data' => $xml
+		);
+	    } catch (Exception $e) {
+		$reply = array(
+		    'result' => 'error',
+		    'data' => (string) $e
+		);
+	    }
+
+	    $this->_helper->json($reply);
 	}
 
 	public function overviewAction()
@@ -515,6 +542,38 @@ class Admin_SettingsController extends Zend_Controller_Action
 
 	public function updatesAction() {
 		
+	}
+
+	public function xmlConfigAction()
+	{
+
+		$t = Zend_Registry::get('Zend_Translate');
+		$this->view->title = $t->_('Configuration');
+		$request = $this->getRequest();
+
+		//@todo - This should probably be a define or something instead of hardcoded in two places
+		$settingsPath = realpath(APPLICATION_PATH . '/settings/environment/settings.xml');
+
+		$xmlString = Zre_File::read($settingsPath);
+		$this->view->xml_string = $xmlString;
+
+		$dir = APPLICATION_PATH . '/settings/environment/';
+		$dirList = Zre_File::ls($dir);
+		$xmlFiles = array();
+		
+		foreach($dirList as $filename) {
+		    if (is_file($dir . $filename) && $filename != 'settings.xml') {
+			$ext = pathinfo($dir . $filename, PATHINFO_EXTENSION);
+
+			if ($ext == 'xml') $xmlFiles[] = $filename;
+		    }
+		}
+
+		$this->view->xmlFiles = $xmlFiles;
+
+		Zre_Registry_Session::set('selectedMenuItem', 'Settings');
+		Zre_Registry_Session::save();
+
 	}
 
 }

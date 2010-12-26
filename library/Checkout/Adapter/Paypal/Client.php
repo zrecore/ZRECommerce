@@ -152,12 +152,25 @@ class Checkout_Adapter_Paypal_Client extends Zend_Http_Client {
 	 * @return Zend_Http_Response
 	 * @throws Zend_Http_Client_Exception
 	 */
-	function ecDoExpressCheckout($token, $payer_id, $payment_amount, $currency_code, $payment_action = 'Authorization') {
+	function ecDoExpressCheckout($token, $payer_id, $payment_amount, $currency_code, $payment_action = 'Sale') {
+		$this->setParameterGet('METHOD', 'DoExpressCheckoutPayment');
+		$this->setParameterGet('AMT', $payment_amount);
 		$this->setParameterGet('TOKEN', $token);
 		$this->setParameterGet('PAYERID', $payer_id);
 		$this->setParameterGet('PAYMENTACTION', $payment_action); // Can be 'Authorization', 'Sale', or 'Order'
 
 		return $this->request(Zend_Http_Client::GET);
+	}
+
+	function ecSetSexpressCheckout($paymentAmount, $returnURL, $cancelURL, $currencyID, $payment_action = 'Authorization') {
+	    $this->setParameterGet('METHOD', 'SetExpressCheckout');
+	    $this->setParameterGet('AMT', $paymentAmount);
+//	    $this->setParameterGet('PAYMENTREQUEST_0_AMT', $paymentAmount); // The paypal PDF says to use this and not AMT, but in practice, that doesnt work yet.
+	    $this->setParameterGet('RETURNURL', $returnURL);
+	    $this->setParameterGet('CANCELURL', $cancelURL);
+	    $this->setParameterGet('PAYMENTREQUEST_0_PAYMENTACTION', $payment_action); // Can be 'Authorization', 'Sale', or 'Order'
+
+	    return $this->request(Zend_Http_Client::GET);
 	}
 
 	public static function parse($response) {

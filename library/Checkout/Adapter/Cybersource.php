@@ -271,26 +271,6 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 		);
 		
 		$values = array(
-			'accountNumber'	=> array(
-							'label' => 'Card Number',
-							'type' => 'text'
-						),
-			'creditCardType'	=> array(
-							'label' => 'Card Type',
-							'type' => $ccard_types
-						),
-			'expirationMonth'	=> array(
-							'label' => 'Exp. Month',
-							'type' => $expMonths
-						),
-			'expirationYear'	=> array(
-							'label' => 'Exp. Year',
-							'type' => $expYears
-						),
-			'cvv2'			=> array(
-							'label' => 'CVV2',
-							'type' => 'text'
-						),
 			'firstName'		=> array(
 							'label' => 'First Name',
 							'type' => 'text'
@@ -326,12 +306,40 @@ class Checkout_Adapter_Cybersource implements Checkout_Adapter_Interface {
 			'country'		=> array(
 							'label' => 'Country',
 							'type' => $countries
-						)
+						),
+			'accountNumber'	=> array(
+							'label' => 'Card Number',
+							'type' => 'text'
+						),
+			'creditCardType'	=> array(
+							'label' => 'Card Type',
+							'type' => $ccard_types
+						),
+			'expirationMonth'	=> array(
+							'label' => 'Exp. Month',
+							'type' => $expMonths
+						),
+			'expirationYear'	=> array(
+							'label' => 'Exp. Year',
+							'type' => $expYears
+						),
+			'cvv2'			=> array(
+							'label' => 'CVV2',
+							'type' => 'text'
+						),
+			'billingSubmitted'	=> array(
+			    'type' => 'submit',
+			    'value' => 'Checkout'
+			)
 		);
 
 		return $values;
 	}
 
+	public function  getPostProcessFields($cart, $request) {
+	    // Not used.
+	}
+	
 	public function getOptionalFields($options = null) {
 		return null;
 	}
