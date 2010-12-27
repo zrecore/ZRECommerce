@@ -256,12 +256,12 @@ class ShopController extends Zend_Controller_Action {
 						$settings->site->cryptographicSalt :
 						'salty.Pop!c0rN';
 						
-						$order_hash = (crypt($order_id , $cryptSalt));
+						$order_hash = urlencode(base64_encode( crypt($order_id , $cryptSalt) ));
 						Zre_Registry_Session::load();
 						Zre_Registry_Session::set('shop.checkout.order_id', $order_id);
 						Zre_Registry_Session::save();
 						
-						$this->_redirect('/shop/checkout-complete/order/' . urlencode($order_hash), array('exit' => true) );
+						$this->_redirect('/shop/checkout-complete/order/' . $order_hash, array('exit' => true) );
 						
 					} catch (Exception $e) {
 						Debug::logException($e);
@@ -303,20 +303,23 @@ class ShopController extends Zend_Controller_Action {
 
 		$request = $this->getRequest();
 		$cryptSalt = isset($settings->site->cryptographicSalt) ?
-					$settings->site->cryptographicSalt :
+					(string)$settings->site->cryptographicSalt :
 					'salty.Pop!c0rN';
 		
 		$cart = Cart::getCartContainer();
 		
 		$orderHash = $request->getParam('order', null);
+		$orderHashReg = null;
 		if (Zre_Registry_Session::isRegistered('shop.checkout.order_id')) {
 			$orderId = Zre_Registry_Session::get('shop.checkout.order_id');
+
+			$orderHashReg = Zre_Registry_Session::get('shop.checkout.order_hash');
 		} else {
 			$this->_redirect('/shop/');
 			return;
 		}
 		
-		if (isset($orderHash) && $orderHash == crypt(urldecode($orderId), $cryptSalt) ) {
+		if (isset($orderHash) && isset($orderHashReg) && $orderHashReg == $orderHash ) {
 
 			Cart::flushSession();
 			Cart::saveSession();
@@ -368,16 +371,17 @@ class ShopController extends Zend_Controller_Action {
 			try {
 				// Let's keep the order ID secret to prevent someone from just guessing it.
 				$cryptSalt = isset($settings->site->cryptographicSalt) ?
-				$settings->site->cryptographicSalt :
-				'salty.Pop!c0rN';
+				    (string)$settings->site->cryptographicSalt :
+				    'salty.Pop!c0rN';
 
-				$order_hash = ( crypt($order_id , $cryptSalt) );
+				$order_hash = base64_encode( crypt($order_id , $cryptSalt) );
 
 				Zre_Registry_Session::load();
 				Zre_Registry_Session::set('shop.checkout.order_id', $order_id);
+				Zre_Registry_Session::set('shop.checkout.order_hash', $order_hash);
 				Zre_Registry_Session::save();
 
-				$this->_redirect('/shop/checkout-complete/order/' . urlencode($order_hash) );
+				$this->_redirect('/shop/checkout-complete/order/' . $order_hash );
 
 			} catch (Exception $e) {
 				Debug::logException($e);

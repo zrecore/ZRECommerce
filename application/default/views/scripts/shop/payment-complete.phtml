@@ -8,7 +8,7 @@ $settings = Zre_Config::getSettingsCached();
 $zendCurrency = new Zend_Currency( (string) $settings->site->currency );
 ?>
 
-<h1><?php echo $this->translate("Click the 'Confirm Payment'"); ?></h1>
+<h1><?php echo $this->translate("Click the 'Confirm Payment' button"); ?></h1>
 <p class="info"><?php echo $this->translate("You MUST click the 'Confirm Payment' button in order to complete your order. If you do not wan't to complete your order at this time, simply click the 'Back To Cart' link below.");?></p>
 <br /><br />
 <form action="/shop/payment-complete" method="post">
