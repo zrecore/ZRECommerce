@@ -1,0 +1,56 @@
+<?php
+
+$data = $this->data;
+$cart = $this->cart;
+$items = $cart->getItems();
+
+$settings = Zre_Config::getSettingsCached();
+$zendCurrency = new Zend_Currency( (string) $settings->site->currency );
+?>
+
+<h1><?php echo $this->translate("Click the 'Confirm Payment'"); ?></h1>
+<p class="info"><?php echo $this->translate("You MUST click the 'Confirm Payment' button in order to complete your order. If you do not wan't to complete your order at this time, simply click the 'Back To Cart' link below.");?></p>
+<br /><br />
+<form action="/shop/payment-complete" method="post">
+<?php foreach($data as $key => $value): ?>
+    <input type="hidden" name="<?php echo $key;?>" value="<?php echo $value;?>" />
+<?php endforeach;?>
+    <table cellspacing="0" cellpadding="0" border="0" class="table-data">
+	
+	<tr class="table-header">
+	    <th>
+		<?php echo $this->translate('Quantity');?>
+	    </th>
+	    <th>
+		<?php echo $this->translate('Title');?>
+	    </th>
+	    <th>
+		<?php echo $this->translate('Subtotal');?>
+	    </th>
+	</tr>
+	<?php foreach($items as $item): 
+	    
+	    $item = Cart_Container_Item::factory($item);
+
+	    $cost = $item->getCostOptions()->calculate();
+	    $itemPrice = $zendCurrency->toCurrency( $cost );
+	    $cartSubtotal = $zendCurrency->toCurrency( $item->getQuantity() * $cost );
+
+	    $cartDetails = $item->getDetailOptions()->items();
+	?>
+	<tr class="table-row">
+	    <td><?php echo $item->getQuantity();?> @ <?php echo $itemPrice;?></td>
+	    <td>
+		    <h3><?php echo $cartDetails['title'];?></h3>
+		    <p><?php echo $cartDetails['desc'];?></p>
+	    </td>
+	    <td>
+		    <p>
+			    <?php echo $cartSubtotal;?>
+		    </p>
+	    </td>
+	</tr>
+	<?php endforeach;?>
+    </table>
+    <a href="/shop/cart/"><?php echo $this->translate('Back to cart');?></a><input type="submit" name="confirm_payment" value="<?php echo $this->translate('Confirm Payment');?>" />
+</form>

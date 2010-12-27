@@ -29,6 +29,7 @@ class Checkout_Adapter_PaypalExpressCheckout implements Checkout_Adapter_Interfa
 	    $paymentData = (array) $paymentData;
 
 	$amount = $cartContainer->getTotal();
+	$currency_code = (string) $settings->site->currency;
 	/**
 	 * @todo Finish implementing express checkout, dynamically
 	 * add production or dev urls below using settings.xml
@@ -41,10 +42,10 @@ class Checkout_Adapter_PaypalExpressCheckout implements Checkout_Adapter_Interfa
 
 	    // ...Perform an authorization.
 	    $reply = $adapter->ecSetSexpressCheckout($amount, $returnURL, $cancelURL, $currency_code);
-
+	    
 	    if ($reply->isSuccessful()) {
 		$data = $adapter->parse($reply->getBody());
-
+		
 		if (strtoupper($data->ACK) == 'SUCCESS' || strtoupper($data->ACK) == 'SUCCESSWITHWARNING') {
 		    $token = urldecode($data->TOKEN);
 //			    $payPalURL = "https://www.paypal.com/webscr&cmd=_express-checkout&token=$token";
@@ -54,11 +55,13 @@ class Checkout_Adapter_PaypalExpressCheckout implements Checkout_Adapter_Interfa
 //			    if("sandbox" === $environment || "beta-sandbox" === $environment) {
 //				    $payPalURL = "https://www.$environment.paypal.com/webscr&cmd=_express-checkout&token=$token";
 //			    }
-		    header("Location: $payPalURL");
+		    
+		    return $payPalURL;
 		} else {
 		    throw new Exception('Payment failed.');
 		}
 	    }
+	    return;
 	} else {
 	    $token = $paymentData['token'];
 	    $payer_id = $paymentData['PayerID'];
@@ -162,8 +165,7 @@ class Checkout_Adapter_PaypalExpressCheckout implements Checkout_Adapter_Interfa
 	$settings = Zre_Config::getSettingsCached();
 	$values = array(
 	    'token' => array(
-		'type' => 'hidden',
-		'value' => ''
+		'type' => 'hidden'
 	    ),
 	    'payerID' => array(
 		'type' => 'hidden'
@@ -193,8 +195,7 @@ class Checkout_Adapter_PaypalExpressCheckout implements Checkout_Adapter_Interfa
 
 	$reply = array(
 	    'token' => $data->token,
-	    'PayerID' => $data->PayerID,
-	    'Amt' => $cart->getTotal()
+	    'PayerID' => $data->PayerID
 	);
 
 	return $reply;
