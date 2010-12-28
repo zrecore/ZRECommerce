@@ -12,9 +12,20 @@ Bootstrap::setupAutoLoader();
 
 class Orders_Paypal {
 
+    function bootstrap() {
+	Bootstrap::setupPaths();
+	$application = new Zend_Application(
+	    APPLICATION_ENV,
+	    APPLICATION_PATH . '/settings/application.ini'
+	);
+
+	$application->bootstrap();
+
+	Zend_Db_Table::getDefaultAdapter()->getProfiler()->setEnabled(true);
+    }
     function __construct() {
 	// Run!
-
+	$this->bootstrap();
     }
 }
 

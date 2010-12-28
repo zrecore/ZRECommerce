@@ -23,6 +23,13 @@ $this->placeholder('title')->set($this->title);
 $vars = $this->getVars();
 
 $strStatus	= 'Published';
+$strDeliveryMethod = 'Delivery Method';
+$strDeliveryMethods = '<option value="">None</option>';
+
+foreach($this->logistic_adapters as $adapter) {
+    $strDeliveryMethods .= '<option value="' . $adapter . '">' . $this->translate($adapter) . '</option>';
+}
+
 $strYes		= $this->translate('Yes');
 $strNo		= $this->translate('No');
 $strArchived	= $this->translate('Archived');
@@ -59,6 +66,12 @@ if (isset($vars['content'])) echo $vars['content'];
 					'				<li><span class="float-box-left">Allotment: </span><span><input type="text" class="product-allotment" id="product_allotment_' + row.product_id + '" value="' + row.allotment + '" /></span></div>' +
 					'				<li><span class="float-box-left">Price: </span><span><input type="text" class="product-price" id="product_price_' + row.product_id + '" value="' + row.price + '" /></span></div>' +
 					'				<li>' +
+					'				<span class="float-box-left"><?php echo $strDeliveryMethod;?>: </span>' +
+					'				    <select class="product-delivery-method-select" id="product_delivery_method_' + row.product_id + '">' +
+					'					' + '<?php echo $strDeliveryMethods;?>' +
+					'				    </select>' +
+					'				</li>' +
+					'				<li>' +
 					'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' +
 					'					<select class="product-published-select" id="product_published_' + row.product_id + '">' +
 					'						<option value="yes"><?php echo $strYes;?></option>' +
@@ -74,11 +87,18 @@ if (isset($vars['content'])) echo $vars['content'];
 				);
 
 				$('#frmProducts #product_status_' + row.product_id + ' option[value=' + row.status + ']').attr('selected', 'selected');
+				$('#frmProducts #product_delivery_method_' + row.product_id + ' option[value=' + row.delivery_method + ']').attr('selected', 'selected');
 				$('#frmProducts #product_status_label_' + row.product_id).html(row.status);
 			});
 
 			rebindProductEditors();
 		}
+
+		$('#frmProducts').tableSort({
+			pageIndex: 1,
+			rowCount: 5,
+			onJsonSuccess: renderTable
+		});
 
 		function rebindProductEditors() {
 
@@ -111,6 +131,7 @@ if (isset($vars['content'])) echo $vars['content'];
 									var product_published = $('#product_published_' + product_id).val();
 									var product_allotment = $('#product_allotment_' + product_id).val();
 									var product_price = $('#product_price_' + product_id).val();
+									var product_delivery_method = $('#product_delivery_method_' + product_id).val();
 
 									var subRow = $('#product_description_' + product_id).parent().parent();
 									var row = subRow.prev();
@@ -125,7 +146,8 @@ if (isset($vars['content'])) echo $vars['content'];
 											title: product_title,
 											published: product_published,
 											allotment: product_allotment,
-											price: product_price
+											price: product_price,
+											delivery_method: product_delivery_method
 										},
 										function (reply) {
 											var responseColor = '';
@@ -157,12 +179,6 @@ if (isset($vars['content'])) echo $vars['content'];
 			});
 		}
 
-		$('#frmProducts').tableSort({
-			pageIndex: 1,
-			rowCount: 5,
-			onJsonSuccess: renderTable
-		});
-
 		$('#new_product_description').wymeditor({
 			postInit: function(wym) {
 
@@ -190,6 +206,7 @@ if (isset($vars['content'])) echo $vars['content'];
 					var allotment = jQuery('#new_product_allotment').val();
 					var published = jQuery('#new_product_published').val();
 					var price = jQuery('#new_product_price').val();
+					var delivery_method = jQuery('#new_product_delivery_method').val();
 
 					jQuery.getJSON(
 					'/admin/products/json-create',
@@ -199,11 +216,19 @@ if (isset($vars['content'])) echo $vars['content'];
 						image: product_image,
 						published: published,
 						price: price,
-						allotment: allotment
+						allotment: allotment,
+						delivery_method: delivery_method
 					},
 					function (reply) {
+					
 						if (reply > 0) {
-							$('#new_product_description').tableSort('load', renderTable);
+
+						    var el = $('#frmNewProduct li');
+						    var bg = el.css('background-color');
+
+						    el.css('background-color', '#0a0').animate({backgroundColor: bg}, 1000, function(){});
+
+						    $('#frmProducts').tableSort('load', null);
 						} else {
 							alert('<?php echo $strInternalError; ?>');
 						}
@@ -233,7 +258,7 @@ if (isset($vars['content'])) echo $vars['content'];
 <br />
 <br />
 <h3><?php echo $this->translate('Create a new product'); ?></h3>
-<div>
+<div id="frmNewProduct">
 	<ul class="form-list">
 		<li>
 			<label for="new_product_title"><?php echo $this->translate('Title'); ?></label>
@@ -259,7 +284,7 @@ if (isset($vars['content'])) echo $vars['content'];
 					endforeach;
 				else:
 					?>
-				<option value="">None.</option>
+				<option value="">None</option>
 				<?php
 				endif;
 				?>
@@ -276,6 +301,12 @@ if (isset($vars['content'])) echo $vars['content'];
 		<li>
 			<label for="new_product_price"><?php echo $this->translate('Price'); ?></label>
 			<input type="text" id="new_product_price" value="0.00" />
+		</li>
+		<li>
+		    <label>Shipping method</label>
+		    <select id="new_product_delivery_method">
+			<?php echo $strDeliveryMethods;?>
+		    </select>
 		</li>
 	</ul>
 	<div id="new_product_description"></div>

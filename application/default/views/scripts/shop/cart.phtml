@@ -26,10 +26,7 @@ $params = $vars['params'];
 if (isset($vars['content'])) echo $vars['content'];
 
 // ...Display our cart
-
-Cart::loadSession();
-
-$cart = Cart::getCartContainer();
+$cart = $this->cart;
 $cartItems = $cart->getItems();
 
 $cartTotal = $zendCurrency->toCurrency( $cart->getTotal() );
@@ -109,3 +106,6 @@ EOD;
 }
 echo $output;
 ?>
+<p>
+    Please note: You have approximately 30 minutes to complete your order. Your items will expire from your cart after 30 minutes.
+</p>

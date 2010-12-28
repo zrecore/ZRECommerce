@@ -157,7 +157,6 @@ abstract class Data_Set_Abstract {
 	$model = $this->getModel();
 
 	$select = self::appendOptions( $model->select(), $columns, $options );
-
 	$results = $model->fetchAll($select);
 
 	return $asArray ? $results->toArray() : $results;
@@ -191,7 +190,7 @@ abstract class Data_Set_Abstract {
 	    foreach ($columns as $col => $val) {
 		if (is_array($val)) {
 		    if (isset($val['operator']) && isset($val['value'])) {
-			$select = $select->where( "$col " . $val['operator'] . " ?", $val);
+			$select = $select->where( "$col " . $val['operator'] . " ?", $val['value']);
 		    }
 		} else {
 		    $select = $select->where($col . ' = ?', $val);

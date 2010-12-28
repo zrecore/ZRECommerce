@@ -86,4 +86,15 @@ class Debug {
 		
 		return mail($to, 'Debug message', $content, "From: zrecommerce@localhost\n");
 	}
+
+	public static function sqlQueries() {
+	    $qS = '';
+	    $qP = Zend_Db_Table::getDefaultAdapter()->getProfiler()->getQueryProfiles();
+
+	    if (!empty($qP)) {
+		foreach($qP as $q):$qS .= $q->getQuery() . "\n";endforeach;
+	    }
+
+	    return $qS;
+	}
 }

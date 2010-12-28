@@ -18,6 +18,27 @@
  *
  */
 class Zre_Store_Shipping {
-	
+	public static function logisticAdapters() {
+	    $dir = BASE_PATH . '/library/Logistic/Adapter/';
+
+	    $files = Zre_File::ls($dir);
+
+	    $adapters = array();
+
+	    foreach($files as $file) {
+
+		if (is_file($dir . $file)) {
+		    $name = pathinfo($dir . $file, PATHINFO_FILENAME);
+		    $extension = pathinfo($dir . $file, PATHINFO_EXTENSION);
+
+		    if ($extension == 'php' && $name !== 'Interface') {
+			$adapters[] = $name;
+		    }
+		}
+		
+	    }
+
+	    return $adapters;
+	}
 }
 ?>

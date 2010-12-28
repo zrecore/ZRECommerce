@@ -64,6 +64,13 @@ class ShopController extends Zend_Controller_Action {
 	public function cartAction() {
 		
 		$this->view->assign('params', $this->getRequest()->getParams());
+
+		Cart::loadSession();
+		$cart = Cart::getCartContainer();
+
+		if ($cart->count() <= 0) $this->_redirect('/shop/checkout-empty');
+
+		$this->view->cart = $cart;
 		
 		Zre_Registry_Session::set('selectedMenuItem', 'Shop');
 		Zre_Registry_Session::save();
@@ -90,17 +97,12 @@ class ShopController extends Zend_Controller_Action {
 		Cart::loadSession();
 		
 		$cart = Cart::getCartContainer();
-		echo print_r($cart, true);
+		
 		if (isset($cart) && count($cart->getItems()) > 0) {
-			$productDataset = new Zre_Dataset_Product();
+			
 			foreach($cart->getItems() as $cartItem) {
 				$item = Cart_Container_Item::factory($cartItem);
-
-				$p = $productDataset->read($item->getSku())->current();
-				$p->pending -= $item->getQuantity();
-				$p->save();
-
-				unset($p);
+				Zre_Store_Product::flushPending($item->getSku());
 			}
 		}
 		Cart::flushSession();
@@ -124,7 +126,9 @@ class ShopController extends Zend_Controller_Action {
 		$product = $datasetProduct->read( (int)$productId )->current()->toArray();
 		
 		$productAllotment = $product['allotment'];
-		$productPending = $product['pending'];
+
+		$productPending = Zre_Store_Product::countPending($productId);
+
 		$productSold = $product['sold'];
 		$productLeft = $productAllotment - ($productPending + $productSold);
 		$productPrice = $product['price'];
@@ -140,8 +144,7 @@ class ShopController extends Zend_Controller_Action {
 		$productDescription = $product['description'];
 		
 		if (isset($productId) && $productAllotment - ($productQuantity + $productPending + $productSold) >= 0 ) {
-			// @todo Add item to cart (grab 'id' param)
-			
+
 			Cart::loadSession();
 			
 			$cart = Cart::getCartContainer();
@@ -153,8 +156,11 @@ class ShopController extends Zend_Controller_Action {
 					'weight' => $productWeight,
 					'title' => $productTitle )
 			);
-									
-			$cart->addItem( new Cart_Container_Item(
+
+			/**
+			 * @todo Use validators!
+			 */
+			$newItem = new Cart_Container_Item(
 				$productId,
 				$detailOptions,
 				$costOptions,
@@ -162,14 +168,12 @@ class ShopController extends Zend_Controller_Action {
 				(int) $productQuantity,
 				null, // validators
 				''
-			));
+			);
 			
-			$productDataset = new Zre_Dataset_Product();
+			$cart->addItem( $newItem );
+			
+			Zre_Store_Product::makePending($newItem);
 
-			$p = $productDataset->read($productId)->current();
-			$p->pending += $productQuantity;
-			$p->save();
-			
 			Cart::setCartContainer($cart);
 			Cart::saveSession();
 			
@@ -204,34 +208,48 @@ class ShopController extends Zend_Controller_Action {
 		$fields = Checkout_Payment::getRequiredFields();
 
 		if (count($cart->getItems()) <= 0) $this->_redirect('/shop/checkout-empty');
+
+		foreach($cart->getItems() as $cartItem) {
+			$item = Cart_Container_Item::factory($cartItem);
+
+			$pendingTotal = Zre_Store_Product::countPending($item->getSku());
+
+			if ($pendingTotal <= 0) {
+				// ...Something doesn't add up!
+				// ...Don't allow this item.
+				$cart->removeItem($item->getSku());
+			}
+		}
+
+		Cart::setCartContainer($cart);
+		Cart::saveSession();
+
+		if ($cart->count() <= 0) $this->_redirect('/shop/checkout-empty/reason/expired_items');
 		
 		if (isset($billingSubmitted)) {
 			$db = Zre_Db_Mysql::getInstance();
 			
-			$productDataset = new Zre_Dataset_Product();
-			
+			$productPendingDataset = new Zre_Dataset_ProductPending();
+
 			foreach($cart->getItems() as $cartItem) {
 				$item = Cart_Container_Item::factory($cartItem);
 
-				$p = $productDataset->read($item->getSku())->current();
+				$pendingTotal = Zre_Store_Product::countPending($item->getSku());
 
-				if ($p->pending <= 0) {
+				if ($pendingTotal <= 0) {
 					// ...Something doesn't add up!
 					// ...Don't allow this item.
-
-					$cart->removeItem($p->product_id);
+					Zre_Store_Product::flushPending($item->getSku());
+					$cart->removeItem($item->getSku());
 				}
 
 				unset($p);
 			}
-			
+
 			Cart::setCartContainer($cart);
 			Cart::saveSession();
 
-			if (count($cart->getItems()) <= 0) {
-				// Emptied cart, no valid items.
-				$this->_redirect('/shop/cart/');
-			}
+			if ($cart->count() <= 0) $this->_redirect('/shop/checkout-empty/reason/expired_items');
 			
 			$keys = array_keys($fields);
 			$params = array();
@@ -269,6 +287,7 @@ class ShopController extends Zend_Controller_Action {
 						$this->_forward('checkout-error', 'shop', 'default', array('error' => $e));
 					}
 				} elseif (isset($order_id) && is_string ($order_id)) {
+				    // The adapter requested a redirect to a payment gateway.
 				    $redir = $order_id;
 
 				    $this->_redirect($redir);
@@ -290,7 +309,9 @@ class ShopController extends Zend_Controller_Action {
 	}
 	
 	public function checkoutEmptyAction() {
+		$reason = $this->getRequest()->getParam('reason', null);
 		
+		$this->view->reason = $reason;
 	}
 	
 	public function checkoutCompleteAction() {
@@ -320,6 +341,14 @@ class ShopController extends Zend_Controller_Action {
 		}
 		
 		if (isset($orderHash) && isset($orderHashReg) && $orderHashReg == $orderHash ) {
+
+			if (isset($cart) && count($cart->getItems()) > 0) {
+
+				foreach($cart->getItems() as $cartItem) {
+					$item = Cart_Container_Item::factory($cartItem);
+					Zre_Store_Product::flushPending($item->getSku());
+				}
+			}
 
 			Cart::flushSession();
 			Cart::saveSession();

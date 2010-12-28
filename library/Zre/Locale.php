@@ -40,7 +40,7 @@ class Zre_Locale
 						$locale = new Zend_Locale( (string)$settings->site->locale ); 
 					}
 					
-					$translate = new Zend_Translate('gettext', realpath('../languages') . '/' . $locale->getLanguage() . '.mo' );
+					$translate = new Zend_Translate('gettext', BASE_PATH . '/languages/' . $locale->getLanguage() . '.mo' );
 					
 					$frontendOptions = array(
 						'lifetime' => (int)$settings->cache->lifetime->ui,

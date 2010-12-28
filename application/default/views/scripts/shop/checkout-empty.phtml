@@ -1,5 +1,22 @@
 <?php
 ?>
-<h1>Checkout Empty</h1>
+<h1>Empty Cart</h1>
 
-Your cart seems to be empty. Try adding things to your cart before checking out.
+<p>Your cart seems to be empty.</p>
+<?php
+if (!empty($this->reason)):
+	switch ($this->reason) {
+	    case 'expired_items':
+
+		$output = 'Some items in your cart have expired.';
+		break;
+	    default:
+		break;
+	}
+	?>
+	<p>
+	    <?php echo $output;?>
+	</p>
+	<?php
+endif;
+?>

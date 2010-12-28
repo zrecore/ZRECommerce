@@ -14,15 +14,15 @@
  */
 
 /**
- * Zre_Dataset_Model_ProductOptions - Provides common queries related to
- * product options.
+ * Zre_Dataset_Model_ProductPending - Provides common queries related to
+ * product pending records.
  *
  */
-class Zre_Dataset_Model_ProductOptions extends Zend_Db_Table_Abstract {
+class Zre_Dataset_Model_ProductPending extends Zend_Db_Table_Abstract {
 	/**
 	 * The default table name
 	 */
-	protected $_name = 'product_options';
+	protected $_name = 'product_pending';
 
 	public function __construct($config = array())
 	{
@@ -30,9 +30,9 @@ class Zre_Dataset_Model_ProductOptions extends Zend_Db_Table_Abstract {
 
 
 		$this->_name = $settings->db->table_name_prepend . $this->_name;
-		$this->_primary = 'option_id';
+		$this->_primary = 'product_pending_id';
 		$this->setDefaultAdapter( Zre_Db_Mysql::getInstance() );
-		
+
 		parent::__construct($config);
 	}
 

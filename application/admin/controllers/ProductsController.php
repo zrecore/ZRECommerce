@@ -87,7 +87,10 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			false
 		);
 
+		$logisticAdapters = Zre_Store_Shipping::logisticAdapters();
+		
 		$this->view->assign('articles', $articleListing);
+		$this->view->assign('logistic_adapters', $logisticAdapters);
 	}
 
 	public function jsonListAction() {
@@ -173,6 +176,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$description = $request->getParam('description', null);
 			$price = $request->getParam('price', null);
 			$allotment = $request->getParam('allotment', null);
+			$delivery_method = $request->getParam('delivery_method', null);
 
 			$date = new Zend_Date(null, 'yyyy-MM-dd HH:mm:ss');
 			$date_modified = $date->get('yyyy-MM-dd HH:mm:ss');
@@ -186,7 +190,8 @@ class Admin_ProductsController extends Zend_Controller_Action {
 				'description' => $description,
 				'price' => $price,
 				'allotment' => $allotment,
-				'date_modified' => $date_modified
+				'date_modified' => $date_modified,
+				'delivery_method' => $delivery_method
 			);
 
 			$result = $dataset->update(
@@ -208,6 +213,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 				'published' => $record->published,
 				'date_modified' => $record->date_modified,
 				'date_created' => $record->date_created,
+				'delivery_method' => $record->delivery_method,
 				'data' => $result
 			);
 		} catch (Exception $e) {

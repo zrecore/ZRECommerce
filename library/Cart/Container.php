@@ -96,7 +96,7 @@ class Cart_Container
 		
 		if ($exists == true) {
 			$cartItem->setQuantity( $cartItem->getQuantity() - 1 );
-			if ($cartItem->getQuantity <= 0) {
+			if ($cartItem->getQuantity() <= 0) {
 				unset($this->_items[$sku]);
 			} else {
 				$this->updateItem($cartItem);
