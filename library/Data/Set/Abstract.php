@@ -211,15 +211,12 @@ abstract class Data_Set_Abstract {
 			);
 			break;
 		    case 'join':
-			$select = $select->join($optionValue['name'], $optionValue['cond'], $optionValue['cols'], $optionValue['schema']);
+			$select = $select->join($optionValue['name'], $optionValue['cond'], $optionValue['cols'], isset($optionValue['schema']) ? $optionValue['schema'] : null);
 			break;
 		    case 'rightJoin':
 			$select = $select->joinRight($optionValue['name'], $optionValue['cond'], $optionValue['cols'], isset($optionValue['schema']) ? $optionValue['schema'] : null);
 			break;
-		    case 'leftJoin': // Break statement omitted.
-		    case 'leftJoin1':
-			$select = $select->joinLeft($optionValue['name'], $optionValue['cond'], $optionValue['cols'], isset($optionValue['schema']) ? $optionValue['schema'] : null);
-			break;
+		   
 		    case 'leftJoinUsing':
 			$select = $select->joinLeftUsing(
 				isset($optionValue['name']) ? $optionValue['name'] : null,

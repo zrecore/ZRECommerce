@@ -1,0 +1,19 @@
+<?php
+$message = $this->message;
+$data = $this->data;
+
+?>
+<h1><?php echo $this->translate('Order Downloads');?></h1>
+<table cellspacing="0" cellpadding="0" border="0" class="table-data">
+    <tr class="table-header">
+	<th colspan="2"><?php echo $this->translate((string)$message);?></th>
+    </tr>
+<?php if (!empty($data)): ?>
+<?php foreach($data as $r): ?>
+    <tr class="table-row">
+	<td><?php echo $r->product_id;?></td>
+	<td><?php echo !empty($r->value) ? '<a href="/orders/file/' . $r->value . '">' . $r->title . '</a>' : $r->title;?></td>
+    </tr>
+<?php endforeach;?>
+<?php endif;?>
+</table>

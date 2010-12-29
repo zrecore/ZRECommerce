@@ -126,18 +126,23 @@ class Zre_Controller_Crud_Json_Action extends Zend_Controller_Action
     protected function jsonDeleteAction() {
         try {
             $request = $this->getRequest();
-            $key = $request->getParam('key');
-
+            
             $primary = $this->_dataset->info('primary');
             $primary = array_pop($primary);
 
-            $where = $primary . ' = ?';
-            $affectedRows = $this->_dataset->delete($where, $key);
+	    $key = $request->getParam($primary, null);
 
-            $reply = array(
-                'result' => 'ok',
-                'data' => $affectedRows
-            );
+	    if (!empty($key)) {
+		$where = $primary . ' = ?';
+		$affectedRows = $this->_dataset->delete($where, $key);
+
+		$reply = array(
+		    'result' => 'ok',
+		    'data' => $affectedRows
+		);
+	    } else {
+		throw new Exception('Invalid primary key provided.');
+	    }
         } catch (Exception $e) {
             $reply = array(
                 'result' => 'error',
@@ -153,7 +158,8 @@ class Zre_Controller_Crud_Json_Action extends Zend_Controller_Action
         try {
 
             $request = $this->getRequest();
-            
+            $columns = null;
+
             $dataset = $this->_dataset;
             $primary = $dataset->info('primary');
             $primary = array_pop($primary);
@@ -162,6 +168,15 @@ class Zre_Controller_Crud_Json_Action extends Zend_Controller_Action
             $order = $request->getParam('order', 'ASC');
             $page = $request->getParam('pageIndex', 1);
             $rowCount = $request->getParam('rowCount', 5);
+
+	    $cols = $dataset->info('cols');
+	    foreach($cols as $c) {
+		$param = $request->getParam($c, null);
+
+		if (!empty($param)) {
+		    $columns[$c] = $param;
+		}
+	    }
 
             $options = array(
                     'order' => $sort . ' ' . $order,
@@ -178,7 +193,7 @@ class Zre_Controller_Crud_Json_Action extends Zend_Controller_Action
                     )
             ), false)->current()->offsetGet('COUNT(*)');
 
-            $records = $dataset->listAll(null, $options);
+            $records = $dataset->listAll($columns, $options);
             if (empty($records)) $records = null;
             
             // ...Run strip slashes on requested fields, if any.

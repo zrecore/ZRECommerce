@@ -32,3 +32,21 @@ Thank you for your order. You may <a href="JavaScript:window.print();">print</a>
 		<th><?php echo $cart->getTotal(); ?></th>
 	</tr>
 </table>
+<?php
+if (!empty($this->links)):
+?>
+<hr />
+<h1><?php echo $this->translate('Downloads');?></h1>
+<p>
+    <?php echo $this->translate('Click on each link to download your purchase.');?>
+</p>
+<ul class="form-list">
+    <?php foreach($this->links as $sku => $link):?>
+    <li>
+	<a href="<?php echo $link['href'];?>" target="_blank"><?php echo $link['title'];?></a>
+    </li>
+    <?php endforeach;?>
+</ul>
+<?php
+endif;
+?>

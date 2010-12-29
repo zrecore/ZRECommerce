@@ -49,7 +49,7 @@ class Zre_Dataset_Orders extends Data_Set_Abstract {
 				'status'
 			    )
 			),
-			'leftJoin1' => array(
+			'leftJoin ' => array(
 			    'name' => array('p' => $pre . 'product'),
 			    'cond' => 'p.product_id = oP.product_id',
 			    'cols' => array(

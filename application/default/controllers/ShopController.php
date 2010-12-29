@@ -331,6 +331,8 @@ class ShopController extends Zend_Controller_Action {
 		
 		$orderHash = $request->getParam('order', null);
 		$orderHashReg = null;
+		$orderId = null;
+
 		if (Zre_Registry_Session::isRegistered('shop.checkout.order_id')) {
 			$orderId = Zre_Registry_Session::get('shop.checkout.order_id');
 
@@ -342,10 +344,21 @@ class ShopController extends Zend_Controller_Action {
 		
 		if (isset($orderHash) && isset($orderHashReg) && $orderHashReg == $orderHash ) {
 
-			if (isset($cart) && count($cart->getItems()) > 0) {
+			$links = array();
 
+			if (isset($cart) && count($cart->getItems()) > 0) {
+				$products = new Zre_Dataset_Product();
 				foreach($cart->getItems() as $cartItem) {
 					$item = Cart_Container_Item::factory($cartItem);
+
+					$p = $products->read($cartItem->getSku())->current();
+
+					if ($p->delivery_method == 'Download') {
+					    $links[$item->getSku()] = array(
+						'title' => $p->title,
+						'href' => '/orders/download/' . $orderId . '/' . $item->getSku()
+					    );
+					}
 					Zre_Store_Product::flushPending($item->getSku());
 				}
 			}
@@ -357,7 +370,8 @@ class ShopController extends Zend_Controller_Action {
 			Zre_Registry_Session::save();
 			
 			Zend_Session::regenerateId();
-			
+
+			$this->view->assign('links', $links);
 			$this->view->assign('cart_container', $cart);
 			$this->view->assign('order_id', $orderId);
 		} else {

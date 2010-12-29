@@ -161,17 +161,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 			'module' => 'default'
 		)
 	);
-	$router->addRoute('indexReadArticle', $route);
-
+	// Provide a download link to a purchased download.
 	$route = new Zend_Controller_Router_Route(
-		'orders/post-process/:source',
+		'orders/download/:order_id/:product_id',
 		array(
 			'controller' => 'orders',
-			'action' => 'post-process',
+			'action' => 'download',
 			'module' => 'default'
 		)
 	);
-	$router->addRoute('ordersPostProcess', $route);
+	$router->addRoute('ordersDownload', $route);
 
 	$front->setRouter($router);
     }

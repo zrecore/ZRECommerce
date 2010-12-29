@@ -42,6 +42,100 @@ if (isset($vars['content'])) echo $vars['content'];
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
+		$('#product_option_dialog').dialog({
+		    autoOpen: false,
+		    modal: true,
+		    buttons: {
+			"<?php echo $this->translate('Create Option');?>": function() {
+			    var productId = $(this).find('#target_product_id');
+			    var key = $(this).find('#target_product_option_key');
+			    var value = $(this).find('#target_product_option_value');
+
+			    var data = {
+				product_id: productId.val(),
+				key: key.val(),
+				value: value.val()
+			    };
+
+			    productId.val('');
+			    key.val('');
+			    value.val('');
+
+			    jQuery.getJSON(
+				'/admin/product-options/json-create',
+				data,
+				function (reply) {
+				    if (reply.result == 'ok') {
+					reloadOptions(data.product_id);
+				    } else {
+					alert(reply.data);
+				    }
+				}
+			    );
+
+			    $(this).dialog('close');
+			},
+			"<?php echo $this->translate('Cancel');?>": function() {
+			    var productId = $(this).find('#target_product_id');
+			    var key = $(this).find('#target_product_option_key');
+			    var value = $(this).find('#target_product_option_value');
+
+			    productId.val('');
+			    key.val('');
+			    value.val('');
+
+			    $(this).dialog('close');
+			}
+		    }
+		});
+
+		function rebindRemoveOptionButton() {
+		    $('#frmProducts .remove-option').click(function(ev){
+			var id = $(this).attr('id').replace('product_remove_option_', '');
+			jQuery.getJSON(
+			    '/admin/product-options/json-delete',
+			    {
+				option_id: id
+			    },
+			    function(reply) {
+				if (reply.result == 'ok' && reply.data > 0) {
+				    $('#product_option_li_' + id).remove();
+				} else {
+				    alert(reply.data);
+				}
+			    }
+			);
+		    });
+		}
+
+		function reloadOptions(product_id) {
+		    // Reload product options here.
+		    jQuery.getJSON(
+			'/admin/product-options/json-list/',
+			{
+			    product_id: product_id
+			},
+			function (reply) {
+			    var ul = $('#product_options_' + product_id + ' .form-list');
+
+			    if (reply.result == 'ok') {
+				ul.html('');
+				if (reply.data != null) {
+				    jQuery.each(reply.data, function (i, obj) {
+					ul.append(
+					    '<li id="product_option_li_' + obj.option_id +'"><label>' + obj.key + '</label><input id="product_option_' + obj.key + '" type="text" value="' + obj.value + '" /><button class="remove-option" id="product_remove_option_' + obj.option_id + '"><?php echo $this->translate('Remove');?></button></li>'
+					);
+				    });
+
+				    rebindRemoveOptionButton();
+				}
+			    } else {
+				alert(reply.data);
+			    }
+			}
+		    );
+		}
+
 		function renderTable(response) {
 
 			$('#frmProducts .table-data .table-body').remove();
@@ -81,6 +175,14 @@ if (isset($vars['content'])) echo $vars['content'];
 					'				</li>' +
 					'			</ul>' +
 					'			<div class="editor" id="product_description_' + row.product_id + '">' + row.description + '</div>' +
+					'			<div class="product-options-controls">' +
+					'			    <?php echo $this->translate('Options:');?>' +
+					'			    <button class="add-option" id="product_add_option_' + row.product_id + '"><?php echo $this->translate('Add');?></button>' +
+					'			</div>' +
+					'			<div class="product-options" id="product_options_' + row.product_id + '">' +
+					'			    <ul class="form-list">' +
+					'			    </ul>' +
+					'			</div>' +
 					'		</td>' +
 					'	</tr>' +
 					'</tbody>'
@@ -89,6 +191,15 @@ if (isset($vars['content'])) echo $vars['content'];
 				$('#frmProducts #product_status_' + row.product_id + ' option[value=' + row.status + ']').attr('selected', 'selected');
 				$('#frmProducts #product_delivery_method_' + row.product_id + ' option[value=' + row.delivery_method + ']').attr('selected', 'selected');
 				$('#frmProducts #product_status_label_' + row.product_id).html(row.status);
+
+				// Load up product options, if any
+				$('#frmProducts .add-option').click(function(ev){
+				    var id = $(this).attr('id').replace('product_add_option_', '');
+				    $('#product_option_dialog').find('#target_product_id').val(id);
+				    $('#product_option_dialog').dialog('open');
+				});
+
+				reloadOptions(row.product_id);
 			});
 
 			rebindProductEditors();
@@ -241,6 +352,13 @@ if (isset($vars['content'])) echo $vars['content'];
 		});
 	});
 </script>
+<div id="product_option_dialog" title="<?php echo $this->translate('Options');?>" style="display: none;">
+    <input type="hidden" id="target_product_id" value="" />
+    <ul class="form-list">
+	<li><label>Key:</label><input type="text" id="target_product_option_key" value="" /></li>
+	<li><label>Value:</label><input type="text" id="target_product_option_value" value="" /></li>
+    </ul>
+</div>
 <div id="product_msg_dialog"></div>
 <form id="frmProducts" action="/admin/products/json.list">
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
