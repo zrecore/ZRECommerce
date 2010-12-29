@@ -172,6 +172,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	);
 	$router->addRoute('ordersDownload', $route);
 
+	// Provide a download link to a purchased download.
+	$route = new Zend_Controller_Router_Route(
+		'orders/file/:filename',
+		array(
+			'controller' => 'orders',
+			'action' => 'file',
+			'module' => 'default'
+		)
+	);
+	$router->addRoute('ordersFile', $route);
+
+
 	$front->setRouter($router);
     }
 }

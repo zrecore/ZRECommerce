@@ -127,4 +127,60 @@ class OrdersController extends Zend_Controller_Action {
 		$this->_redirect('/');
 	    }
 	}
+
+	function fileAction() {
+	    
+	    $this->_helper->layout->disableLayout();
+	    $this->_helper->viewRenderer->setNoRender();
+
+	    $request = $this->getRequest();
+
+	    $filename = $request->getParam('filename', null);
+
+	    if (!empty($filename)) {
+
+		$filename = basename($filename);
+		$dir = BASE_PATH . '/downloads/';
+
+		if (file_exists($dir . $filename)) {
+
+		    /**
+		     * @todo This should probably be done with adapters.
+		     */
+		    $extension = pathinfo($dir . $filename, PATHINFO_EXTENSION);
+		    $mime = '';
+		    switch ($extension) {
+			case 'mp3':
+			    $mime = 'audio/mpeg';
+			    break;
+			case 'pdf':
+			    $mime = 'application/pdf';
+			    break;
+			case 'zip':
+			    $imem = 'application/zip';
+			    break;
+			case 'gz':
+			    $mime = 'application/x-gzip';
+			    break;
+			default:
+			    $mime = 'application/octet-stream';
+			    break;
+		    }
+
+		    $content = Zre_File::read($dir . $filename);
+		    $this->getResponse()
+			->setHeader('Cache-Control', 'public')
+			->setHeader('Content-Description', 'File Transfer')
+			->setHeader('Content-Disposition', 'attachement; filename=' . $filename)
+			->setHeader('Content-Type', $mime)
+			->setHeader('Content-Transfer-Encoding', 'binary')
+			->appendBody($content);
+		} else {
+		    throw new Exception('File does not exist.');
+		}
+
+	    } else {
+		$this->_redirect('/');
+	    }
+	}
 }
