@@ -161,6 +161,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 			'module' => 'default'
 		)
 	);
+	$router->addRoute('indexReadArticle', $route);
+
 	// Provide a download link to a purchased download.
 	$route = new Zend_Controller_Router_Route(
 		'orders/download/:order_id/:product_id',
