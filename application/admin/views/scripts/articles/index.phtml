@@ -59,7 +59,49 @@ $exclude_map = array(
 $strTitle = $t->_('Title: ');
 $strInternalError = $this->translate('Internal error.');
 
+$categories = new Zre_Dataset_Article_Container();
+$categoryData = $categories->listAll(
+	array(
+	    'parent_id' => array(
+		'operator' => 'IS',
+		'value' => new Zend_Db_Expr('NULL')
+	    )
+	),
+	array(
+	    'order' => 'order_weight ASC',
+	    'order ' => 'title ASC'
+	),
+	false
+);
+
+$rootCategories = array();
+$childCategories = array();
+
+foreach ($categoryData as $row) {
+    $childCategories[] = array(
+	'data' => $row->title,
+	'attr' => array(
+	    'id' => 'category_' . $row->article_container_id,
+	    'parent_id' => !empty($row->parent_id) ? $row->parent_id : ''
+	),
+	'state' => 'closed',
+	'icon' => 'folder'
+    );
+}
+
+$rootCategories = array(
+    'data' => '(Root)',
+    'attr' => array(
+	'id' => 'category_0',
+	'parent_id' => '',
+    ),
+    'state' => 'open',
+    'icon' => 'folder',
+    'children' => $childCategories
+);
 ?>
+<script type="text/javascript" src="/scripts/jquery/jquery.cookie.js"></script>
+<script type="text/javascript" src="/scripts/jquery/jstree/jquery.jstree.js"></script>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
 		function renderTable(response)
@@ -80,26 +122,32 @@ $strInternalError = $this->translate('Internal error.');
 					'		<td class="article_title">' + row.title + '</td>' +
 					'	</tr>' +
 					'	<tr class="table-sub-row">'  +
-					'		<td colspan="2">' +
-					'			<div><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></div>' +
-					'			<div><label>' + '<?php echo $this->translate('Published'); ?>' + '</label><select id="article_published_' + row.article_id + '">' +
+					'		<td colspan="2"><ul class="form-list">' +
+					'			<li><label><?php echo 'Title';?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li>' +
+					'			<li><label><?php echo 'Image';?></label><input type="text" size="80" id="article_image_' + row.article_id + '" value="' + row.image + '" /></li>' +
+					'			<li><label><?php echo 'Category';?></label><input type="hidden" class="article_category" id="article_category_' + row.article_id + '" value="' + row.article_category_id + '" /><button id="article_category_button_' + row.article_id + '">' + row.category_title + '</button></li>' +
+					'			<li><label><?php echo $this->translate('Published'); ?></label><select class="article_published" id="article_published_' + row.article_id + '">' +
 					'				<option value="yes"' + (row.published == 'yes' ? 'selected="selected"' : '') + '>' + strYes +'</option>' +
 					'				<option value="no"' + (row.published == 'no' ? 'selected="selected"' : '') + '>' + strNo +'</option>' +
 					'				<option value="archived"' + (row.published == 'archived' ? 'selected="selected"' : '') + '>' + strArchived +'</option>' +
-					'			</select></div>' +
+					'			</select></li></ul>' +
 					'			<div class="editor" id="article_description_' + row.article_id + '">' + row.description + '</div>' +
-					'			<div class="article_image" id="article_image_' + row.article_id + '"><img src="' + row.image + '" alt="[' + row.title + ']" /></div>' +
 					'		</td>' + 
 					'	</tr>' + 
 					'</tbody>'
 				);
+				
+				$('#article_category_button_' + row.article_id).click(function(ev) {
+				    var id = $(this).attr('id').replace('article_category_button_', '');
+				    $('#article_category_dialog .selected_article_id').val(id);
+				    $('#article_category_dialog').dialog('open');
+				});
 			});
 
 			rebindArticleForm();
 		}
 		
 		function rebindArticleForm() {
-			
 			$('#frmArticles .table-data .editor').each(function (i, obj) {
 				var content = $(obj).html();
 				$(obj).wymeditor({
@@ -225,8 +273,53 @@ $strInternalError = $this->translate('Internal error.');
 						});
 			}
 		});
+
+		$('#article_category_dialog').dialog({
+		    autoOpen: false,
+		    modal: true
+		});
+
+		$.jstree._themes = "/scripts/jquery/jstree/themes/";
+		$('#article_category_dialog .category_tree').jstree({
+		    "plugins" : ["themes", "json_data", "crrm", "ui"],
+		    callback: {
+			oncreate    : function(NODE,REF_NODE,TYPE,TREE_OBJ) { alert('hi'); },
+		    },
+		    "ui" : {
+			"initially_select" : [ "category_0" ],
+		    },
+		    "json_data" : {
+			"data" : <?php echo Zend_Json::encode($rootCategories);?>,
+			"ajax" : {
+			    "url" : "/admin/category/json-dir/",
+			    "data" : function (n) {
+				
+				return {
+				    "id" : n.attr('id').replace('category_', '')
+				};
+			    }
+			}
+		    },
+		   
+		});
+
+		$('#category_add').click(function(ev){
+		    $("#article_category_dialog .category_tree").jstree(
+			"create",
+			"#category_0",
+			"first",
+			"Enter a new name"
+		    );
+		    
+		});
+
 	});
 </script>
+<div id="article_category_dialog" style="display: none;">
+    <input type="hidden" class="selected_article_id" value="" />
+    <div class="category_tree"></div>
+    <button id="category_add">+</button><button id="category_remove">-</button>
+</div>
 <div id="articles_msg_dialog"></div>
 
 <form id="frmArticles" action="/admin/articles/json.list">

@@ -39,9 +39,12 @@ class IndexController extends Zend_Controller_Action {
 		$this->view->assign('extra_css', array( $cssBase . '/components/content/article.css' ));
 
                 $articles = new Zre_Dataset_Article();
+
+		// Get articles that belong to the main category only.
                 $articleData = $articles->listAll(
                         array(
-                            'published' => 'yes'
+                            'published' => 'yes',
+			    'article_container_id' => 1 // The main category.
                         ),
                         array(
                             'order' => 'date_created DESC'

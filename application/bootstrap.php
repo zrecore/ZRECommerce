@@ -163,6 +163,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	);
 	$router->addRoute('indexReadArticle', $route);
 
+	$route = new Zend_Controller_Router_Route(
+		'category/:c/:title',
+		array(
+			'controller' => 'read',
+			'action' => 'index',
+			'module' => 'default'
+		)
+	);
+	$router->addRoute('indexReadCategory', $route);
+
 	// Provide a download link to a purchased download.
 	$route = new Zend_Controller_Router_Route(
 		'orders/download/:order_id/:product_id',
