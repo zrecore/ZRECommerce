@@ -147,6 +147,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 		try {
 			
 			$article_id = $request->getParam('article_id', null);
+			$article_container_id = $request->getParam('article_container_id', null);
 			$description = $request->getParam('description', null);
 			$article_title = $request->getParam('title', null);
 			$published = $request->getParam('published');
@@ -158,6 +159,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			
 			$updateData = array(
 				'article_id' => $article_id,
+				'article_container_id' => $article_container_id,
 				'description' => $description,
 				'title' => $article_title,
 				'date_modified' => $date_modified,
@@ -175,6 +177,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			$reply = array(
 				'result' => 'ok',
 				'article_id' => $article_id,
+				'article_container_id' => $article_container_id,
 				'date_modified' => $record->date_modified,
 				'date_created' => $record->date_created,
 				'data' => $result
@@ -184,6 +187,7 @@ class Admin_ArticlesController extends Zend_Controller_Action
 			$reply = array(
 				'result' => 'error',
 				'article_id' => $article_id,
+				'article_container_id' => $article_container_id,
 				'date_modified' => $date_modified,
 				'data' => (string) $e
 			);

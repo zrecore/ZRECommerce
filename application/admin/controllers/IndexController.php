@@ -52,6 +52,7 @@ class Admin_IndexController extends Zend_Controller_Action
 		 * Other administrative controllers can be linked to from here.
 		 */
 		$this->view->headScript()->appendFile('/scripts/jquery/wymeditor/jquery.wymeditor.min.js');
+		$this->view->headScript()->appendFile('/scripts/jquery/jquery.simpletree.js');
 		$settings = Zre_Config::getSettingsCached();
 
     	$t = Zend_Registry::get('Zend_Translate');

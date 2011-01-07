@@ -22,8 +22,7 @@ $this->placeholder('title')->set($this->title);
 
 $vars = $this->getVars();
 ?>
-<script type="text/javascript">
-    <!--
+<script type="text/javascript"><!--//
     jQuery(document).ready(function($){
 	$('.merge-xml-button').click(function(ev){
 	    ev.preventDefault();
@@ -52,43 +51,38 @@ $vars = $this->getVars();
 	});
 
 	$('#frmSettings').submit(function(ev){
-		ev.preventDefault();
+	    ev.preventDefault();
 
-		var formValues = $(this).find('#xml_string').val();
-		var url = '/admin/settings/config-ajax';
+	    var formValues = $(this).find('#xml_string').val();
+	    var url = '/admin/settings/config-ajax';
 
-		/**
-		 * @todo Convert formValues into proper array.
-		 */
-    //		jQuery.each(formValues, function(i, obj){
-    //			alert(i + ', ' + $(obj).attr('id'));
-    //		});
-		jQuery.post(
-			url, 
-			{'xml' : formValues},
-			function(reply) {
-				if (reply.result == 'ok') {
-				$('#msg').html(reply.desc)
-						 .show()
-						 .delay(3000)
-						 .slideUp();
-				} else {
+	    jQuery.post(
+		url,
+		{'xml' : formValues},
+		function(reply) {
+		    if (reply.result == 'ok') {
+		    $('#msg').html(reply.desc)
+				     .show()
+				     .delay(3000)
+				     .slideUp();
+		    } else {
 
-					alert(reply.desc);
-				}
+			    alert(reply.desc);
+		    }
+		    $('#frmSettings .table-row').slideUp();
+		},
+		'json'
+	    );
+	});
 
-			}, 
-			'json'
-		);
+	$('#frmSettings .table-header').click(function(ev){
+	    $('#frmSettings .table-row').slideToggle('fast');
 	});
     });
     //-->
 </script>
 <?php
-if (isset($vars['content']))
-    echo $vars['content'];
-
-//echo $this->form;
+if (isset($vars['content'])) echo $vars['content'];
 ?>
 <div id="msg" class="ui-corner-all ui-state-highlight" style="margin-top: 20px; padding: 1em .7em; display: none">
 </div>
@@ -116,13 +110,13 @@ if (isset($vars['content']))
 </form>
 <form action="#frmSettings" method="post" id="frmSettings">
     <table cellspacing="0" cellpadding="0" border="0" class="table-data">
-	<tr class="table-header">
-	    <th>View or Update 'settings.xml'</th>
+	<tr class="table-header" style="cursor: pointer;">
+	    <th>View or Update 'settings.xml' &raquo;</th>
 	</tr>
-	<tr class="table-row">
+	<tr class="table-row" style="display:none">
 	    <td>
 		<ul class="form-list">
-		    <li><label></label><textarea id="xml_string" cols="64" rows="42" class="monotype" style="width: 99%; float: left;"><?php echo $this->xml_string; ?></textarea></li>
+		    <li><label></label><textarea id="xml_string" cols="64" rows="42" class="monotype" style="width: 99%; float: left; border: none;"><?php echo $this->xml_string; ?></textarea></li>
 		    <li><input type="submit" value="Save" /></li>
 		</ul>
 	    </td>

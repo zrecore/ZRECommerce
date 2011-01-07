@@ -56,6 +56,8 @@ class Admin_LoginController extends Zend_Controller_Action {
 
 		$form = new Zre_Ui_Form_Login();
 		$form->setAction('/admin/login');
+		$form->setAttrib('id', 'frmLogin');
+		
 		$t = Zend_Registry::get('Zend_Translate');
 
 		$this->view->title = $t->_('Login');

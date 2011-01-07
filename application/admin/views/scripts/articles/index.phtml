@@ -11,10 +11,13 @@
  * @version $Id$
  * @copyright Copyrights 2008 ZRECommerce. See README file.
  * @license GPL v3 or higher. See README file.
+ *
+ *
+ * @todo Make the new article dialog continue to expand horizontally as a
+ * user types, until a new line character is input (indicating the max width).
  */
 
 $settings = ZRE_Config::getSettingsCached();
-$t = Zend_Registry::get('Zend_Translate');
 
 $this->headTitle((string)$settings->site->title,Zend_View_Helper_Placeholder_Container_Abstract::SET );
 if (empty($this->title)) $this->title = (string)$settings->site->title;
@@ -56,7 +59,7 @@ $exclude_map = array(
 	'image'
 );
 
-$strTitle = $t->_('Title: ');
+$strTitle = $this->translate('Title: ');
 $strInternalError = $this->translate('Internal error.');
 
 $categories = new Zre_Dataset_Article_Container();
@@ -100,8 +103,6 @@ $rootCategories = array(
     'children' => $childCategories
 );
 ?>
-<script type="text/javascript" src="/scripts/jquery/jquery.cookie.js"></script>
-<script type="text/javascript" src="/scripts/jquery/jstree/jquery.jstree.js"></script>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
 		function renderTable(response)
@@ -125,7 +126,7 @@ $rootCategories = array(
 					'		<td colspan="2"><ul class="form-list">' +
 					'			<li><label><?php echo 'Title';?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li>' +
 					'			<li><label><?php echo 'Image';?></label><input type="text" size="80" id="article_image_' + row.article_id + '" value="' + row.image + '" /></li>' +
-					'			<li><label><?php echo 'Category';?></label><input type="hidden" class="article_category" id="article_category_' + row.article_id + '" value="' + row.article_category_id + '" /><button id="article_category_button_' + row.article_id + '">' + row.category_title + '</button></li>' +
+					'			<li><label><?php echo 'Category';?></label><input type="hidden" class="article_category" id="article_category_' + row.article_id + '" value="' + row.article_container_id + '" /><button id="article_category_button_' + row.article_id + '">' + row.category_title + '</button></li>' +
 					'			<li><label><?php echo $this->translate('Published'); ?></label><select class="article_published" id="article_published_' + row.article_id + '">' +
 					'				<option value="yes"' + (row.published == 'yes' ? 'selected="selected"' : '') + '>' + strYes +'</option>' +
 					'				<option value="no"' + (row.published == 'no' ? 'selected="selected"' : '') + '>' + strNo +'</option>' +
@@ -138,8 +139,22 @@ $rootCategories = array(
 				);
 				
 				$('#article_category_button_' + row.article_id).click(function(ev) {
-				    var id = $(this).attr('id').replace('article_category_button_', '');
-				    $('#article_category_dialog .selected_article_id').val(id);
+
+				    var buttonElement = $(this);
+				    var id = buttonElement.attr('id').replace('article_category_button_', '');
+				    var inputElement = $('#article_category_' + id);
+
+				    $('#article_category_dialog .category_tree').simpleTree('selected', inputElement.val());
+				    $('#article_category_dialog').dialog('option', 'buttons', {
+					'Ok' : function (ev) {
+					    inputElement.val($('#article_category_dialog .selected_category_id').val());
+					    buttonElement.html($('#article_category_dialog .selected_article_text').val());
+					    $(this).dialog('close');
+					},
+					'Cancel': function (ev) {
+					    $(this).dialog('close');
+					}
+				    });
 				    $('#article_category_dialog').dialog('open');
 				});
 			});
@@ -175,6 +190,7 @@ $rootCategories = array(
 									var article_id = jQuery(this).parent().parent().parent().parent().parent().parent().find('.editor').attr('id').replace('article_description_', '');
 									var article_title = jQuery('#article_title_' + article_id).val();
 									var article_published = jQuery('#article_published_' + article_id).val();
+									var article_container_id = jQuery('#article_category_' + article_id).val();
 
 									var subRow = $('#article_description_' + article_id).parent().parent();
 									var row = subRow.prev();
@@ -185,6 +201,7 @@ $rootCategories = array(
 										'/admin/articles/json-update',
 										{
 											article_id: article_id,
+											article_container_id: article_container_id,
 											description: htmlData,
 											title: article_title,
 											published: article_published
@@ -226,124 +243,151 @@ $rootCategories = array(
 			postInit: function(wym) {
 				
 				//construct the button's html
-				var html = "<li class='wym_tools_newbutton'>"
+				var html = "<li class='wym_tools_savebutton'>"
 					+ "<a name='SaveButton' href='#'"
 					+ " style='background-image:"
 					+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
 					+ "Save"
 					+ "</a></li>";
-			
-				//add the button to the tools box
-				jQuery(wym._box)
-					.find(wym._options.toolsSelector + wym._options.toolsListSelector)
-					.prepend(html);
-				
-					//handle click event
-					jQuery(wym._box)
-						.find('li.wym_tools_newbutton a').click(function() {
-							//do something
-							var htmlData = wym.html();
-							
-							var article_title = jQuery('#new_article_title').val();
-							var article_image = jQuery('#new_article_image').val();
-							
-							jQuery.getJSON(
-								'/admin/articles/json-create',
-								{
-									article_container_id: 1,
-									description: htmlData,
-									title: article_title,
-									image: article_image
-								},
-								function (reply) {
-									if (reply > 0) {
-                                                                            $('#frmArticles').tableSort('load', null);
 
-                                                                            jQuery('#new_article_title').val('');
-                                                                            jQuery('#new_article_image').val('');
-                                                                            wym.html('');
+				if (jQuery(wym._box).find('li.wym_tools_savebutton').length == 0) {
+				    //add the button to the tools box
+				    jQuery(wym._box)
+				    .find(wym._options.toolsSelector + wym._options.toolsListSelector)
+				    .prepend(html);
 
-									} else {
-										alert('<?php echo $strInternalError; ?>');
-									}
-								}
-							);
-							
-							return(false);
-						});
+				    //handle click event
+				    jQuery(wym._box)
+				    .find('li.wym_tools_savebutton a').click(function() {
+					    //do something
+					    var htmlData = wym.html();
+
+					    var article_title = jQuery('#new_article_title').val();
+					    var article_image = jQuery('#new_article_image').val();
+					    var article_container_id = jQuery('#new_article_category').val();
+
+					    jQuery.getJSON(
+						    '/admin/articles/json-create',
+						    {
+							    article_container_id: 1,
+							    description: htmlData,
+							    title: article_title,
+							    image: article_image
+						    },
+						    function (reply) {
+
+							    if (reply > 0) {
+								$('#frmArticles').tableSort('load', null);
+
+								jQuery('#new_article_title').val('');
+								jQuery('#new_article_image').val('');
+								wym.html('');
+
+							    } else {
+								    alert('<?php echo $strInternalError; ?>');
+							    }
+
+							    $('#newArticleDiv').dialog('close');
+						    }
+					    );
+
+					    return(false);
+				    });
+				}
 			}
 		});
 
 		$('#article_category_dialog').dialog({
 		    autoOpen: false,
-		    modal: true
-		});
-
-		$.jstree._themes = "/scripts/jquery/jstree/themes/";
-		$('#article_category_dialog .category_tree').jstree({
-		    "plugins" : ["themes", "json_data", "crrm", "ui"],
-		    callback: {
-			oncreate    : function(NODE,REF_NODE,TYPE,TREE_OBJ) { alert('hi'); },
-		    },
-		    "ui" : {
-			"initially_select" : [ "category_0" ],
-		    },
-		    "json_data" : {
-			"data" : <?php echo Zend_Json::encode($rootCategories);?>,
-			"ajax" : {
-			    "url" : "/admin/category/json-dir/",
-			    "data" : function (n) {
-				
-				return {
-				    "id" : n.attr('id').replace('category_', '')
-				};
-			    }
+		    modal: true,
+		    buttons: {
+			'Ok': function (ev) {
+			    $(this).dialog('close');
+			},
+			'Cancel': function (ev) {
+			    $(this).dialog('close');
 			}
-		    },
-		   
+		    }
 		});
 
-		$('#category_add').click(function(ev){
-		    $("#article_category_dialog .category_tree").jstree(
-			"create",
-			"#category_0",
-			"first",
-			"Enter a new name"
-		    );
-		    
+		
+		$('#article_category_dialog .category_tree').simpleTree({
+		    url: '/admin/category/json-list',
+		    onSelect: function (lastId, newId, text) {
+			$('#article_category_dialog .selected_category_id').val(newId);
+			$('#article_category_dialog .selected_article_text').val( text );
+		    }
 		});
 
+		$('#new_article_category_button').click(function(ev) {
+
+		    var buttonElement = $(this);
+		    var inputElement = $('#new_article_category');
+
+		    $('#article_category_dialog .category_tree').simpleTree('selected', 0);
+		    $('#article_category_dialog').dialog('option', 'buttons', {
+			'Ok' : function (ev) {
+			    inputElement.val($('#article_category_dialog .selected_category_id').val());
+			    buttonElement.val($('#article_category_dialog .selected_article_text').val());
+			    $(this).dialog('close');
+			},
+			'Cancel': function (ev) {
+			    $(this).dialog('close');
+			}
+		    });
+		    $('#article_category_dialog').dialog('open');
+		});
+
+		$('#newArticleDiv').dialog({
+		    autoOpen: false,
+		    modal: true,
+		    minWidth: 480,
+		    width: 480
+		});
+
+		$('.create-new-article-button').click(function(ev){
+		    ev.preventDefault();
+		    $('#newArticleDiv').dialog('open');
+		    return false;
+		});
 	});
 </script>
-<div id="article_category_dialog" style="display: none;">
-    <input type="hidden" class="selected_article_id" value="" />
+<div id="article_category_dialog" class="small-text" style="display: none;">
+    <input type="hidden" class="selected_category_id" value="" />
+    <input type="hidden" class="selected_article_text" value="" />
     <div class="category_tree"></div>
-    <button id="category_add">+</button><button id="category_remove">-</button>
 </div>
 <div id="articles_msg_dialog"></div>
+
+<input type="button" class="create-new-article-button" value="<?php echo $this->translate('New Article'); ?>" />
 
 <form id="frmArticles" action="/admin/articles/json.list">
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
-			<th><a href="#date_created"><?php echo $t->_('Date Created'); ?></a></th>
+			<th><a href="#date_created"><?php echo $this->translate('Date Created'); ?></a></th>
 			<th>
-				<a href="#title"><?php echo $t->_('Article'); ?></a>
+				<a href="#title"><?php echo $this->translate('Article'); ?></a>
 			</th>
 		</tr>
 	</table>
 </form>
-<br />
-<br />
-<h3><?php echo $t->_('Create a new article'); ?></h3>
-<div>
-	<ul class="form-list">
+
+<input type="button" class="create-new-article-button" value="<?php echo $this->translate('New Article'); ?>" />
+
+<div id="newArticleDiv" title="<?php echo $this->translate('Create a new article'); ?>" style="display: none;">
+	<ul class="form-list small-text">
 		<li>
-			<label for="new_article_title"><?php echo $t->_('Title:'); ?></label>
+			<label for="new_article_title"><?php echo $this->translate('Title:'); ?></label>
 			<input type="text" id="new_article_title" value="" />
 		</li>
 		<li>
-			<label for="new_article_image"><?php echo $t->_('Image:'); ?></label>
+			<label for="new_article_image"><?php echo $this->translate('Image:'); ?></label>
 			<input type="text" id="new_article_image" value="/images/dummy.png" />
+		</li>
+		<li>
+			<label for="new_article_category"><?php echo $this->translate('Category:'); ?></label>
+			<input type="hidden" id="new_article_category" value="1" />
+			<input type="button" id="new_article_category_button" value="Main" />
 		</li>
 	</ul>
 	<div id="new_article_description"></div>

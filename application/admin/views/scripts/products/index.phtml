@@ -291,64 +291,82 @@ if (isset($vars['content'])) echo $vars['content'];
 		}
 
 		$('#new_product_description').wymeditor({
-			postInit: function(wym) {
+		    postInit: function(wym) {
 
-				//construct the button's html
-				var html = "<li class='wym_tools_newbutton'>"
-					+ "<a name='SaveButton' href='#'"
-					+ " style='background-image:"
-					+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
-					+ "Save"
-					+ "</a></li>";
+			//construct the button's html
+			var html = "<li class='wym_tools_savebutton'>"
+				+ "<a name='SaveButton' href='#'"
+				+ " style='background-image:"
+				+ " url(/scripts/jquery/wymeditor/skins/default/icons.png); background-position: 0px -" + (26 * 24) + "px;' title='Save'>"
+				+ "Save"
+				+ "</a></li>";
+			if (jQuery(wym._box).find('li.wym_tools_savebutton').length == 0) {
+			    //add the button to the tools box
+			    jQuery(wym._box)
+			    .find(wym._options.toolsSelector + wym._options.toolsListSelector)
+			    .prepend(html);
 
-				//add the button to the tools box
-				jQuery(wym._box)
-				.find(wym._options.toolsSelector + wym._options.toolsListSelector)
-				.prepend(html);
+			    //handle click event
+			    jQuery(wym._box)
+			    .find('li.wym_tools_savebutton a').click(function() {
+				//do something
+				var htmlData = wym.html();
 
-				//handle click event
-				jQuery(wym._box)
-				.find('li.wym_tools_newbutton a').click(function() {
-					//do something
-					var htmlData = wym.html();
+				var product_title = jQuery('#new_product_title').val();
+				var product_image = jQuery('#new_product_image').val();
+				var allotment = jQuery('#new_product_allotment').val();
+				var published = jQuery('#new_product_published').val();
+				var price = jQuery('#new_product_price').val();
+				var delivery_method = jQuery('#new_product_delivery_method').val();
 
-					var product_title = jQuery('#new_product_title').val();
-					var product_image = jQuery('#new_product_image').val();
-					var allotment = jQuery('#new_product_allotment').val();
-					var published = jQuery('#new_product_published').val();
-					var price = jQuery('#new_product_price').val();
-					var delivery_method = jQuery('#new_product_delivery_method').val();
+				jQuery.getJSON(
+				'/admin/products/json-create',
+				{
+				    description: htmlData,
+				    title: product_title,
+				    image: product_image,
+				    published: published,
+				    price: price,
+				    allotment: allotment,
+				    delivery_method: delivery_method
+				},
+				function (reply) {
+				    if (reply > 0) {
+					var el = $('#frmNewProduct li');
+					var bg = el.css('background-color');
 
-					jQuery.getJSON(
-					'/admin/products/json-create',
-					{
-						description: htmlData,
-						title: product_title,
-						image: product_image,
-						published: published,
-						price: price,
-						allotment: allotment,
-						delivery_method: delivery_method
-					},
-					function (reply) {
-					
-						if (reply > 0) {
+					el.css('background-color', '#0a0').animate({backgroundColor: bg}, 'fast', function(){
+					    $('#frmNewProduct').dialog('close');
+					    $('#frmProducts').tableSort('load', null);
+					});
 
-						    var el = $('#frmNewProduct li');
-						    var bg = el.css('background-color');
 
-						    el.css('background-color', '#0a0').animate({backgroundColor: bg}, 1000, function(){});
-
-						    $('#frmProducts').tableSort('load', null);
-						} else {
-							alert('<?php echo $strInternalError; ?>');
-						}
-					}
-				);
-
-					return(false);
+				    } else {
+					    alert('<?php echo $strInternalError; ?>');
+					    $('#frmNewProduct').dialog('close');
+				    }
 				});
+
+				return(false);
+			    });
+
 			}
+
+
+		    }
+		});
+
+		$('#frmNewProduct').dialog({
+		    autoOpen: false,
+		    modal: true,
+		    minWidth: 480,
+		    width: 480
+		});
+
+		$('.create-new-product-button').click(function(ev){
+		    ev.preventDefault();
+		    $('#frmNewProduct').dialog('open');
+		    return false;
 		});
 	});
 </script>
@@ -360,6 +378,9 @@ if (isset($vars['content'])) echo $vars['content'];
     </ul>
 </div>
 <div id="product_msg_dialog"></div>
+
+<input type="button" class="create-new-product-button" value="<?php echo $this->translate('New Product'); ?>" />
+
 <form id="frmProducts" action="/admin/products/json.list">
 	<table cellspacing="0" cellpadding="0" border="0" class="table-data">
 		<tr class="table-header">
@@ -373,11 +394,11 @@ if (isset($vars['content'])) echo $vars['content'];
 		</tr>
 	</table>
 </form>
-<br />
-<br />
-<h3><?php echo $this->translate('Create a new product'); ?></h3>
-<div id="frmNewProduct">
-	<ul class="form-list">
+
+<input type="button" class="create-new-product-button" value="<?php echo $this->translate('New Product'); ?>" />
+
+<div id="frmNewProduct" title="<?php echo $this->translate('Create a new product'); ?>" style="display: none;">
+	<ul class="form-list small-text">
 		<li>
 			<label for="new_product_title"><?php echo $this->translate('Title'); ?></label>
 			<input type="text" id="new_product_title" value="" />

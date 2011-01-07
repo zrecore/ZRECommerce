@@ -19,6 +19,28 @@ $this->headTitle( (string)$settings->site->title, 'SET');
 if (empty($this->title)) $this->title = (string)$settings->site->title;
 $this->placeholder('title')->set($this->title);
 
-$vars = $this->getVars();
+echo $this->doctype();
+?>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/scripts/jquery/css/<?php echo (string)$settings->site->jqueryui_theme;?>/jquery-ui-1.7.custom.css" />
+</head>
+<body>
+    <script type="text/javascript" src="/scripts/jquery/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="/scripts/jquery/jquery-ui-1.7.custom.min.js"></script>
+    <script type="text/javascript">
+	jQuery(document).ready(function($){
+	
+	    $('#divLoginForm')
+		.addClass('ui-reset')
+		.addClass('ui-widget-content')
+		.addClass('ui-corner-all');
+	});
+    </script>
+    <div id="divLoginForm" style="border: solid 1px #aaa; width: 260px; padding: 0.6em;">
+<?php
 echo $this->form;
 ?>
+    </div>
+</body>
+</html>

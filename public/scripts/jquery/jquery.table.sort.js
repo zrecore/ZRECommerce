@@ -47,6 +47,7 @@ $.widget('ui.tableSort', {
 		var headerLinks = headerElement.find('a');
 		
 		formElement.prepend('<div class="' + config.paginatorClass.replace('.', '') + '"></div>');
+		formElement.append('<div class="' + config.paginatorClass.replace('.', '') + '"></div>');
 		
 		// Set element values.
 		if (orderElement.val() != config.order) orderElement.val(config.order);
@@ -190,7 +191,7 @@ $.widget('ui.tableSort', {
 		var headerElement = tableElement.find(config.tableHeaderClass);
 		
 		headerElement.find('th').last().append(
-			'<select class="' + config.tableSortOrderClass.replace('.', '') + '">' +
+			'<select class="' + config.tableSortOrderClass.replace('.', '') + '" style="float: right; margin: 0; padding: 0;">' +
 				'<option value="ASC">' + config.orderAscText + '</option>' + 
 				'<option value="DESC">' + config.orderDescText + '</option>' +
 			'</select>'
