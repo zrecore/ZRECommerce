@@ -49,6 +49,7 @@ echo $this->form;
                 );
 	}
 	$categories = $articleContainer->listAll( $where );
+	
 ?>
 <h1 class="articleCategoryTitle"><?php echo $t->_('Category:'); ?> <?php echo $mainCategory->current()->title;?></h1>
 <?php 
@@ -107,26 +108,32 @@ echo $this->form;
 	}
 
 	foreach ($categories as $category) {
+	    
 		if ($category['article_container_id'] != $categoryParentId ) {
-			$readArticle = Zre_Dataset_Article::readContainerArticles($category['article_container_id']);
+//			$readArticle = Zre_Dataset_Article::readContainerArticles($category['article_container_id']);
+			$readArticle = $article->listAll(
+				array('article_container_id', $category['article_container_id']),
+				array('order', 'date_created DESC')
+			);
 			$totalArticles = count($readArticle);
 			
-			if ($totalArticles < 1) continue;
+			
 ?>
 	<h2 class="articleSubCategoryTitle"><a href="/read/index/c/<?php echo $category['article_container_id'];?>"><?php echo $category['title']; ?></a></h2>
 <?php
-			foreach($readArticle as $index => $article) {
+	    if ($totalArticles < 1) continue;
+			foreach($readArticle as $index => $row) {
 				
 				// ...Grab our article properties
-				$articleId 			= $article['article_id'];
-				$articleContainerId = $article['article_container_id'];
-				$articleResource 	= $article['resource'];
-				$articlePublished 	= $article['published'];
-				$articleTitle 		= $article['title'];
-				$articleDescription = $article['description'];
-				$articleDateCreated  = new Zend_Date( $article['date_created'] );
-				$articleDateModified = new Zend_Date( $article['date_modified'] );
-				$articleImage 		= $article['image'];
+				$articleId 			= $row['article_id'];
+				$articleContainerId = $row['article_container_id'];
+				$articleResource 	= $row['resource'];
+				$articlePublished 	= $row['published'];
+				$articleTitle 		= $row['title'];
+				$articleDescription = $row['description'];
+				$articleDateCreated  = new Zend_Date( $row['date_created'] );
+				$articleDateModified = new Zend_Date( $row['date_modified'] );
+				$articleImage 		= $row['image'];
 				
 				$articleDescription = html_entity_decode($articleDescription, ENT_QUOTES);
 				$articleDescription = str_replace(array('{', '}', '\"'), array('<', ' />', '"'), $articleDescription);
