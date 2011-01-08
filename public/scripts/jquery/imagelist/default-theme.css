@@ -1,0 +1,21 @@
+.ui-image-list {
+    margin-left: 0;
+    padding-left: 0;
+    border: solid 1px #aaa;
+    position: absolute;
+    z-index: 1;
+}
+.ui-image-list-item {
+    border: solid 1px #aaa;
+    background-color: #fff;
+    width: 100px;
+    height: 100px;
+}
+
+.ui-image-list-item img {
+    width: 92px;
+    margin: 4px;
+    padding: 0;
+    float: left;
+}
+

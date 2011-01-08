@@ -125,7 +125,10 @@ $rootCategories = array(
 					'	<tr class="table-sub-row">'  +
 					'		<td colspan="2"><ul class="form-list">' +
 					'			<li><label><?php echo 'Title';?></label><input type="text" size="80" id="article_title_' + row.article_id + '" value="' + row.title + '" /></li>' +
-					'			<li><label><?php echo 'Image';?></label><input type="text" size="80" id="article_image_' + row.article_id + '" value="' + row.image + '" /></li>' +
+					'			<li><label><?php echo 'Image';?></label><input type="text" size="20" id="article_image_' + row.article_id + '" value="' + row.image + '" />' +
+					'			    <input type="button" class="article-image-selector-button" id="article_image_selector_button_' + row.article_id + '" value="<?php echo $this->translate('Browse');?>" />' +
+					'			    <div class="article-image-selector" id="article_image_selector_' + row.article_id + '"></div>' +
+					'			</li>' +
 					'			<li><label><?php echo 'Category';?></label><input type="hidden" class="article_category" id="article_category_' + row.article_id + '" value="' + row.article_container_id + '" /><button id="article_category_button_' + row.article_id + '">' + row.category_title + '</button></li>' +
 					'			<li><label><?php echo $this->translate('Published'); ?></label><select class="article_published" id="article_published_' + row.article_id + '">' +
 					'				<option value="yes"' + (row.published == 'yes' ? 'selected="selected"' : '') + '>' + strYes +'</option>' +
@@ -156,6 +159,25 @@ $rootCategories = array(
 					}
 				    });
 				    $('#article_category_dialog').dialog('open');
+				});
+
+				$('.article-image-selector').each(function (i, obj) {
+				    var id = $(obj).attr('id').replace('article_image_selector_', '');
+				    
+				    $(obj).imageList({
+					url: '/admin/images/json-list',
+					onItemClick: function (ev) {
+					    var file = $(this).find('img').attr('alt');
+					    var dir = $(obj).imageList('option', 'image_dir');
+
+					    $('#article_image_' + id).val(dir + file);
+					    $(obj).imageList('hide');
+					}
+				    });
+				});
+				$('.article-image-selector-button').click(function(ev){
+				    var id = $(this).attr('id').replace('article_image_selector_button_', '');
+				    $('#article_image_selector_' + id).imageList('show');
 				});
 			});
 
@@ -350,9 +372,25 @@ $rootCategories = array(
 		    $('#newArticleDiv').dialog('open');
 		    return false;
 		});
+
+		$('#new_article_image_selector').imageList({
+		    url: '/admin/images/json-list',
+		    onItemClick: function (ev) {
+			var file = $(this).find('img').attr('alt');
+			var dir = $('#new_article_image_selector').imageList('option', 'image_dir');
+
+			$('#new_article_image').val(dir + file);
+
+			$('#new_article_image_selector').imageList('hide');
+		    }
+		});
+
+		$('#select_new_article_image').click(function(ev){
+		    $('#new_article_image_selector').imageList('show');
+		});
 	});
 </script>
-<div id="article_category_dialog" class="small-text" style="display: none;">
+<div id="article_category_dialog" class="small-text">
     <input type="hidden" class="selected_category_id" value="" />
     <input type="hidden" class="selected_article_text" value="" />
     <div class="category_tree"></div>
@@ -382,7 +420,8 @@ $rootCategories = array(
 		</li>
 		<li>
 			<label for="new_article_image"><?php echo $this->translate('Image:'); ?></label>
-			<input type="text" id="new_article_image" value="/images/dummy.png" />
+			<input type="text" id="new_article_image" value="/images/dummy.png" /><input type="button" id="select_new_article_image" value="<?php echo $this->translate('Browse');?>" />
+			<div id="new_article_image_selector"></div>
 		</li>
 		<li>
 			<label for="new_article_category"><?php echo $this->translate('Category:'); ?></label>

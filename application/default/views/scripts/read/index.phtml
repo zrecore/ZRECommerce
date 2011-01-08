@@ -51,7 +51,7 @@ echo $this->form;
 	$categories = $articleContainer->listAll( $where );
 	
 ?>
-<h1 class="articleCategoryTitle"><?php echo $t->_('Category:'); ?> <?php echo $mainCategory->current()->title;?></h1>
+<h1 class="articleCategoryTitle"><?php echo $mainCategory->current()->title;?></h1>
 <?php 
 //$readArticle = new Zre_Ui_Datagrid_Read($categoryParentId, 'yes', null);
 	if (isset($categoryParentId)) {

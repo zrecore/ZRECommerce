@@ -40,6 +40,8 @@ class Admin_IndexController extends Zend_Controller_Action
 		
 //		$this->view->assign('enable_admin_menu', 1);
 		$this->view->headScript()->appendFile('/scripts/jquery/jquery.table.sort.js');
+		$this->view->headScript()->appendFile('/scripts/jquery/jquery.imagelist.js');
+		$this->view->headLink()->appendStylesheet('/scripts/jquery/imagelist/default-theme.css');
 	}
 	/**
 	 * The default action - show the home page

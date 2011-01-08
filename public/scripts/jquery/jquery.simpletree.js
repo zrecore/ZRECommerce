@@ -56,7 +56,7 @@ $.widget('ui.simpleTree', {
     selected: function(id) {
 	var containerElement = jQuery(this.element);
 	if (id) {
-	    var last_id = this.options.parend_id;
+	    var last_id = this.options.parent_id;
 	    var text = '';
 	    // Setter
 	    containerElement.find('li.ui-state-focus').removeClass('ui-state-focus');
