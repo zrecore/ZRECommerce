@@ -44,7 +44,7 @@ echo $this->form;
 	
 	$categories = $articleContainer->listAll( array('parent_id' => $categoryParentId) );
 ?>
-<h1 class="productCategoryTitle"><?php echo $t->_('Category:'); ?> <?php echo $mainCategory->current()->title;?></h1>
+<h1 class="productCategoryTitle"><?php echo $mainCategory->current()->title;?></h1>
 <?php
 $product = new Zre_Dataset_Product();
 $productData = $product->listAll(
@@ -68,6 +68,17 @@ $productData = $product->listAll(
 		$productDescription = str_replace(array('{', '}', '\"'), array('<', ' />', '"'), $productDescription);
 		
 		if (empty($productImage)) $productImage = '/images/dummy.png';
+
+		$productSlug = Zre_Template::createSlug($productTitle);
+		$productLink = $this->url(
+		    array(
+			'controller'=>'shop',
+			'action'=>'product',
+			'id'=>$productId,
+			'title' => $productSlug
+		    ),
+		    'shopProduct'
+		);
 		// ...And display however we want.
 ?>
 		<div class="productContainer">
@@ -75,16 +86,16 @@ $productData = $product->listAll(
 				
 				<tr>
 					<td class="productImageContainer">
-						<a href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>" class="productImageAnchor"><img src="<?php echo $productImage; ?>" alt="<?php echo $productTitle; ?>" class="productImage" /></a>
+						<a href="<?php echo $productLink; ?>" class="productImageAnchor"><img src="<?php echo $productImage; ?>" alt="<?php echo $productTitle; ?>" class="productImage" /></a>
 					</td>
 					
 					<td class="productText">
-						<a name="product-<?php echo $productId; ?>" href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>">
+						<a name="product-<?php echo $productId; ?>" href="<?php echo $productLink; ?>">
 							<h2 class="productTitle"><?php echo $productTitle; ?></h2>
 						</a>
 						<div class="productSubHeader"><?php echo $t->_('Summary'); ?></div>
 						<div class="productDescription">
-						<?php echo Plugin::search_and_insert($productDescription); ?>&nbsp;<a href="<?php echo $this->url(array('controller'=>'shop', 'action'=>'product', 'id'=>$productId)); ?>"><?php echo $t->_('...more'); ?></a>
+						<?php echo Plugin::inject($productDescription); ?>
 						</div>
 						<div class="productFooter"><?php echo $t->_('Written on ') . $productDateCreated->getArpa(); ?></div>
 					</td>

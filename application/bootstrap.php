@@ -152,30 +152,31 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	$front = Zend_Controller_Front::getInstance();
 	$router = $front->getRouter();
 
-	// ...'Read' controller routes
+	// Article link
 	$route = new Zend_Controller_Router_Route(
-		'a/:id/:title',
+		'/a/:id/:title',
 		array(
-			'controller' => 'read',
+			'controller' => 'index',
 			'action' => 'article',
 			'module' => 'default'
 		)
 	);
 	$router->addRoute('indexReadArticle', $route);
 
+	// Category link
 	$route = new Zend_Controller_Router_Route(
-		'category/:c/:title',
+		'/c/:c/:title',
 		array(
-			'controller' => 'read',
+			'controller' => 'index',
 			'action' => 'index',
 			'module' => 'default'
 		)
 	);
 	$router->addRoute('indexReadCategory', $route);
 
-	// Provide a download link to a purchased download.
+	// Order link. Provide a download link to a purchased download.
 	$route = new Zend_Controller_Router_Route(
-		'orders/download/:order_id/:product_id',
+		'/orders/download/:order_id/:product_id',
 		array(
 			'controller' => 'orders',
 			'action' => 'download',
@@ -184,9 +185,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	);
 	$router->addRoute('ordersDownload', $route);
 
-	// Provide a download link to a purchased download.
+	// Order link. Provide a download link to a purchased download.
 	$route = new Zend_Controller_Router_Route(
-		'orders/file/:filename',
+		'/orders/file/:filename',
 		array(
 			'controller' => 'orders',
 			'action' => 'file',
@@ -194,6 +195,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		)
 	);
 	$router->addRoute('ordersFile', $route);
+
+	// Shop link.Provide a link to a product.
+	$route = new Zend_Controller_Router_Route(
+		'/p/:id/:title',
+		array(
+			'controller' => 'shop',
+			'action' => 'product',
+			'module' => 'default'
+		)
+	);
+	$router->addRoute('shopProduct', $route);
 
 
 	$front->setRouter($router);

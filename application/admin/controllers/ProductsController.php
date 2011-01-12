@@ -171,6 +171,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$dataset = new Zre_Dataset_Product();
 
 			$product_id = $request->getParam('product_id', null);
+			$article_id = $request->getParam('article_id', null);
 			$product_title = $request->getParam('title', null);
 			$published = $request->getParam('published', null);
 			$description = $request->getParam('description', null);
@@ -185,6 +186,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 
 			$updateData = array(
 				'product_id' => $product_id,
+				'article_id' => $article_id,
 				'title' => $product_title,
 				'published' => $published,
 				'description' => $description,
@@ -204,6 +206,7 @@ class Admin_ProductsController extends Zend_Controller_Action {
 			$reply = array(
 				'result' => 'ok',
 				'product_id' => $product_id,
+				'article_id' => $record->article_id,
 				'price' => $record->price,
 				'allotment' => $record->allotment,
 				'pending' => $record->pending,

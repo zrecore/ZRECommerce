@@ -6,6 +6,7 @@ a, abbr, acronym, b, bdo, big, br, cite, code, dfn, em, i, img, kbd, q, samp, sm
 strong, sub, sup, tt, var, legend, fieldset {
 margin: 0;
 padding: 0;
+vertical-align: top;
 }
 img, fieldset {
 border: 0;

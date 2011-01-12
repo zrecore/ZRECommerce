@@ -20,8 +20,6 @@ $this->headTitle((string)$settings->site->title, Zend_View_Helper_Placeholder_Co
 if (empty($this->title)) $this->title = (string)$settings->site->title;
 $this->placeholder('title')->set($this->title);
 
-$vars = $this->getVars();
-
 $strStatus	= 'Published';
 $strDeliveryMethod = 'Delivery Method';
 $strDeliveryMethods = '<option value="">None</option>';
@@ -37,8 +35,6 @@ $strUpdateProduct = $this->translate('Update Product');
 
 $strInternalError = $this->translate('There was an internal error.');
 
-// Content
-if (isset($vars['content'])) echo $vars['content'];
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
@@ -154,19 +150,33 @@ if (isset($vars['content'])) echo $vars['content'];
 					'		<td id="product_status_label_' + row.product_id + '">' + row.published + '</td>' +
 					'	</tr>' +
 					'	<tr class="table-sub-row">' +
-					'		<td colspan="7">' +
-					'			<ul class="text-right no-bullets">' +
-					'				<li><span class="float-box-left">Product #' + row.product_id + ': </span><span><input type="text" class="product-title" id="product_title_' + row.product_id + '" value="' + row.title + '" /></span></div>' +
-					'				<li><span class="float-box-left">Allotment: </span><span><input type="text" class="product-allotment" id="product_allotment_' + row.product_id + '" value="' + row.allotment + '" /></span></div>' +
-					'				<li><span class="float-box-left">Price: </span><span><input type="text" class="product-price" id="product_price_' + row.product_id + '" value="' + row.price + '" /></span></div>' +
+					'		<td colspan="2">' +
+					'			<ul class="text-right no-bullets form-list">' +
+					'				<li><label>Title: </label><span><input type="text" class="product-title" id="product_title_' + row.product_id + '" value="' + row.title + '" /></span></div>' +
+					'<li>' +
+					'    <label for="product_article_' + row.product_id + '"><?php echo $this->translate('Article'); ?></label>' +
+					'    <select id="product_article_' + row.product_id + '">' +
+					'<?php
+						    if ($this->articles->count() > 0):
+							    foreach($this->articles as $a):
+								    ?><option value="<?php echo $a->article_id;?>"' + (row.article_id == <?php echo $a->article_id;?> ? ' selected="selected"' : '') + '><?php echo $a->title;?></option><?php
+							    endforeach;
+						    else:
+							    ?><option value="">None</option><?php
+						    endif;
+					 ?>' +
+					'    </select>' +
+					'</li>' +
+					'				<li><label>Allotment: </label><span><input type="text" class="product-allotment" id="product_allotment_' + row.product_id + '" value="' + row.allotment + '" /></span></div>' +
+					'				<li><label>Price: </label><span><input type="text" class="product-price" id="product_price_' + row.product_id + '" value="' + row.price + '" /></span></div>' +
 					'				<li>' +
-					'				<span class="float-box-left"><?php echo $strDeliveryMethod;?>: </span>' +
+					'				<label><?php echo $strDeliveryMethod;?>: </label>' +
 					'				    <select class="product-delivery-method-select" id="product_delivery_method_' + row.product_id + '">' +
 					'					' + '<?php echo $strDeliveryMethods;?>' +
 					'				    </select>' +
 					'				</li>' +
 					'				<li>' +
-					'				<span class="float-box-left"><?php echo $strStatus;?>: </span>' +
+					'				<label><?php echo $strStatus;?>: </label>' +
 					'					<select class="product-published-select" id="product_published_' + row.product_id + '">' +
 					'						<option value="yes"><?php echo $strYes;?></option>' +
 					'						<option value="no"><?php echo $strNo;?></option>' +
@@ -174,7 +184,6 @@ if (isset($vars['content'])) echo $vars['content'];
 					'					</select>' +
 					'				</li>' +
 					'			</ul>' +
-					'			<div class="editor" id="product_description_' + row.product_id + '">' + row.description + '</div>' +
 					'			<div class="product-options-controls">' +
 					'			    <?php echo $this->translate('Options:');?>' +
 					'			    <button class="add-option" id="product_add_option_' + row.product_id + '"><?php echo $this->translate('Add');?></button>' +
@@ -182,7 +191,8 @@ if (isset($vars['content'])) echo $vars['content'];
 					'			<div class="product-options" id="product_options_' + row.product_id + '">' +
 					'			    <ul class="form-list">' +
 					'			    </ul>' +
-					'			</div>' +
+					'			</div></td><td colspan="5">' +
+					'			<div class="editor" id="product_description_' + row.product_id + '">' + row.description + '</div>' +
 					'		</td>' +
 					'	</tr>' +
 					'</tbody>'
@@ -238,6 +248,7 @@ if (isset($vars['content'])) echo $vars['content'];
 									//do something
 									var htmlData = wym.html();
 									var product_id = jQuery(this).parent().parent().parent().parent().parent().parent().find('.editor').attr('id').replace('product_description_', '');
+									var product_article_id = jQuery('#product_article_' + product_id).val();
 									var product_title = jQuery('#product_title_' + product_id).val();
 									var product_published = $('#product_published_' + product_id).val();
 									var product_allotment = $('#product_allotment_' + product_id).val();
@@ -253,6 +264,7 @@ if (isset($vars['content'])) echo $vars['content'];
 										'/admin/products/json-update',
 										{
 											product_id: product_id,
+											article_id: product_article_id,
 											description: htmlData,
 											title: product_title,
 											published: product_published,

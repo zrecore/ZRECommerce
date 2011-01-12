@@ -100,7 +100,7 @@ class Plugin_Menu_Breadcrumb implements Plugin_Abstract {
 									$actionText = $data->current()->title;
 								}
 								break;
-							case 'read':
+							case 'index':
 								$paramsText = Zre_Template::makeLink( Zre_Template::LINK_ARTICLE, $id );
 								$article = new Zre_Dataset_Article();
 								

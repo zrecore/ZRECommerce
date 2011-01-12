@@ -55,7 +55,7 @@ class Zre_Ui_Menu_Shop extends Zre_Ui_Menu_Abstract
 			$config[$row->title] = array(
 			    'id' => 'menu_' . $row->article_container_id,
 			    'class' => 'menuItem',
-			    'url' => '/category/' . $row->article_container_id . '/' . Zre_Template::createSlug($row->title)
+			    'url' => '/c/' . $row->article_container_id . '/' . Zre_Template::createSlug($row->title)
 			);
 		    }
 

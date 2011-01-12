@@ -72,7 +72,7 @@ class Zre_Ui_Datagrid_Read_Article
 		<div class="articleContainer">
 			<h2 class="articleTitle">' . $article_array['title'] . '<br /><small>'. $article_array['date_modified']->getArpa() . '</small></h3>
 		
-			<p class="articleContent">' . ($article_array['use_zre_plugins'] == 'yes' ? Zre_Ui_Widgets_Plugin::search_and_insert( $article_array['content'] ) : $article_array['content'] ) . '</p>
+			<p class="articleContent">' . ($article_array['use_zre_plugins'] == 'yes' ? Zre_Ui_Widgets_Plugin::inject( $article_array['content'] ) : $article_array['content'] ) . '</p>
 		</div>
 		';
 		

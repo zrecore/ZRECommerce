@@ -19,41 +19,56 @@
  */
 class Plugin
 {
-	private static $tag_name = 'zre';
-	private static $root_namespace = 'Plugin_';
+	public static $tag_name = 'plugin';
+	public static $root_namespace = 'Plugin_';
+
+	public static $view = null;
 	
-	public static function search_and_insert($input)
+	public static function inject($input)
 	{
-		$pattern = array('/<'.self::$tag_name.' [ -~\n]*?\/>/');
-		$tag = self::$tag_name;
-		$namespace = self::$root_namespace;
-		
-		$zre_regex_function = <<<EOD
-        \$xml_doc = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><document>'.\$matches[0].'</document>');
+		$pattern = array('/<' . self::$tag_name . ' [ -~\n]*?\/>/');
 
-        //Try and load up the plugin type.
-        
-        try {
-        	\$attribs = array();
-        	foreach(\$xml_doc->{$tag}[0]->attributes() as \$key => \$value)
-        	{
-        		\$attribs[\$key] = (string)\$value;
-        	}
-        	
-        	\$class_name = '$namespace'.\$attribs['type'];
-        	
-        	\$compiled = new \$class_name;
-        	\$compiled->setOptions( \$attribs );
-        	
-        } catch (Exception \$e) {
-        	\$compiled = \$matches[0];
-        }
-        return \$compiled;
-EOD;
+		$new_input = preg_replace_callback($pattern, function($matches){
+		    $xml_doc = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><document>' . $matches[0] . '</document>');
 
-		$new_input = preg_replace_callback($pattern, create_function('$matches', $zre_regex_function), $input);
+		    //Try and load up the plugin type.
+		    $tag = Plugin::$tag_name;
+		    $namespace = Plugin::$root_namespace;
+		    
+		    try {
+			$attribs = array();
+			foreach($xml_doc->{$tag}[0]->attributes() as $key => $value)
+			{
+				$attribs[$key] = (string)$value;
+			}
+
+			$class_name = $namespace . $attribs['type'];
+
+			$compiled = new $class_name;
+			$compiled->setOptions( $attribs );
+
+		    } catch (Exception $e) {
+			$compiled = $matches[0];
+		    }
+		    return $compiled;
+		}, $input);
 		return $new_input;
 	}
+	/**
+	 * Get the view object.
+	 * @return Zend_View_Abstract
+	 */
+	public static function getView() {
+	    return self::$view;
+	}
+	/**
+	 * Set the view object.
+	 * @param Zend_View_Abstract $view
+	 */
+	public static function setView($view) {
+	    self::$view = $view;
+	}
+	
 	/**
 	 * Returns a tree array of all plugins found in the Plugin library.
 	 *
@@ -61,6 +76,7 @@ EOD;
 	 */
 	public static function probe( $baseDir = null ) {
 		$result = array();
+		$handle = null;
 		$path = '../' . DIRECTORY_SEPARATOR . 
 						'library' . DIRECTORY_SEPARATOR;
 		$realPath = realpath($path);
@@ -68,7 +84,10 @@ EOD;
 		if (!isset($baseDir)) {
 			$baseDir = realpath($path . 'Plugin' . DIRECTORY_SEPARATOR);
 		}
-		if ($handle = opendir($baseDir)) {
+		
+		$handle = opendir($baseDir);
+
+		if ($handle) {
 		    while (false !== ($file = readdir($handle))) {
 		        if ($file != "." && $file != ".." && $file[0] != ".") {
 		        	

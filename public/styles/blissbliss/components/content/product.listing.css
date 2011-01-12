@@ -1,0 +1,88 @@
+.productCategoryTitle
+{	font-size: 1.8em; 
+	color: #444; 
+	font-weight: bold; 
+	margin: 0; 
+	padding: 0; 
+	margin-left: 32px; 
+	margin-top: -24px; 
+	margin-bottom: 12px; }
+
+.productSubCategoryTitle
+{ font-size: 1.4em; text-align: center; margin: 0px; padding: 0px; margin-bottom: 12px;}
+.productSubCategoryTitle a
+{ color: #606060; }
+
+.productContainer
+{ 	
+	color: #000000; 
+	width: 604px; 
+	display: block;
+	border: solid 1px #aaa;
+	background-color: #fff;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	margin: 0px;
+	margin-left: 6px;
+	margin-bottom: 24px;
+	margin-top: -8px;
+	padding-left: 12px;
+	padding-top: 12px;
+	padding-bottom: 32px;
+	position: relative;
+}
+
+.productText
+{ vertical-align: top; text-align: left; min-height: 115px; margin: auto; padding-left: 12px; padding-top: 8px; padding-right: 16px; }
+
+.productText a
+{ text-decoration: none; border: none; }
+
+.productTitle
+{ margin: auto; font-size: 1.4em; margin-bottom: 10px; color: #000000; }
+
+.productImageCell
+{ 	vertical-align: top;
+	background-image: url('/styles/blissbliss/components/article.image.container.png'); 
+	background-repeat: no-repeat;
+	width: 118px;
+	height: 115px; }
+
+.productImageAnchor
+{  }
+
+.productImage
+{ border: none; width: 107px; height: 107px; padding-left: 4px; padding-top: 4px; }
+
+.productSubHeader
+{ font-size: 0.9; color: #a0a0a0; margin: auto; }
+
+.productDescription
+{ margin: auto; font-size: 1.0em; color: #202020; line-height: 1.2em; }
+
+.productDescription a
+{ color: #aa0000; text-decoration: underline; }
+
+.productDescription a:hover
+{ color: #ff0000; }
+
+.productContent
+{ margin-left: 2%; margin-right: 2%; }
+
+.productFooter
+{ font-size: 0.9em; color: #404040; margin: auto; position: absolute; bottom: 6px; }
+
+.productReadContainer
+{ position: relative; margin: auto; width: 100%; min-height: 140px; }
+
+.productReadContainerContent
+{ 	position: relative;
+	font-size: 1.1em;
+	margin: auto; 
+	margin-right: 16px;
+	padding: 0px;
+	padding-left: 12px;
+	width: 632px; 
+	min-height: 140px; 
+	text-align: left;
+	line-height: 1.6em; }

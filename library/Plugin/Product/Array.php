@@ -38,12 +38,41 @@ class Plugin_Product_Array implements Plugin_Abstract
 		return $this->getHtml();
 	}
 	public function getHtml() {
-		if (isset($this->_options['message']) )
-		{
-			return '<b>'.$this->_options['message'].'</b>';
+	    $reply = '';
+	    if (!empty($this->_options['article_id']) )
+	    {
+		$options = $this->getOptions();
+		$articleId = $options['article_id'];
+
+		$products = new Zre_Dataset_Product();
+		$rows = $products->listAll(
+			array(
+			    'article_id' => $articleId,
+			    'published' => 'yes'
+			),
+			array(
+			    'order' => 'title ASC'
+			),
+			false
+		);
+
+		if ($rows->count() > 0) {
+		    $reply = '<ul class="ui-widget plugin-product-array">';
+		    foreach ($rows as $row) {
+			$reply .=
+			'<li class="ui-helper-reset ui-helper-clearfix product-item">' .
+			    '<a href="/shop/">' .
+				'<img class="ui-helper-reset ui-helper-clearfix product-image" src="' . $row->image . '" alt="' . $row->title . '"/>' .
+			    '</a>' .
+			'</li>';
+		    }
+		    $reply .= '</ul>';
 		} else {
-			return '<b>'."[Product Array]".'</b>';
+
 		}
+	    }
+
+	    return $reply;
 	}
 	
 	public function getScript() {

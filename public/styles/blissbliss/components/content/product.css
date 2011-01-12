@@ -1,0 +1,173 @@
+/* product area */
+.productArea
+{  }
+
+.productArea a
+{ color: #aa0000; text-decoration: underline; }
+.productArea a:hover
+{ color: #ff0000; }
+
+/* product area header */
+.productArea .productAreaHeader
+{	position: relative; 
+	vertical-align: top; 
+	height: 382px; 
+	margin-bottom: 24px;
+}
+
+	/* product image container */
+	.productArea .productAreaHeader .productImageContainer
+	{ position: relative; margin: 0px; margin-left: 0px; width: 370px; height: 370px; float: left;
+		background-image: url('/styles/blissbliss/components/product.image.container.png'); background-repeat: no-repeat; }
+	
+		/* product image */
+		.productArea .productAreaHeader .productImageContainer .productImage
+		{ padding: 4px; width: 362px; height: 362px; }
+	
+	/* product title, price, etc.. container */
+	.productArea .productAreaHeader .productDataContainer
+	{ position: relative; margin: 0px; margin-left: 384px; width: 208px; height: 336px; padding: 16px; border: solid 1px #aaa; -moz-border-radius: 12px; border-radius: 12px; background-color: #fff;}
+	
+		/* product title */
+		.productArea .productAreaHeader .productDataContainer .productTitle
+		{ margin: 0px; margin-bottom: 16px; padding: 0px; font-size: 1.6em; color: #000000; }
+		
+		/* product amount label and value */
+		.productArea .productAreaHeader .productDataContainer .productAmountLeftLabel
+		{ margin: 0px; padding: 0px; margin-bottom: 8px; font-size: 1.0em; color: #808080; font-weight: bold; }
+		.productArea .productAreaHeader .productDataContainer .productAmountLeftLabel .productAmountLeftValue
+		{ font-weight: normal; }
+		
+		/* product price label and value */
+		.productArea .productAreaHeader .productDataContainer .productPriceLabel
+		{ margin: 0px; padding: 0px; margin-bottom: 8px; font-size: 1.0em; color: #808080; font-weight: bold; }
+		.productArea .productAreaHeader .productDataContainer .productPriceLabel .productPriceValue
+		{ font-weight: normal; }
+		
+		/* product weight label and value */
+		.productArea .productAreaHeader .productDataContainer .productWeightLabel
+		{ margin: 0px; padding: 0px; margin-bottom: 8px; font-size: 1.0em; color: #808080; font-weight: bold; }
+		.productArea .productAreaHeader .productDataContainer .productWeightLabel .productWeightValue
+		{ font-weight: normal; }
+		
+		/* product size label and value */
+		.productArea .productAreaHeader .productDataContainer .productSizeLabel
+		{ margin: 0px; padding: 0px; margin-bottom: 8px; font-size: 1.0em; color: #808080; font-weight: bold; }
+		.productArea .productAreaHeader .productDataContainer .productSizeLabel .productSizeValue
+		{ font-weight: normal; }
+		
+		/* product shipping container area */
+		.productArea .productAreaHeader .productDataContainer .productShippingContainer
+		{  }
+			/* product shipping title */
+			.productArea .productAreaHeader .productDataContainer .productShippingContainer .productShippingTitle
+			{ margin: 0px; padding: 0px; margin-bottom: 8px; font-size: 1.0em; color: #808080; font-weight: bold; }
+			/* product shipping value unordered list container */
+			.productArea .productAreaHeader .productDataContainer .productShippingContainer .productShippingValuesContainer .productShipingValuesListingContainer
+			{ color: #a00000; }
+				/* product shipping value unordered list */
+				.productArea .productAreaHeader .productDataContainer .productShippingContainer .productShippingValuesContainer .productShipingValuesListingContainer .productShipingValuesListing
+				{  }
+			/* product thumbnail display area */
+			.productArea .productAreaHeader .productDataContainer .productShippingContainer .productThumbnailContainer
+			{  }
+		
+	
+/* product area body*/
+.productArea .productAreaBody
+{ position; relative; vertical-align: top; margin-bottom: 16px; min-height: 140px; padding: 0px; padding-bottom: 64px;
+	background-image: url('/styles/blissbliss/components/bar.repeat.png'); background-position: left bottom; background-repeat: repeat-x; }
+	
+	/* product review rating area */
+	.productArea .productAreaBody .productAreaReview
+	{ 	width: 18%; height: 140px; position: relative; 
+		vertical-align: top; margin: 0px; margin-left: 48px;
+		float: left; text-align: right;
+		font-size: 0.9em; color: #a00000; }
+		
+		/* product rating */
+		.productArea .productAreaBody .productAreaReview .productReviewRatingBackground
+		{ background-image: url('/styles/blissbliss/components/rating.off.icon.png'); height: 17px; width: 90px; margin: auto; margin-right: 0px; margin-top: 36px; margin-bottom: 8px; }
+			.productArea .productAreaBody .productAreaReview .productReviewRatingBackground .productReviewRatingForeground
+			{ background-image: url('/styles/blissbliss/components/rating.on.icon.png'); height: 17px; margin: 0px; float: left; }
+	
+	/* Review description */
+	.productArea .productAreaBody .productReviewDescription
+	{ width: 570px; height: 140px; position: relative; vertical-align: top; margin: 0px; margin-left: 212px; }
+		.productArea .productAreaBody .productReviewDescription .productReviewTitle
+		{ margin: 0px; margin-bottom: 12px; padding: 0px; color: #808080; font-size: 1.2em; }
+		.productArea .productAreaBody .productReviewDescription .productReviewText
+		{  }
+
+.productArea .productAreaFooter
+{ position: relative; vertical-align: top; }
+	/* product description */
+	.productArea .productAreaFooter .productDescription
+	{	position: relative; 
+		width: 592px; 
+		min-height: 120px; 
+		margin: 0px; 
+		margin-bottom: 16px;
+		margin-top: -24px;
+		margin-left: 0px;
+		padding: 16px;
+		border: solid 1px #aaa; -moz-border-radius: 12px; border-radius: 12px;
+		background-color: #fff;
+	}
+	
+		.productArea .productAreaFooter .productDescription .productDescriptionTitle
+		{ margin: 0px; padding: 0px; margin-bottom: 12px; position: relative; color: #808080; font-size: 1.2em; }
+		
+		.productArea .productAreaFooter .productDescription .productDescriptionText
+		{  }
+	
+	/* product options "add to cart" area */
+	.productArea .productAreaFooter .productAddToCartArea 
+	{	width: 184px; 
+		height: 180px; 
+		position: relative; 
+		vertical-align: top; 
+		margin: 0px; 
+		margin-right: 08px; 
+		float: right;
+		border: solid 1px #aaa; -moz-border-radius: 12px; border-radius: 12px;
+		background-color: #fff;
+	}
+	
+		.productArea .productAreaFooter .productAddToCartArea .boxSmallTop
+		{ width: 100%; height: 12px;}
+		
+		.productArea .productAreaFooter .productAddToCartArea .boxSmallCenter
+		{ width: 90%; min-height: 140px; padding: 0px; padding-left: 10%; }
+		
+		.productArea .productAreaFooter .productAddToCartArea .boxSmallBottom
+		{ width: 100%; height: 12px;}
+		
+	/* product options area */
+	.productArea .productAreaFooter .productOptionsArea
+	{	width: 420px; 
+		height: 180px; 
+		position: relative; 
+		vertical-align: top; 
+		margin: 0px; 
+		margin-left: 0px; 
+		border: solid 1px #aaa; -moz-border-radius: 12px; border-radius: 12px;
+		background-color: #fff;
+	}
+		
+		.productArea .productAreaFooter .productOptionsArea .boxLargeTop
+		{ width: 100%; height: 12px;}
+		
+		.productArea .productAreaFooter .productOptionsArea .boxLargeCenter
+		{ width: 93%; min-height: 140px; padding: 0px; padding-left: 7%; }
+			/* product options title */
+			.productArea .productAreaFooter .productOptionsArea .boxLargeCenter .productOptionsTitle
+			{ margin: 0px; padding: 0px; margin-bottom: 8px; position: relative; color: #808080; font-size: 1.2em; }
+			
+			.productArea .productAreaFooter .productOptionsArea .boxLargeCenter .productOptionsList
+			{ margin: 0px; padding: 0px; margin-left: 36px; position: relative; list-style-type: square; }
+		
+		.productArea .productAreaFooter .productOptionsArea .boxLargeBottom
+		{ width: 100%; height: 12px; }
+		
+		
